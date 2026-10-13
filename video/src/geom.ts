@@ -9,8 +9,8 @@ export const CLUSTER_RING: readonly (readonly [number, number])[] = [
   [-175, -70],
   [-70, -175],
   [70, -175],
-  [175, -70],
-  [185, 35],
+  [120, -80],
+  [130, 30],
   [105, 135],
   [-175, 60],
 ];
@@ -30,18 +30,18 @@ export const seatedCapsules = (
   const W = (lx: number, ly: number): Pt => [desk.x + lx * desk.scale, desk.y + ly * desk.scale];
   const s = desk.scale;
   const capsules: Capsule[] = [
-    { a: W(...pose.hip), b: W(...pose.shoulder), w: 72 * s },
-    { a: W(...pose.shoulder), b: W(...pose.elbowN), w: 30 * s },
+    { a: W(...pose.hip), b: W(...pose.shoulder), w: 118 * s },
+    { a: W(...pose.shoulder), b: W(...pose.elbowN), w: 27 * s },
     { a: W(...pose.elbowN), b: W(...pose.wristN), w: 27 * s },
-    { a: W(...pose.shoulder), b: W(...pose.elbowF), w: 28 * s },
-    { a: W(...pose.elbowF), b: W(...pose.wristF), w: 25 * s },
-    { a: W(...pose.hip), b: W(...pose.kneeN), w: 34 * s },
-    { a: W(...pose.kneeN), b: W(...pose.ankleN), w: 30 * s },
+    { a: W(...pose.shoulder), b: W(...pose.elbowF), w: 24 * s },
+    { a: W(...pose.elbowF), b: W(...pose.wristF), w: 24 * s },
+    { a: W(...pose.hip), b: W(...pose.kneeN), w: 36 * s },
+    { a: W(...pose.kneeN), b: W(...pose.ankleN), w: 36 * s },
     { a: W(...pose.hip), b: W(...pose.kneeF), w: 32 * s },
-    { a: W(...pose.kneeF), b: W(...pose.ankleF), w: 28 * s },
+    { a: W(...pose.kneeF), b: W(...pose.ankleF), w: 32 * s },
   ];
   const [hx, hy] = W(...pose.head);
-  return { capsules, head: { x: hx, y: hy, r: 27 * s } };
+  return { capsules, head: { x: hx, y: hy, r: 30 * s } };
 };
 
 /** Push a disc center away from every body capsule (+margin). Returns [x, y]. */
@@ -160,13 +160,34 @@ export const bubblePosition = (args: {
   headY: number;
   logoCx: number;
   logoCy: number;
+  logoRect: { x: number; y: number; w: number; h: number };
   capsules: Capsule[];
   head: { x: number; y: number; r: number };
 }): Pt => {
-  const { bx, by, br, i, chaosPull, flight, headX, headY, logoCx, logoCy, capsules, head } = args;
+  const { bx, by, br, i, chaosPull, flight, headX, headY, logoCx, logoCy, logoRect, capsules, head } = args;
   const px = lerpN(bx, headX + CLUSTER_RING[i][0], chaosPull);
   const py = lerpN(by, headY + CLUSTER_RING[i][1], chaosPull);
-  const [sx, sy] = repelFromBody(px, py, br, capsules, head);
+  const [sx0, sy0] = repelFromBody(px, py, br, capsules, head);
+  /* the body repel can shove a disc toward the logo — push it back out of
+     the logo box (+40px zone) until its deliberate absorb glide starts */
+  const pad = br + 40;
+  const Lx = logoRect.x - pad;
+  const Rx = logoRect.x + logoRect.w + pad;
+  const Ty = logoRect.y - pad;
+  const By = logoRect.y + logoRect.h + pad;
+  let sx = sx0;
+  let sy = sy0;
+  if (flight < 0.05 && sx > Lx && sx < Rx && sy > Ty && sy < By) {
+    const dl = sx - Lx;
+    const dr = Rx - sx;
+    const dt = sy - Ty;
+    const db = By - sy;
+    const m = Math.min(dl, dr, dt, db);
+    if (m === dl) sx = Lx;
+    else if (m === dr) sx = Rx;
+    else if (m === dt) sy = Ty;
+    else sy = By;
+  }
   if (flight <= 0) return [sx, sy];
   if (flight >= 1) return [logoCx, logoCy];
   const [qx, qy] = quad(sx, sy, (sx + logoCx) / 2, Math.min(sy, logoCy) - 240, logoCx, logoCy, flight);

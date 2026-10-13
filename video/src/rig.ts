@@ -166,8 +166,8 @@ export const D_RELIEF: AnglePose = {
   upperF: -95,
   foreF: -200,
   thighN: -15,
-  shinN: -50,
+  shinN: -40,
   thighF: -9,
-  shinF: -58,
+  shinF: -48,
   headDroop: 0,
 };

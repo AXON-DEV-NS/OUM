@@ -65,9 +65,9 @@ export const DURATION_IN_FRAMES = 480; // 16.0s
 export const TIMELINE = {
   poseUprightToSlump: { start: 0, dur: 75 },
   poseTiredToOverwhelmed: { start: 100, dur: 85 },
-  poseOverwhelmedToCalm: { start: 240, dur: 28 },
-  poseCalmToRest: { start: 288, dur: 62 },
-  poseCalmToNeutral: { start: 405, dur: 75 },
+  poseOverwhelmedToCalm: { start: 240, dur: 32 },
+  poseCalmToRest: { start: 292, dur: 64 },
+  poseCalmToNeutral: { start: 401, dur: 78 },
 
   clockIn: { start: 85, dur: 20 },
   clockOut: { start: 165, dur: 20 },
@@ -118,32 +118,34 @@ export const LAYOUTS: Record<"desktop" | "mobile", Layout> = {
       [1050, 330, 48],
       [1160, 220, 56],
       [1320, 180, 42],
-      [1480, 230, 52],
-      [1620, 310, 46],
-      [1640, 520, 38],
-      [1540, 140, 36],
+      [1360, 240, 52],
+      [1830, 250, 46],
+      [1690, 710, 38],
+      [1540, 110, 36],
     ],
-    logo: { x: 1435, y: 335, size: 290 },
+    logo: { x: 1470, y: 208, size: 266 },
     /**
      * R7B: the stage chain lives in the free band above/right of the desk.
-     * Top row y=150 sits above the logo box (335); the right column at x≥1776
-     * clears the logo's right edge (1725) by ≥51 px and the desk (x≤1436).
+     * Top row y=120 (disc bottom 164) leaves 44 px above the logo box (208);
+     * the right column (x≥1786) clears the logo right edge (1736) by ≥50 px;
+     * its bottom disc (604) sits ≥57 px above the desk top (world 661);
+     * check/cue sit below the desk-leg bend with ≥47 px clearance.
      */
     stagePoints: [
-      [1060, 150],
-      [1200, 150],
-      [1340, 150],
-      [1480, 150],
-      [1620, 150],
-      [1760, 150],
-      [1830, 300],
-      [1830, 450],
-      [1830, 600],
+      [1060, 120],
+      [1200, 120],
+      [1340, 120],
+      [1480, 120],
+      [1620, 120],
+      [1760, 120],
+      [1830, 290],
+      [1830, 425],
+      [1830, 560],
     ],
-    check: { x: 1830, y: 740, r: 26 },
-    cue: { x: 1830, y: 840, w: 110 },
+    check: { x: 1850, y: 940, r: 26 },
+    cue: { x: 1850, y: 1030, w: 110 },
     clock: { x: 1680, y: 190, r: 40 },
-    stageR: 54,
+    stageR: 44,
   },
   mobile: {
     width: 1080,
@@ -161,24 +163,24 @@ export const LAYOUTS: Record<"desktop" | "mobile", Layout> = {
     ],
     logo: { x: 450, y: 70, size: 180 },
     /**
-     * R7B mobile: the chain runs down the right column (x≈900, r=65 →
-     * 835–965) clearing the desk's right edge (743) by ≥64 px and the
-     * top-centre logo (right edge 630) by ≥177 px.
+     * R7B mobile: chain hugs the LEFT margin (x≈92–208, r=58) — clear of the
+     * chair (x≥444), the figure and the desk slab band; the logo (right edge
+     * 630) clears disc 1 by ≥120 px. Check + cue stack below, inside 1350.
      */
     stagePoints: [
-      [900, 150],
-      [872, 270],
-      [928, 390],
-      [872, 510],
-      [928, 630],
-      [872, 750],
-      [928, 870],
-      [880, 985],
-      [905, 1090],
+      [430, 110],
+      [270, 150],
+      [150, 280],
+      [150, 405],
+      [150, 530],
+      [150, 655],
+      [150, 780],
+      [150, 905],
+      [150, 1030],
     ],
-    check: { x: 905, y: 1190, r: 26 },
-    cue: { x: 905, y: 1280, w: 110 },
+    check: { x: 150, y: 1145, r: 26 },
+    cue: { x: 150, y: 1240, w: 110 },
     clock: { x: 880, y: 240, r: 36 },
-    stageR: 65,
+    stageR: 58,
   },
 } as const;

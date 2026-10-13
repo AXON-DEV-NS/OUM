@@ -25,11 +25,15 @@ export type { JointName, Joints } from "../poses";
  * No outlines anywhere.
  */
 
+const ARM_SEAM = ARM_W * 1.2 + (ARM_W + 7) / 2;
+const LEG_SEAM = LEG_W * 1.2 + (LEG_W + 7) / 2;
+
 const FOOT_AT: React.FC<{
   at: readonly [number, number];
   knee: readonly [number, number];
 }> = ({ at: ankle, knee }) => {
-  const ang = (Math.atan2(ankle[1] - knee[1], ankle[0] - knee[0]) * 180) / Math.PI - 90;
+  const raw = (Math.atan2(ankle[1] - knee[1], ankle[0] - knee[0]) * 180) / Math.PI - 90;
+  const ang = Math.max(-15, Math.min(15, raw));
   return (
     <g transform={`translate(${ankle[0]} ${ankle[1]}) rotate(${ang})`}>
       <rect x={-6} y={-4} width={FOOT_LEN} height={FOOT_H} rx={FOOT_H / 2} fill={COLORS.figNear} />
@@ -131,9 +135,9 @@ export const Person: React.FC<{ pose: Joints; breathe: number; headBob: number; 
       <Torso hip={pose.hip} shoulder={pose.shoulder} />
       {LIMB([pose.shoulder, pose.elbowF, pose.wristF], ARM_W - 3, far, null)}
       {/* near limbs with trimmed cream seams at the crossings only */}
-      {LIMB([pose.hip, pose.kneeN, pose.ankleN], LEG_W, COLORS.figNear, LEG_W)}
+      {LIMB([pose.hip, pose.kneeN, pose.ankleN], LEG_W, COLORS.figNear, LEG_SEAM)}
       <FOOT_AT at={pose.ankleN} knee={pose.kneeN} />
-      {LIMB([pose.shoulder, pose.elbowN, pose.wristN], ARM_W, COLORS.figNear, ARM_W)}
+      {LIMB([pose.shoulder, pose.elbowN, pose.wristN], ARM_W, COLORS.figNear, ARM_SEAM)}
       {/* head — drawn AFTER the arms so wrapped-behind forearms pass behind it;
           the 0.20 D cream ring keeps the gap where anything crosses */}
       <g transform={`translate(0 ${headBob})`}>

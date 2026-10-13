@@ -42,6 +42,20 @@ export const easeProg = (
     easing: easePremium,
   });
 
+/**
+ * Sine ease-in-out 0→1 — peak angular speed = 1.57× the average, used for the
+ * big limb folds (head-in-hand, arms-behind-head) so the measured per-frame
+ * joint speeds stay inside the pre-declared limits (verify-all).
+ */
+export const easeSine = (
+  frame: number,
+  start: number,
+  durationInFrames: number,
+): number => {
+  const t = Math.min(1, Math.max(0, (frame - start) / durationInFrames));
+  return 0.5 - 0.5 * Math.cos(Math.PI * t);
+};
+
 /** Linear ramp 0→1 (clamped). */
 export const ramp = (
   frame: number,

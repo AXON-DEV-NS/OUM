@@ -15,7 +15,8 @@ import {
   type StageKind,
 } from "./parts/icons";
 import { LogoCard } from "./parts/LogoCard";
-import { A_UPRIGHT, B_TIRED, C_HEADHAND, D_RELIEF, E_LOOKUP, lerpAngles, solve } from "./rig";
+import { solve } from "./rig";
+import { filmPose } from "./anim";
 import { bubblePosition, seatedCapsules, smoothPath } from "./geom";
 
 export type HeroVariant = "desktop" | "mobile";
@@ -84,35 +85,10 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
   const W = L.width;
   const H = L.height;
 
-  // ---------- poses: FK angles (fixed bones) — never position lerps ----------
-  const slump = easeProg(frame, T.poseUprightToSlump.start, T.poseUprightToSlump.dur);
-  const t1 = easeProg(frame, T.poseTiredToOverwhelmed.start, T.poseTiredToOverwhelmed.dur);
-  const t2 = easeProg(frame, T.poseOverwhelmedToCalm.start, T.poseOverwhelmedToCalm.dur);
-  const t4 = easeProg(frame, T.poseCalmToRest.start, T.poseCalmToRest.dur);
-  const t3 = easeProg(frame, T.poseCalmToNeutral.start, T.poseCalmToNeutral.dur);
-  /** loop target: same visual pose as A_UPRIGHT, angles unwrapped (−360°) so
-   *  the return from the behind-the-head arms is a short, gentle sweep. */
-  const A_LOOP = {
-    ...A_UPRIGHT,
-    foreN: A_UPRIGHT.foreN - 360,
-    foreF: A_UPRIGHT.foreF - 360,
-  };
-  const anglePose = lerpAngles(
-    lerpAngles(
-      lerpAngles(
-        lerpAngles(lerpAngles(A_UPRIGHT, B_TIRED, slump), C_HEADHAND, t1),
-        E_LOOKUP,
-        t2,
-      ),
-      D_RELIEF,
-      t4,
-    ),
-    A_LOOP,
-    t3,
-  );
-  const seated: Joints = solve(anglePose);
+  // ---------- pose: shared per-frame timeline (single source: anim.ts) ----------
+  const seated: Joints = solve(filmPose(frame));
   // slow breathing (stronger while tired) + drooping head
-  const tiredness = 1 - easeProg(frame, 185, 45);
+  const tiredness = 1 - easeProg(frame, T.poseCalmToRest.start, T.poseCalmToRest.dur);
   const breath = 1 + (0.014 + 0.008 * tiredness) * periodic(frame, 160);
   const headBob = 4 * periodic(frame, 160) * (0.4 + 0.6 * tiredness);
   const glow = 0.3 + 0.15 * (1 - tiredness);
@@ -184,6 +160,7 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
       headY,
       logoCx,
       logoCy,
+      logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size },
       capsules: bodyCaps,
       head: headCap,
     });
