@@ -22,6 +22,7 @@ import {
   type StageKind,
 } from "./parts/icons";
 import { LogoCard } from "./parts/LogoCard";
+import { A_UPRIGHT, B_TIRED, C_HEADHAND, E_LOOKUP, lerpAngles, solve } from "./rig";
 import { bubblePosition, seatedCapsules, smoothPath } from "./geom";
 
 export type HeroVariant = "desktop" | "mobile";
@@ -107,20 +108,21 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
   const W = L.width;
   const H = L.height;
 
-  // ---------- poses: upright → slump → overwhelmed → calm → (relief) → neutral ----------
+  // ---------- poses: FK angles (fixed bones) — never position lerps ----------
   const slump = easeProg(frame, T.poseUprightToSlump.start, T.poseUprightToSlump.dur);
   const t1 = springProg(frame, T.poseTiredToOverwhelmed.start, T.poseTiredToOverwhelmed.dur, fps);
   const t2 = springProg(frame, T.poseOverwhelmedToCalm.start, T.poseOverwhelmedToCalm.dur, fps);
   const t3 = springProg(frame, T.poseCalmToNeutral.start, T.poseCalmToNeutral.dur, fps);
-  const seated: Joints = lerpPose(
-    lerpPose(
-      lerpPose(lerpPose(POSE_NEUTRAL, POSE_TIRED, slump), POSE_OVERWHELMED, t1),
-      POSE_CALM,
+  const anglePose = lerpAngles(
+    lerpAngles(
+      lerpAngles(lerpAngles(A_UPRIGHT, B_TIRED, slump), C_HEADHAND, t1),
+      E_LOOKUP,
       t2,
     ),
-    POSE_NEUTRAL,
+    A_UPRIGHT,
     t3,
   );
+  const seated: Joints = solve(anglePose);
   // slow breathing (stronger while tired) + drooping head
   const tiredness = 1 - easeProg(frame, 185, 45);
   const breath = 1 + (0.014 + 0.008 * tiredness) * periodic(frame, 160);

@@ -1,102 +1,122 @@
 import React from "react";
 import { COLORS } from "../brand";
 import type { Joints } from "../poses";
+import {
+  ARM_W,
+  FOOT_H,
+  FOOT_LEN,
+  HEAD_GAP,
+  HEAD_R,
+  LEG_W,
+} from "../rig";
 
 export type { JointName, Joints } from "../poses";
 
 /**
- * ROUND 5 figure — rebuilt from the professional pictogram reference sheets
- * the client supplied (solid black pictogram pose + walk/run-cycle sheets):
- *   · head: a clean separate circle, paper-gap ring against the torso
- *   · torso: a solid rounded trapezoid (shoulder → hip), not a stick capsule
- *   · limbs: thick rounded tubes with visible elbows/knees
- *   · hands: distinct ball hands (circles)
- *   · feet: real foot tabs pointing forward, flat on the floor line
- *   · far side in the lighter theme-green tone
- * No black, no beak torso, no floating fragments.
- * Local frame: seated floor y=460 · lying floor y=420 · faces +x.
+ * ROUND 7B — ONE unified pictogram silhouette (per the reference sheets):
+ *   · ONE fill colour for the whole figure (far limbs same colour)
+ *   · each limb is ONE continuous path (round caps + joins)
+ *   · hands = the forearm's rounded cap; feet = small forward shapes fused to
+ *     the shin ends
+ *   · head = separate circle with exactly a 0.20 D cream gap
+ *   · cream separation lines ONLY where the near arm / near leg crosses the
+ *     torso or the far limb, and they start ONE limb thickness away from the
+ *     shoulder / hip joint — never a cream ring at a joint
+ * No outlines anywhere.
  */
 
-const GAP = 3.5;
-const FLOOR = 460;
-
-/** Torso path: rounded trapezoid between shoulder line and hip line. */
-const Torso: React.FC<{
-  shoulder: readonly [number, number];
-  hip: readonly [number, number];
-}> = ({ shoulder, hip }) => {
-  const [sx, sy] = shoulder;
-  const [hx, hy] = hip;
-  const sw = 38; // half width at shoulders
-  const hw = 31; // half width at hips
-  const r = 18;
-  const d = `
-    M ${sx - sw + r} ${sy}
-    L ${sx + sw - r} ${sy}
-    Q ${sx + sw} ${sy} ${sx + sw} ${sy + r}
-    L ${hx + hw} ${hy - r}
-    Q ${hx + hw} ${hy} ${hx + hw - r} ${hy}
-    L ${hx - hw + r} ${hy}
-    Q ${hx - hw} ${hy} ${hx - hw} ${hy - r}
-    L ${sx - sw} ${sy + r}
-    Q ${sx - sw} ${sy} ${sx - sw + r} ${sy}
-    Z`;
+const FOOT_AT: React.FC<{
+  at: readonly [number, number];
+  knee: readonly [number, number];
+}> = ({ at: ankle, knee }) => {
+  const ang = (Math.atan2(ankle[1] - knee[1], ankle[0] - knee[0]) * 180) / Math.PI - 90;
   return (
-    <g>
-      <path d={d} fill={COLORS.paper} stroke={COLORS.paper} strokeWidth={GAP * 2} strokeLinejoin="round" />
-      <path d={d} fill={COLORS.figNear} />
+    <g transform={`translate(${ankle[0]} ${ankle[1]}) rotate(${ang})`}>
+      <rect x={-6} y={-4} width={FOOT_LEN} height={FOOT_H} rx={FOOT_H / 2} fill={COLORS.figNear} />
     </g>
   );
 };
 
-const Limb: React.FC<{
-  a: readonly [number, number];
-  b: readonly [number, number];
-  w: number;
-  tone: string;
-  gap?: boolean;
-}> = ({ a, b, w, tone, gap }) => (
-  <g>
-    {gap ? (
-      <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={COLORS.paper} strokeWidth={w + GAP * 2} strokeLinecap="round" />
-    ) : null}
-    <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={tone} strokeWidth={w} strokeLinecap="round" />
-  </g>
-);
+const LIMB = (
+  pts: readonly (readonly [number, number])[],
+  w: number,
+  color: string,
+  seamStart: number | null,
+) => {
+  const d = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]} ${p[1]}`).join(" ");
+  // seam: cream under-stroke trimmed `seamStart` px along the first segment
+  let seamD = "";
+  if (seamStart !== null) {
+    const [a, b] = [pts[0], pts[1]];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const t = Math.min(0.95, seamStart / len);
+    const start: readonly [number, number] = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    seamD = [`M ${start[0]} ${start[1]}`, ...pts.slice(1).map((p) => `L ${p[0]} ${p[1]}`)].join(" ");
+  }
+  return (
+    <g>
+      {seamD ? (
+        <path d={seamD} fill="none" stroke={COLORS.paper} strokeWidth={w + 7} strokeLinecap="round" strokeLinejoin="round" />
+      ) : null}
+      <path d={d} fill="none" stroke={color} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  );
+};
 
-const Hand: React.FC<{ at: readonly [number, number]; r: number; tone: string; gap?: boolean }> = ({
-  at,
-  r,
-  tone,
-  gap,
-}) => (
-  <g>
-    {gap ? <circle cx={at[0]} cy={at[1]} r={r + GAP} fill={COLORS.paper} /> : null}
-    <circle cx={at[0]} cy={at[1]} r={r} fill={tone} />
-  </g>
-);
+/** Rounded polygon path (kills the sharp shoulder spike). */
+const roundedPoly = (pts: readonly (readonly [number, number])[], r: number): string => {
+  const n = pts.length;
+  let d = "";
+  for (let i = 0; i < n; i++) {
+    const prev = pts[(i - 1 + n) % n];
+    const cur = pts[i];
+    const next = pts[(i + 1) % n];
+    const v1 = [cur[0] - prev[0], cur[1] - prev[1]];
+    const v2 = [next[0] - cur[0], next[1] - cur[1]];
+    const l1 = Math.hypot(v1[0], v1[1]) || 1;
+    const l2 = Math.hypot(v2[0], v2[1]) || 1;
+    const rr = Math.min(r, l1 / 2, l2 / 2);
+    const p1 = [cur[0] - (v1[0] / l1) * rr, cur[1] - (v1[1] / l1) * rr];
+    const p2 = [cur[0] + (v2[0] / l2) * rr, cur[1] + (v2[1] / l2) * rr];
+    if (i === 0) d += `M ${p1[0]} ${p1[1]}`;
+    else d += ` L ${p1[0]} ${p1[1]}`;
+    d += ` Q ${cur[0]} ${cur[1]} ${p2[0]} ${p2[1]}`;
+  }
+  return d + " Z";
+};
 
-const Foot: React.FC<{ at: readonly [number, number]; tone: string; gap?: boolean; floor?: number }> = ({
-  at,
-  tone,
-  gap,
-  floor = FLOOR,
-}) => (
-  <g>
-    {gap ? (
-      <rect x={at[0] - 3} y={floor - 14} width={34} height={15} rx={7} fill={COLORS.paper} />
-    ) : null}
-    <rect x={at[0] - 1} y={floor - 12} width={30} height={11} rx={5.5} fill={tone} />
-  </g>
-);
+/** Torso trapezoid oriented along the hip→shoulder axis. */
+const Torso: React.FC<{
+  hip: readonly [number, number];
+  shoulder: readonly [number, number];
+}> = ({ hip, shoulder }) => {
+  const dx = shoulder[0] - hip[0];
+  const dy = shoulder[1] - hip[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len;
+  const uy = dy / len;
+  const px = -uy; // perpendicular
+  const py = ux;
+  const sHW = 60; // 1.0 D half-shoulder
+  const hHW = 42; // 0.7 D half-hip
+  const P = (
+    p: readonly [number, number],
+    hw: number,
+    s: number,
+  ): readonly [number, number] => [p[0] + px * hw * s, p[1] + py * hw * s];
+  const a = P(shoulder, sHW, 1);
+  const b = P(shoulder, sHW, -1);
+  const c = P(hip, hHW, -1);
+  const d2 = P(hip, hHW, 1);
+  return <path d={roundedPoly([a, b, c, d2], 14)} fill={COLORS.figNear} stroke="none" />;
+};
 
 export const Person: React.FC<{ pose: Joints; breathe: number; headBob: number; floor?: number }> = ({
   pose,
   breathe,
   headBob,
-  floor = FLOOR,
 }) => {
-  const footY = floor - 12;
+  const far = COLORS.figNear; // unified silhouette — same colour both sides
   return (
     <g
       style={{
@@ -104,28 +124,21 @@ export const Person: React.FC<{ pose: Joints; breathe: number; headBob: number; 
         transformOrigin: `${pose.hip[0]}px ${pose.hip[1]}px`,
       }}
     >
-      {/* far side (light tone, behind) */}
-      <Limb a={pose.hip} b={pose.kneeF} w={31} tone={COLORS.figFar} />
-      <Limb a={pose.kneeF} b={pose.ankleF} w={27} tone={COLORS.figFar} />
-      <Foot at={pose.ankleF} tone={COLORS.figFar} floor={floor} />
-      <Limb a={pose.shoulder} b={pose.elbowF} w={27} tone={COLORS.figFar} />
-      <Limb a={pose.elbowF} b={pose.wristF} w={24} tone={COLORS.figFar} />
-      <Hand at={pose.wristF} r={10} tone={COLORS.figFar} />
+      {/* far limbs (same colour, behind, no seams) */}
+      {LIMB([pose.hip, pose.kneeF, pose.ankleF], LEG_W - 4, far, null)}
+      <FOOT_AT at={pose.ankleF} knee={pose.kneeF} />
       {/* torso */}
-      <Torso shoulder={pose.shoulder} hip={pose.hip} />
-      {/* near leg */}
-      <Limb a={pose.hip} b={pose.kneeN} w={34} tone={COLORS.figNear} gap />
-      <Limb a={pose.kneeN} b={pose.ankleN} w={30} tone={COLORS.figNear} gap />
-      <Foot at={pose.ankleN} tone={COLORS.figNear} gap floor={floor} />
-      {/* head (bobbed) */}
+      <Torso hip={pose.hip} shoulder={pose.shoulder} />
+      {LIMB([pose.shoulder, pose.elbowF, pose.wristF], ARM_W - 3, far, null)}
+      {/* near limbs with trimmed cream seams at the crossings only */}
+      {LIMB([pose.hip, pose.kneeN, pose.ankleN], LEG_W, COLORS.figNear, LEG_W)}
+      <FOOT_AT at={pose.ankleN} knee={pose.kneeN} />
+      {/* head — separate circle with the 0.20 D cream gap */}
       <g transform={`translate(0 ${headBob})`}>
-        <circle cx={pose.head[0]} cy={pose.head[1]} r={27 + GAP} fill={COLORS.paper} />
-        <circle cx={pose.head[0]} cy={pose.head[1]} r={27} fill={COLORS.figNear} />
+        <circle cx={pose.head[0]} cy={pose.head[1]} r={HEAD_R + HEAD_GAP / 2} fill={COLORS.paper} />
+        <circle cx={pose.head[0]} cy={pose.head[1]} r={HEAD_R} fill={COLORS.figNear} />
       </g>
-      {/* near arm (on top) */}
-      <Limb a={pose.shoulder} b={pose.elbowN} w={30} tone={COLORS.figNear} gap />
-      <Limb a={pose.elbowN} b={pose.wristN} w={27} tone={COLORS.figNear} gap />
-      <Hand at={pose.wristN} r={11} tone={COLORS.figNear} gap />
+      {LIMB([pose.shoulder, pose.elbowN, pose.wristN], ARM_W, COLORS.figNear, ARM_W)}
     </g>
   );
 };
