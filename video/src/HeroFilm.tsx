@@ -2,16 +2,9 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS, LAYOUTS, TIMELINE, type Layout } from "./brand";
 import { bump, easeProg, lerp, lerpPose, periodic, springProg } from "./lib/motion";
-import {
-  POSE_CALM,
-  POSE_NEUTRAL,
-  POSE_OVERWHELMED,
-  POSE_REST,
-  POSE_TIRED,
-  type Joints,
-} from "./poses";
+import { type Joints } from "./poses";
 import { Person } from "./parts/Person";
-import { Clock, DeskFurniture, RestFurniture, Sky } from "./parts/Furniture";
+import { Clock, DeskFurniture } from "./parts/Furniture";
 import {
   CheckBadge,
   ChoreIcon,
@@ -22,7 +15,7 @@ import {
   type StageKind,
 } from "./parts/icons";
 import { LogoCard } from "./parts/LogoCard";
-import { A_UPRIGHT, B_TIRED, C_HEADHAND, E_LOOKUP, lerpAngles, solve } from "./rig";
+import { A_UPRIGHT, B_TIRED, C_HEADHAND, D_RELIEF, E_LOOKUP, lerpAngles, solve } from "./rig";
 import { bubblePosition, seatedCapsules, smoothPath } from "./geom";
 
 export type HeroVariant = "desktop" | "mobile";
@@ -52,27 +45,10 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 /** Total length of the smoothed stage path (knots + tail to the check). */
 const stagePath = (L: Layout) => {
-  let pts: readonly (readonly [number, number])[];
-  if (L.width === 1080) {
-    pts = [
-      L.stagePoints[0],
-      L.stagePoints[1],
-      L.stagePoints[2],
-      L.stagePoints[3],
-      L.stagePoints[4],
-      [940, 490] as const,
-      L.stagePoints[5],
-      L.stagePoints[6],
-      L.stagePoints[7],
-      L.stagePoints[8],
-      [L.check.x, L.check.y] as const,
-    ];
-  } else {
-    pts = [
-      ...L.stagePoints,
-      [L.check.x, L.check.y] as const,
-    ];
-  }
+  const pts: readonly (readonly [number, number])[] = [
+    ...L.stagePoints,
+    [L.check.x, L.check.y] as const,
+  ];
   const d = smoothPath(pts);
   // numeric length by sampling each cubic segment
   let len = 0;
@@ -110,16 +86,28 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
 
   // ---------- poses: FK angles (fixed bones) — never position lerps ----------
   const slump = easeProg(frame, T.poseUprightToSlump.start, T.poseUprightToSlump.dur);
-  const t1 = springProg(frame, T.poseTiredToOverwhelmed.start, T.poseTiredToOverwhelmed.dur, fps);
-  const t2 = springProg(frame, T.poseOverwhelmedToCalm.start, T.poseOverwhelmedToCalm.dur, fps);
-  const t3 = springProg(frame, T.poseCalmToNeutral.start, T.poseCalmToNeutral.dur, fps);
+  const t1 = easeProg(frame, T.poseTiredToOverwhelmed.start, T.poseTiredToOverwhelmed.dur);
+  const t2 = easeProg(frame, T.poseOverwhelmedToCalm.start, T.poseOverwhelmedToCalm.dur);
+  const t4 = easeProg(frame, T.poseCalmToRest.start, T.poseCalmToRest.dur);
+  const t3 = easeProg(frame, T.poseCalmToNeutral.start, T.poseCalmToNeutral.dur);
+  /** loop target: same visual pose as A_UPRIGHT, angles unwrapped (−360°) so
+   *  the return from the behind-the-head arms is a short, gentle sweep. */
+  const A_LOOP = {
+    ...A_UPRIGHT,
+    foreN: A_UPRIGHT.foreN - 360,
+    foreF: A_UPRIGHT.foreF - 360,
+  };
   const anglePose = lerpAngles(
     lerpAngles(
-      lerpAngles(lerpAngles(A_UPRIGHT, B_TIRED, slump), C_HEADHAND, t1),
-      E_LOOKUP,
-      t2,
+      lerpAngles(
+        lerpAngles(lerpAngles(A_UPRIGHT, B_TIRED, slump), C_HEADHAND, t1),
+        E_LOOKUP,
+        t2,
+      ),
+      D_RELIEF,
+      t4,
     ),
-    A_UPRIGHT,
+    A_LOOP,
     t3,
   );
   const seated: Joints = solve(anglePose);
@@ -128,19 +116,6 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
   const breath = 1 + (0.014 + 0.008 * tiredness) * periodic(frame, 160);
   const headBob = 4 * periodic(frame, 160) * (0.4 + 0.6 * tiredness);
   const glow = 0.3 + 0.15 * (1 - tiredness);
-
-  // ---------- wipe (real circular mask reveal with feathered edge) ----------
-  const wipeInProg = easeProg(frame, T.wipeIn.start, T.wipeIn.dur);
-  const wipeOutProg = easeProg(frame, T.wipeOut.start, T.wipeOut.dur);
-  const [wipeCx, wipeCy] = L.wipeCenter;
-  const wipeR =
-    wipeOutProg >= 1
-      ? 0
-      : wipeOutProg > 0
-      ? L.wipeR1 * (1 - wipeOutProg)
-      : wipeInProg > 0
-      ? L.wipeR0 + (L.wipeR1 - L.wipeR0) * wipeInProg
-      : 0;
 
   // ---------- logo ----------
   const logoIn = springProg(frame, T.logoIn.start, T.logoIn.dur, fps);
@@ -179,21 +154,22 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
   const checkOp = easeProg(frame, T.checkDraw.start, 10);
   const cueProg = easeProg(frame, T.publishCue.start, T.publishCue.dur);
   const cueOp = easeProg(frame, T.publishCue.start - 12, 10);
+  /** elements soft-out during the return so the loop closes cleanly */
+  const retOut = 1 - easeProg(frame, T.remOut.start, T.remOut.dur);
 
-  // ---------- chore bubbles (repelled, arcs into the logo) ----------
-  const chaosPull = easeProg(frame, 105, 55) * (1 - easeProg(frame, 426, 40));
-  const returnProg = easeProg(frame, T.bubblesReturn.start, T.bubblesReturn.dur);
+  // ---------- chore bubbles (repelled, arc over the head into the logo) ----------
+  const chaosPull = easeProg(frame, 105, 55) * (1 - easeProg(frame, T.remOut.start, T.remOut.dur));
   const logoCx = L.logo.x + L.logo.size / 2;
   const logoCy = L.logo.y + L.logo.size / 2;
   const headX = L.desk.x + seated.head[0] * L.desk.scale;
   const headY = L.desk.y + seated.head[1] * L.desk.scale;
-  const absorbMax = easeProg(frame, 195, 40);
+  const absorbMax = easeProg(frame, 230, 40);
   const tangleOp = bump(frame, 105, 135, 165, 195) * (1 - absorbMax) * 0.65;
   const { capsules: bodyCaps, head: headCap } = seatedCapsules(seated, L.desk);
   const bubbles = CHORES.map((_, i) => {
     const a = easeProg(frame, T.absorb.first + i * T.absorb.stagger, T.absorb.dur);
-    const flight = a * (1 - returnProg);
-    const opacity = Math.max(1 - a, returnProg);
+    const flight = a;
+    const opacity = 1 - a;
     const [bx, by, br] = L.chores[i];
     const jx = 4 * Math.sin((frame / 160) * Math.PI * 2 + i * 1.7);
     const jy = 4 * Math.cos((frame / 160) * Math.PI * 2 + i * 2.3);
@@ -211,16 +187,10 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
       capsules: bodyCaps,
       head: headCap,
     });
-    const scale = (1 - 0.62 * flight) * (1 + 0.12 * returnProg * (1 - returnProg) * 4);
+    const scale = 1 - 0.62 * flight;
     return { x, y, opacity, scale, r: br };
   });
 
-  // ---------- sky ----------
-  const moonFade = easeProg(frame, T.moonToSun.start, 24);
-  const sunP = easeProg(frame, T.moonToSun.start + 20, T.moonToSun.dur - 20);
-  const sunRot = (frame / 480) * 360 * 2;
-  const starOp = bump(frame, T.stars.inStart, T.stars.inEnd, T.stars.outStart, T.stars.outEnd);
-  const starPhase = (frame / 60) * Math.PI * 2;
 
   return (
     <AbsoluteFill style={{ backgroundColor: COLORS.paper }}>
@@ -230,60 +200,16 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
         viewBox={`0 0 ${W} ${H}`}
         style={{ position: "absolute", inset: 0 }}
       >
-        <defs>
-          <filter id="wipeFeather">
-            <feGaussianBlur stdDeviation="10" />
-          </filter>
-          <mask id="maskDesk" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
-            <rect width={W} height={H} fill="white" />
-            {wipeR > 0 && (
-              <circle
-                cx={wipeCx}
-                cy={wipeCy}
-                r={wipeR}
-                fill="black"
-                filter="url(#wipeFeather)"
-              />
-            )}
-          </mask>
-          <mask id="maskRest" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
-            <rect width={W} height={H} fill="black" />
-            {wipeR > 0 && (
-              <circle
-                cx={wipeCx}
-                cy={wipeCy}
-                r={wipeR}
-                fill="white"
-                filter="url(#wipeFeather)"
-              />
-            )}
-          </mask>
-        </defs>
-
-        {/* ——— the desk (tired → chaos → discovery) ——— */}
-        <g mask="url(#maskDesk)">
+        {/* ——— the desk (ONE scene for the whole film) ——— */}
+        <g>
           <g transform={`translate(${L.desk.x} ${L.desk.y}) scale(${L.desk.scale})`}>
             <DeskFurniture glow={glow} />
             <Person pose={seated} breathe={breath} headBob={headBob} />
           </g>
         </g>
 
-        {/* ——— the rest: sofa, sky, ordered stages (revealed by the wipe) ——— */}
-        <g mask="url(#maskRest)">
-          <g transform={`translate(${L.rest.x} ${L.rest.y}) scale(${L.rest.scale})`}>
-            <RestFurniture />
-            <Person pose={POSE_REST} breathe={breath} headBob={0} />
-          </g>
-          <g transform={`translate(${L.sky.x} ${L.sky.y})`}>
-            <Sky
-              r={L.sky.r}
-              moonOpacity={1 - moonFade}
-              sunP={sunP}
-              sunRot={sunRot}
-              starOpacity={starOp}
-              phase={starPhase}
-            />
-          </g>
+        {/* ——— relief: the S of ordered stages, right of the desk ——— */}
+        <g opacity={retOut}>
 
           {/* one clean line — the S of ordered stages */}
           <path
@@ -371,7 +297,7 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
         ))}
 
         {/* ——— the little clock ——— */}
-        <g opacity={clockOp} transform={`translate(${L.clock.x} ${L.clock.y})`}>
+        <g opacity={clockOp * retOut} transform={`translate(${L.clock.x} ${L.clock.y})`}>
           <Clock r={L.clock.r} minuteAngle={minuteAngle} hourAngle={hourAngle} />
         </g>
       </svg>

@@ -156,13 +156,15 @@ export const E_LOOKUP: AnglePose = {
   foreN: 16,
 };
 
-/** d) relief — leaning back ~25°, hands behind the head, feet crossed on the desk */
+/** d) relief — leaning back ~25°, hands behind the head, feet crossed on the desk.
+ *  Arm angles are wrapped (≤ −180°) so the C→D and D→A interpolations take
+ *  the natural over-the-head path, never through the desk. */
 export const D_RELIEF: AnglePose = {
   torso: -115,
-  upperN: -150,
-  foreN: -13,
-  upperF: -160,
-  foreF: -26,
+  upperN: -84,
+  foreN: -225.3,
+  upperF: -95,
+  foreF: -200,
   thighN: -15,
   shinN: -50,
   thighF: -9,

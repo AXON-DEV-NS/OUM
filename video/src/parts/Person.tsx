@@ -133,12 +133,13 @@ export const Person: React.FC<{ pose: Joints; breathe: number; headBob: number; 
       {/* near limbs with trimmed cream seams at the crossings only */}
       {LIMB([pose.hip, pose.kneeN, pose.ankleN], LEG_W, COLORS.figNear, LEG_W)}
       <FOOT_AT at={pose.ankleN} knee={pose.kneeN} />
-      {/* head — separate circle with the 0.20 D cream gap */}
+      {LIMB([pose.shoulder, pose.elbowN, pose.wristN], ARM_W, COLORS.figNear, ARM_W)}
+      {/* head — drawn AFTER the arms so wrapped-behind forearms pass behind it;
+          the 0.20 D cream ring keeps the gap where anything crosses */}
       <g transform={`translate(0 ${headBob})`}>
         <circle cx={pose.head[0]} cy={pose.head[1]} r={HEAD_R + HEAD_GAP / 2} fill={COLORS.paper} />
         <circle cx={pose.head[0]} cy={pose.head[1]} r={HEAD_R} fill={COLORS.figNear} />
       </g>
-      {LIMB([pose.shoulder, pose.elbowN, pose.wristN], ARM_W, COLORS.figNear, ARM_W)}
     </g>
   );
 };
