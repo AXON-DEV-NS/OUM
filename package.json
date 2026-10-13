@@ -38,7 +38,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^8",
-    "eslint-config-next": "15.5.25"
+    "eslint-config-next": "15.5.25",
+    "playwright": "^1.64.0"
   },
   "overrides": {
     "postcss": "^8.5.23"

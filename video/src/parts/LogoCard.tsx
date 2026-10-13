@@ -1,12 +1,10 @@
 import React from "react";
-import { Img, staticFile } from "remotion";
-import { LOGO_FILE } from "../brand";
+import { VovoLogo } from "./VovoLogo";
 
 /**
- * The site's REAL logo — a transparent cut of public/vovo25.jpg (vovo25.png).
- * The design is untouched: black V + the four green dots + the mark's own soft
- * tail texture. No card, no box, no halo — it sits directly on the cream.
- * Swap LOGO_FILE in brand.ts to change it.
+ * The site's REAL logo, positioned for the film. Uses the shared clean asset
+ * via <VovoLogo> (LOGO_ASSET in brand.ts — swap there to change it).
+ * The single soft bloom is drawn by the film (HeroFilm); no second glow layer.
  */
 export const LogoCard: React.FC<{
   x: number;
@@ -14,29 +12,32 @@ export const LogoCard: React.FC<{
   size: number;
   scale: number;
   opacity: number;
-}> = ({ x, y, size, scale, opacity }) => (
-  <div
-    aria-hidden
-    style={{
-      position: "absolute",
-      left: x,
-      top: y,
-      width: size,
-      height: size,
-      opacity,
-      transform: `scale(${scale})`,
-      transformOrigin: "50% 50%",
-    }}
-  >
-    <Img
-      src={staticFile(LOGO_FILE)}
+  bloom: number;
+}> = ({ x, y, size, scale, opacity, bloom }) => {
+  void bloom;
+  return (
+    <div
+      aria-hidden
       style={{
         position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        display: "block",
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        opacity,
+        transform: `scale(${scale})`,
+        transformOrigin: "50% 50%",
       }}
-    />
-  </div>
-);
+    >
+      <VovoLogo
+        size={size}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      />
+    </div>
+  );
+};

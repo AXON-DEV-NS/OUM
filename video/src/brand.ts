@@ -2,6 +2,9 @@
  * Brand tokens — imported LIVE from the site's own tailwind config so the
  * film can never drift from the site palette. (tailwind.config.ts is the
  * source of truth; `line` lives in app/globals.css.)
+ *
+ * ROUND 4: figure in theme dark-green tones; logo 290px hero on desktop;
+ * stage discs Ø112 desktop / Ø130 mobile; serpentine thread layout.
  */
 import tailwindConfig from "../../tailwind.config";
 
@@ -16,14 +19,14 @@ const green = siteColors.green;
 const gold = siteColors.gold;
 
 export const COLORS = {
-  paper: paper.DEFAULT, // #F5EFE1 — the video background MUST be this exact value
+  paper: paper.DEFAULT,
   paperHigh: paper.high,
   paperLow: paper.low,
   ink: ink.DEFAULT,
   inkSoft: ink.soft,
   inkMute: ink.mute,
   inkFaint: ink.faint,
-  line: "#E3DAC5", // app/globals.css --line
+  line: "#E3DAC5",
   green: {
     50: green["50"],
     100: green["100"],
@@ -33,120 +36,161 @@ export const COLORS = {
     500: green["500"],
     600: green["600"],
     700: green["700"],
+    800: green["800"],
   },
   gold: {
     300: gold["300"],
     400: gold["400"],
-    500: gold["500"],
-    600: gold["600"],
   },
+  /** Figure tones — the theme's dark green, never pure black. */
+  figNear: "#3B5138",
+  figFar: "#5C7A55",
+  figDeep: "#2E4230",
 } as const;
 
-/** THE real logo file (transparent cut of public/vovo25.jpg). Swap + re-render. */
-export const LOGO_FILE = "vovo25.png";
+export const LOGO_ASSET = "vovo-logo-clean-2048.png" as const;
 
 export const FPS = 30;
-export const DURATION_IN_FRAMES = 480; // 16.0s — the loop contract
+export const DURATION_IN_FRAMES = 480; // 16.0s
 
 /**
- * Timeline (frames @30fps) — five story beats from the brief.
- *   tired     0–120      chaos   120–210
- *   discovery 210–300    rest    300–420
- *   loop      420–480    (frame 479 ≡ frame 0)
+ * ROUND 5 timeline (frames @30fps):
+ *   tired    0–105 (slump develops)   chaos   105–195
+ *   gather   195–285                   relief  285–404
+ *   return   405–480 (wipe back completes by f418)
  */
 export const TIMELINE = {
-  tired: { start: 0, end: 120 },
-  chaos: { start: 120, end: 210 },
-  discovery: { start: 210, end: 300 },
-  rest: { start: 300, end: 420 },
-  loop: { start: 420, end: 480 },
+  poseUprightToSlump: { start: 0, dur: 90 },
+  poseTiredToOverwhelmed: { start: 100, dur: 50 },
+  poseOverwhelmedToCalm: { start: 185, dur: 45 },
+  poseCalmToNeutral: { start: 426, dur: 54 },
 
-  poseTiredToOverwhelmed: { start: 122, dur: 50 },
-  poseOverwhelmedToCalm: { start: 208, dur: 50 },
-  poseCalmToTired: { start: 406, dur: 72 },
+  clockIn: { start: 85, dur: 20 },
+  clockOut: { start: 165, dur: 20 },
+  clockChaos: { start: 95, end: 175 },
 
-  clockIn: { start: 100, dur: 28 },
-  clockOut: { start: 268, dur: 26 },
-  clockChaos: { start: 125, end: 205 },
+  logoIn: { start: 180, dur: 30 },
+  logoOut: { start: 396, dur: 36 },
+  absorb: { first: 190, stagger: 5, dur: 15 },
 
-  logoIn: { start: 212, dur: 30 },
-  logoOut: { start: 404, dur: 36 },
-  absorb: { first: 224, stagger: 13, dur: 22 }, // 5 chore bubbles fly into the logo
-  threadDraw: { start: 244, dur: 36 }, // the clean line leaves the logo
-  threadComplete: { start: 332, dur: 28 }, // continues across the stage row (after the scene swap)
-  stagePop: { first: 336, stagger: 3, dur: 10 },
-  stageLight: { first: 352, perStage: 4, dur: 6 },
-  checkDraw: { start: 386, dur: 12 },
+  /** real circular mask reveal: f240 to f276 (36 frames = 1.2s) */
+  wipeIn: { start: 240, dur: 36 },
+  /** mirrored feathered out-wipe: f396 to f432 (36 frames = 1.2s) */
+  wipeOut: { start: 396, dur: 36 },
 
-  restFadeIn: { start: 300, dur: 34 },
-  restFadeOut: { start: 404, dur: 42 },
-  bubblesReturn: { start: 420, dur: 44 },
-  moonToSun: { start: 316, dur: 46 },
-  stars: { inStart: 306, inEnd: 330, outStart: 384, outEnd: 408 },
+  threadDraw: { start: 276, dur: 30 },
+  stagesPop: { first: 280, stagger: 4, dur: 10 },
+  stageLight: { first: 296, perStage: 6, dur: 6 },
+  checkDraw: { start: 336, dur: 12 },
+  publishCue: { start: 340, dur: 11 },
+  payoffHold: { start: 351, end: 396 }, // 45 frames (1.50s) HOLD
+
+  moonToSun: { start: 280, dur: 40 },
+  stars: { inStart: 270, inEnd: 295, outStart: 385, outEnd: 410 },
+
+  bubblesReturn: { start: 426, dur: 40 },
 } as const;
+
+/** Seated scene local frame: floor y=460, character faces +x. */
+export const DESK_GROUND_LOCAL = 460;
+export const REST_GROUND_LOCAL = 420;
+export const HEAD_LOCAL: readonly [number, number] = [216, 138];
 
 export interface Layout {
   width: number;
   height: number;
-  /** The allowed art zone (hero text/button safe zones, DESIGN.md §5). */
   zone: { x: number; y: number; w: number; h: number };
-  /** Scene group translation (local art units × scale). */
   desk: { x: number; y: number; scale: number };
   rest: { x: number; y: number; scale: number };
-  bubbles: readonly (readonly [number, number])[];
+  /** 7 chore discs: [x, y, r] — repel keeps them off the character. */
+  chores: readonly (readonly [number, number, number])[];
   logo: { x: number; y: number; size: number };
-  stageRow: { x: number; cy: number; gap: number; r: number };
+  wipeCenter: readonly [number, number];
+  wipeR0: number;
+  wipeR1: number;
+  /**
+   * Stage path: point 0 = anchor (no disc), points 1..8 = the eight stage
+   * discs, then the line continues to `check`.
+   */
+  stagePoints: readonly (readonly [number, number])[];
   check: { x: number; y: number; r: number };
+  cue: { x: number; y: number; w: number };
   sky: { x: number; y: number; r: number };
   clock: { x: number; y: number; r: number };
-  bubbleR: number;
+  stageR: number;
 }
 
 export const LAYOUTS: Record<"desktop" | "mobile", Layout> = {
   desktop: {
     width: 1920,
     height: 1080,
-    zone: { x: 1000, y: 120, w: 860, h: 840 },
-    desk: { x: 726, y: 39, scale: 1.48 },
-    rest: { x: 994, y: 500, scale: 1.0 },
-    bubbles: [
-      [1055, 325],
-      [1215, 175],
-      [1440, 200],
-      [1745, 430],
-      [1060, 615],
+    zone: { x: 1000, y: 100, w: 860, h: 880 },
+    desk: { x: 940, y: 327, scale: 1.18 },
+    rest: { x: 980, y: 526, scale: 1.07 },
+    chores: [
+      [1050, 330, 48],
+      [1160, 220, 56],
+      [1320, 180, 42],
+      [1480, 230, 52],
+      [1620, 310, 46],
+      [1640, 520, 38],
+      [1540, 140, 36],
     ],
-    logo: { x: 1500, y: 240, size: 200 },
-    stageRow: { x: 1060, cy: 618, gap: 86, r: 34 },
-    check: { x: 1795, y: 618, r: 26 },
-    sky: { x: 1770, y: 205, r: 54 },
-    clock: { x: 1795, y: 210, r: 40 },
-    bubbleR: 48,
+    logo: { x: 1435, y: 335, size: 290 },
+    wipeCenter: [1580, 480],
+    wipeR0: 145.8,
+    wipeR1: 800.9,
+    stagePoints: [
+      [1620, 450],
+      [1570, 520],
+      [1440, 520],
+      [1310, 520],
+      [1180, 520],
+      [1180, 650],
+      [1310, 650],
+      [1440, 650],
+      [1570, 650],
+    ],
+    check: { x: 1610, y: 740, r: 26 },
+    cue: { x: 1620, y: 830, w: 110 },
+    sky: { x: 1680, y: 380, r: 44 },
+    clock: { x: 1680, y: 190, r: 40 },
+    stageR: 54,
   },
   mobile: {
     width: 1080,
-    height: 1920,
-    zone: { x: 120, y: 1260, w: 840, h: 460 },
-    desk: { x: 3, y: 1019, scale: 1.13 },
-    rest: { x: 133, y: 1260, scale: 1.0 },
-    bubbles: [
-      [195, 1285],
-      [330, 1240],
-      [560, 1250],
-      [790, 1315],
-      [575, 1408],
+    height: 1350,
+    zone: { x: 60, y: 60, w: 960, h: 1230 },
+    desk: { x: 260, y: 460, scale: 1.15 },
+    rest: { x: 380, y: 840, scale: 1.02 },
+    chores: [
+      [200, 480, 50],
+      [220, 680, 52],
+      [280, 860, 48],
+      [800, 460, 52],
+      [840, 660, 54],
+      [800, 840, 48],
+      [540, 360, 46],
     ],
-    logo: { x: 152, y: 126, size: 150 },
-    stageRow: { x: 334, cy: 224, gap: 62, r: 26 },
-    check: { x: 848, y: 224, r: 24 },
-    sky: { x: 885, y: 1325, r: 44 },
-    clock: { x: 905, y: 1445, r: 34 },
-    bubbleR: 44,
+    logo: { x: 450, y: 70, size: 180 },
+    wipeCenter: [500, 780],
+    wipeR0: 20,
+    wipeR1: 720,
+    stagePoints: [
+      [150, 340],
+      [210, 400],
+      [430, 400],
+      [650, 400],
+      [870, 400],
+      [870, 580],
+      [650, 580],
+      [430, 580],
+      [210, 580],
+    ],
+    check: { x: 210, y: 715, r: 26 },
+    cue: { x: 210, y: 820, w: 110 },
+    sky: { x: 880, y: 480, r: 44 },
+    clock: { x: 880, y: 240, r: 36 },
+    stageR: 65,
   },
 } as const;
-
-/** Local-frame constant: the seated character's head joint (for clustering). */
-export const HEAD_LOCAL: readonly [number, number] = [318, 256];
-export const DESK_GROUND_LOCAL = 585;
-export const REST_GROUND_LOCAL = 420;
-
