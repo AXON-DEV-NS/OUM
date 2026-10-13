@@ -119,9 +119,10 @@ export const A_UPRIGHT: AnglePose = {
   headDroop: 0,
 };
 
-/** b) tired slump — torso 20° forward vs upright, head 20px lower, hands on thighs */
+/** b) tired slump — torso exactly 20° forward vs vertical, head hangs 12 u
+ *  further down-forward along the spine (visible droop, not just a tilt) */
 export const B_TIRED: AnglePose = {
-  torso: -68,
+  torso: -70,
   upperN: 62,
   foreN: 70,
   upperF: 74,
@@ -130,21 +131,23 @@ export const B_TIRED: AnglePose = {
   shinN: 90,
   thighF: 8,
   shinF: 86,
-  headDroop: 6,
+  headDroop: 12,
 };
 
-/** c) head in hand — elbow planted on the desk, forearm vertical */
+/** c) head in hand — torso 30° forward, elbow cap RESTING on the desk top
+ *  (elbow centre y=269.4 → cap bottom 282.9 ≈ desk top 283), cheek pressing
+ *  the palm (hand cap overlaps the head circle ~12 px) */
 export const C_HEADHAND: AnglePose = {
-  torso: -75,
-  upperN: 54,
-  foreN: -90,
-  upperF: 62,
-  foreF: -84,
+  torso: -60,
+  upperN: 43.5,
+  foreN: -110,
+  upperF: 55,
+  foreF: -95,
   thighN: 2,
   shinN: 90,
   thighF: 8,
   shinF: 86,
-  headDroop: 18,
+  headDroop: 30,
 };
 
 /** discovery — a small look-up toward the logo (head tips back) */
@@ -166,8 +169,8 @@ export const D_RELIEF: AnglePose = {
   upperF: -95,
   foreF: -200,
   thighN: -15,
-  shinN: -40,
+  shinN: -33,
   thighF: -9,
-  shinF: -48,
+  shinF: -41,
   headDroop: 0,
 };

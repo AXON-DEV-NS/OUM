@@ -161,6 +161,7 @@ export const HeroFilm: React.FC<{ variant: HeroVariant }> = ({ variant }) => {
       logoCx,
       logoCy,
       logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size },
+      logoClearActive: frame >= T.logoIn.start,
       capsules: bodyCaps,
       head: headCap,
     });

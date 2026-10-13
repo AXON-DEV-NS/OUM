@@ -9,8 +9,8 @@ export const CLUSTER_RING: readonly (readonly [number, number])[] = [
   [-175, -70],
   [-70, -175],
   [70, -175],
-  [120, -80],
-  [130, 30],
+  [120, -170],
+  [-140, -140],
   [105, 135],
   [-175, 60],
 ];
@@ -71,21 +71,23 @@ export const repelFromBody = (
     const inv = d > 0.0001 ? 1 / d : 0;
     return { d, nx: (px - cx) * inv, ny: (py - cy) * inv };
   };
-  for (const c of capsules) {
-    const { d, nx, ny } = segDist(c.a[0], c.a[1], c.b[0], c.b[1]);
-    const need = r + margin + c.w / 2;
-    if (d < need) {
-      px += nx * (need - d);
-      py += ny * (need - d);
+  for (let pass = 0; pass < 4; pass++) {
+    for (const c of capsules) {
+      const { d, nx, ny } = segDist(c.a[0], c.a[1], c.b[0], c.b[1]);
+      const need = r + margin + c.w / 2;
+      if (d < need) {
+        px += nx * (need - d);
+        py += ny * (need - d);
+      }
     }
-  }
-  {
-    const d = Math.hypot(px - head.x, py - head.y);
-    const need = r + margin + head.r;
-    if (d < need) {
-      const inv = d > 0.0001 ? 1 / d : 1;
-      px = head.x + (px - head.x) * inv * need;
-      py = head.y + (py - head.y) * inv * need;
+    {
+      const d = Math.hypot(px - head.x, py - head.y);
+      const need = r + margin + head.r;
+      if (d < need) {
+        const inv = d > 0.0001 ? 1 / d : 1;
+        px = head.x + (px - head.x) * inv * need;
+        py = head.y + (py - head.y) * inv * need;
+      }
     }
   }
   return [px, py];
@@ -161,32 +163,34 @@ export const bubblePosition = (args: {
   logoCx: number;
   logoCy: number;
   logoRect: { x: number; y: number; w: number; h: number };
+  logoClearActive: boolean;
   capsules: Capsule[];
   head: { x: number; y: number; r: number };
 }): Pt => {
-  const { bx, by, br, i, chaosPull, flight, headX, headY, logoCx, logoCy, logoRect, capsules, head } = args;
+  const { bx, by, br, i, chaosPull, flight, headX, headY, logoCx, logoCy, logoRect, logoClearActive, capsules, head } = args;
   const px = lerpN(bx, headX + CLUSTER_RING[i][0], chaosPull);
   const py = lerpN(by, headY + CLUSTER_RING[i][1], chaosPull);
   const [sx0, sy0] = repelFromBody(px, py, br, capsules, head);
-  /* the body repel can shove a disc toward the logo — push it back out of
-     the logo box (+40px zone) until its deliberate absorb glide starts */
+  /* the body repel can shove a disc toward the logo — walk it radially out of
+     the logo's +40 px zone until its deliberate absorb glide starts */
   const pad = br + 40;
-  const Lx = logoRect.x - pad;
-  const Rx = logoRect.x + logoRect.w + pad;
-  const Ty = logoRect.y - pad;
-  const By = logoRect.y + logoRect.h + pad;
   let sx = sx0;
   let sy = sy0;
-  if (flight < 0.05 && sx > Lx && sx < Rx && sy > Ty && sy < By) {
-    const dl = sx - Lx;
-    const dr = Rx - sx;
-    const dt = sy - Ty;
-    const db = By - sy;
-    const m = Math.min(dl, dr, dt, db);
-    if (m === dl) sx = Lx;
-    else if (m === dr) sx = Rx;
-    else if (m === dt) sy = Ty;
-    else sy = By;
+  const lcx = logoRect.x + logoRect.w / 2;
+  const lcy = logoRect.y + logoRect.h / 2;
+  const insideZone = (x: number, y: number) =>
+    x > logoRect.x - pad && x < logoRect.x + logoRect.w + pad &&
+    y > logoRect.y - pad && y < logoRect.y + logoRect.h + pad;
+  if (logoClearActive && flight < 0.05 && insideZone(sx, sy)) {
+    let dx = sx - lcx;
+    let dy = sy - lcy;
+    const dl = Math.hypot(dx, dy) || 1;
+    dx /= dl;
+    dy /= dl;
+    for (let k = 0; k < 24 && insideZone(sx, sy); k++) {
+      sx += dx * 10;
+      sy += dy * 10;
+    }
   }
   if (flight <= 0) return [sx, sy];
   if (flight >= 1) return [logoCx, logoCy];

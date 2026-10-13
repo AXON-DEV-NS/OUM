@@ -27,9 +27,13 @@ export const DeskFurniture: React.FC<{ glow?: number }> = ({ glow = 1 }) => (
     <ellipse cx={235} cy={458} rx={115} ry={8} fill={COLORS.ink} opacity={0.05} />
     <ellipse cx={555} cy={458} rx={190} ry={8} fill={COLORS.ink} opacity={0.05} />
 
-    {/* chair — thick slabs, pulled close to the desk */}
-    <rect x={172} y={178} width={24} height={158} rx={9} fill={COLORS.paperHigh} stroke={COLORS.inkSoft} strokeWidth={6} />
+    {/* chair — thick slabs, pulled close to the desk; the backrest reclines
+        ~22° so the 25° relief lean visibly rests against it */}
+    <g transform="rotate(-22 196 336)">
+      <rect x={172} y={178} width={24} height={158} rx={9} fill={COLORS.paperHigh} stroke={COLORS.inkSoft} strokeWidth={6} />
+    </g>
     <rect x={160} y={336} width={150} height={20} rx={9} fill={COLORS.paperHigh} stroke={COLORS.inkSoft} strokeWidth={6} />
+    <ellipse cx={240} cy={360} rx={78} ry={7} fill={COLORS.ink} opacity={0.05} />
     <rect x={192} y={356} width={16} height={104} rx={7} fill={COLORS.paperHigh} stroke={COLORS.inkSoft} strokeWidth={5} />
     <rect x={272} y={356} width={16} height={104} rx={7} fill={COLORS.paperHigh} stroke={COLORS.inkSoft} strokeWidth={5} />
 

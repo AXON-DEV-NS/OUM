@@ -65,7 +65,7 @@ export const DURATION_IN_FRAMES = 480; // 16.0s
 export const TIMELINE = {
   poseUprightToSlump: { start: 0, dur: 75 },
   poseTiredToOverwhelmed: { start: 100, dur: 85 },
-  poseOverwhelmedToCalm: { start: 240, dur: 32 },
+  poseOverwhelmedToCalm: { start: 236, dur: 36 },
   poseCalmToRest: { start: 292, dur: 64 },
   poseCalmToNeutral: { start: 401, dur: 78 },
 

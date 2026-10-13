@@ -203,14 +203,14 @@ for (const variant of ["desktop", "mobile"] as const) {
       const jy = 4 * Math.cos((f / 160) * Math.PI * 2 + i * 2.3);
       const [x, y] = bubblePosition({
         bx: bx + jx, by: by + jy, br, i, chaosPull, flight: a,
-        headX: head.x, headY: head.y, logoCx, logoCy, logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size }, capsules, head,
+        headX: head.x, headY: head.y, logoCx, logoCy, logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size }, logoClearActive: f >= T.logoIn.start, capsules, head,
       });
       const rad = br * (1 - 0.62 * a);
       let d = Infinity;
       for (const c of capsules) d = Math.min(d, capDistPt(c, [x, y]));
       d = Math.min(d, Math.hypot(x - head.x, y - head.y) - head.r);
       d -= rad;
-      if (d < minChore) { minChore = d; worstChore = `f${f} disc${i}`; }
+      if (d < minChore) { minChore = d; worstChore = `f${f} disc${i} @(${x.toFixed(0)},${y.toFixed(0)}) r${rad.toFixed(0)}`; }
     }
     /* relief elements */
     type El = { label: string; kind: "c" | "r"; d: (q: { capsules: Capsule[]; head: { x: number; y: number; r: number } }) => number; rect: Rect };
@@ -280,7 +280,7 @@ for (const variant of ["desktop", "mobile"] as const) {
         const jy = 4 * Math.cos((f / 160) * Math.PI * 2 + i * 2.3);
         const [x, y] = bubblePosition({
           bx: bx + jx, by: by + jy, br, i, chaosPull, flight: a,
-          headX: head.x, headY: head.y, logoCx, logoCy, logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size }, capsules, head,
+          headX: head.x, headY: head.y, logoCx, logoCy, logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size }, logoClearActive: f >= T.logoIn.start, capsules, head,
         });
         const rad = br * (1 - 0.62 * a);
         const dd = circleDistRect(x, y, rad, lr);
@@ -304,6 +304,24 @@ for (const variant of ["desktop", "mobile"] as const) {
   add(`[${variant}] logo clear zone vs chores min`, `${minLogoDisc.toFixed(2)} px (${worstLogo})`, "≥ 40 px", minLogoDisc >= 40);
 }
 
+/* ============ 5b) physical-support checks (measured from the rig) ============ */
+{
+  const B = filmPose(95); // tired hold (t1 starts f100)
+  const C = filmPose(200); // head-in-hand hold
+  const D = filmPose(370); // relief hold (t4 ends f356)
+  const bLean = Math.abs((((B.torso + 90 + 180) % 360) + 360) % 360 - 180);
+  const dLean = Math.abs((((D.torso + 90 + 180) % 360) + 360) % 360 - 180);
+  add('pose B lean from vertical', bLean.toFixed(2) + ' deg', '20 +/- 2 deg', Math.abs(bLean - 20) <= 2);
+  add('pose D lean from vertical', dLean.toFixed(2) + ' deg', '25 +/- 2 deg', Math.abs(dLean - 25) <= 2);
+  const rc = solve(C);
+  const elbowCapBottom = rc.elbowN[1] + 13.5;
+  add('pose C: elbow cap bottom vs desk top 283', elbowCapBottom.toFixed(2) + ' (local)', '283 +/- 6 (resting)', Math.abs(elbowCapBottom - 283) <= 6);
+  const wristHeadGap = Math.hypot(rc.wristN[0] - rc.head[0], rc.wristN[1] - rc.head[1]) - 30 - 13.5;
+  add('pose C: cheek pressed on palm', (-wristHeadGap).toFixed(2) + ' px overlap', '0 to 8 px overlap', wristHeadGap <= 0 && wristHeadGap >= -8);
+  const rd = solve(D);
+  const footBottom = rd.ankleN[1] + 12;
+  add('pose D: foot bottom vs desk top 283', footBottom.toFixed(2) + ' (local)', '283 +/- 10 (resting)', Math.abs(footBottom - 283) <= 10);
+}
 /* ================= 6) seam vs joints (construction math) ================= */
 const armSeamStart = ARM_W * 1.2 + (ARM_W + 7) / 2;
 const legSeamStart = LEG_W * 1.2 + (LEG_W + 7) / 2;

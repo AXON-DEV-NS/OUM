@@ -2376,7 +2376,7 @@ var DURATION_IN_FRAMES = 480;
 var TIMELINE = {
   poseUprightToSlump: { start: 0, dur: 75 },
   poseTiredToOverwhelmed: { start: 100, dur: 85 },
-  poseOverwhelmedToCalm: { start: 240, dur: 32 },
+  poseOverwhelmedToCalm: { start: 236, dur: 36 },
   poseCalmToRest: { start: 292, dur: 64 },
   poseCalmToNeutral: { start: 401, dur: 78 },
   clockIn: { start: 85, dur: 20 },
@@ -17503,7 +17503,7 @@ var A_UPRIGHT = {
   headDroop: 0
 };
 var B_TIRED = {
-  torso: -68,
+  torso: -70,
   upperN: 62,
   foreN: 70,
   upperF: 74,
@@ -17512,19 +17512,19 @@ var B_TIRED = {
   shinN: 90,
   thighF: 8,
   shinF: 86,
-  headDroop: 6
+  headDroop: 12
 };
 var C_HEADHAND = {
-  torso: -75,
-  upperN: 54,
-  foreN: -90,
-  upperF: 62,
-  foreF: -84,
+  torso: -60,
+  upperN: 43.5,
+  foreN: -110,
+  upperF: 55,
+  foreF: -95,
   thighN: 2,
   shinN: 90,
   thighF: 8,
   shinF: 86,
-  headDroop: 18
+  headDroop: 30
 };
 var E_LOOKUP = {
   ...A_UPRIGHT,
@@ -17540,9 +17540,9 @@ var D_RELIEF = {
   upperF: -95,
   foreF: -200,
   thighN: -15,
-  shinN: -40,
+  shinN: -33,
   thighF: -9,
-  shinF: -48,
+  shinF: -41,
   headDroop: 0
 };
 
@@ -17580,8 +17580,8 @@ var CLUSTER_RING = [
   [-175, -70],
   [-70, -175],
   [70, -175],
-  [120, -80],
-  [130, 30],
+  [120, -170],
+  [-140, -140],
   [105, 135],
   [-175, 60]
 ];
@@ -17616,21 +17616,23 @@ var repelFromBody = (x, y, r, capsules, head, margin = 40) => {
     const inv = d > 1e-4 ? 1 / d : 0;
     return { d, nx: (px - cx) * inv, ny: (py - cy) * inv };
   };
-  for (const c2 of capsules) {
-    const { d, nx, ny } = segDist(c2.a[0], c2.a[1], c2.b[0], c2.b[1]);
-    const need = r + margin + c2.w / 2;
-    if (d < need) {
-      px += nx * (need - d);
-      py += ny * (need - d);
+  for (let pass = 0; pass < 4; pass++) {
+    for (const c2 of capsules) {
+      const { d, nx, ny } = segDist(c2.a[0], c2.a[1], c2.b[0], c2.b[1]);
+      const need = r + margin + c2.w / 2;
+      if (d < need) {
+        px += nx * (need - d);
+        py += ny * (need - d);
+      }
     }
-  }
-  {
-    const d = Math.hypot(px - head.x, py - head.y);
-    const need = r + margin + head.r;
-    if (d < need) {
-      const inv = d > 1e-4 ? 1 / d : 1;
-      px = head.x + (px - head.x) * inv * need;
-      py = head.y + (py - head.y) * inv * need;
+    {
+      const d = Math.hypot(px - head.x, py - head.y);
+      const need = r + margin + head.r;
+      if (d < need) {
+        const inv = d > 1e-4 ? 1 / d : 1;
+        px = head.x + (px - head.x) * inv * need;
+        py = head.y + (py - head.y) * inv * need;
+      }
     }
   }
   return [px, py];
@@ -17641,27 +17643,26 @@ var quad = (ax, ay, cx, cy, bx, by, t) => {
 };
 var lerpN = (a2, b2, t) => a2 + (b2 - a2) * t;
 var bubblePosition = (args) => {
-  const { bx, by, br, i, chaosPull, flight, headX, headY, logoCx, logoCy, logoRect, capsules, head } = args;
+  const { bx, by, br, i, chaosPull, flight, headX, headY, logoCx, logoCy, logoRect, logoClearActive, capsules, head } = args;
   const px = lerpN(bx, headX + CLUSTER_RING[i][0], chaosPull);
   const py = lerpN(by, headY + CLUSTER_RING[i][1], chaosPull);
   const [sx0, sy0] = repelFromBody(px, py, br, capsules, head);
   const pad = br + 40;
-  const Lx = logoRect.x - pad;
-  const Rx = logoRect.x + logoRect.w + pad;
-  const Ty = logoRect.y - pad;
-  const By = logoRect.y + logoRect.h + pad;
   let sx = sx0;
   let sy = sy0;
-  if (flight < 0.05 && sx > Lx && sx < Rx && sy > Ty && sy < By) {
-    const dl = sx - Lx;
-    const dr = Rx - sx;
-    const dt = sy - Ty;
-    const db = By - sy;
-    const m = Math.min(dl, dr, dt, db);
-    if (m === dl) sx = Lx;
-    else if (m === dr) sx = Rx;
-    else if (m === dt) sy = Ty;
-    else sy = By;
+  const lcx = logoRect.x + logoRect.w / 2;
+  const lcy = logoRect.y + logoRect.h / 2;
+  const insideZone = (x, y) => x > logoRect.x - pad && x < logoRect.x + logoRect.w + pad && y > logoRect.y - pad && y < logoRect.y + logoRect.h + pad;
+  if (logoClearActive && flight < 0.05 && insideZone(sx, sy)) {
+    let dx = sx - lcx;
+    let dy = sy - lcy;
+    const dl = Math.hypot(dx, dy) || 1;
+    dx /= dl;
+    dy /= dl;
+    for (let k = 0; k < 24 && insideZone(sx, sy); k++) {
+      sx += dx * 10;
+      sy += dy * 10;
+    }
   }
   if (flight <= 0) return [sx, sy];
   if (flight >= 1) return [logoCx, logoCy];
@@ -17830,6 +17831,7 @@ for (const variant of ["desktop", "mobile"]) {
         logoCx,
         logoCy,
         logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size },
+        logoClearActive: f >= T.logoIn.start,
         capsules,
         head
       });
@@ -17840,7 +17842,7 @@ for (const variant of ["desktop", "mobile"]) {
       d -= rad2;
       if (d < minChore) {
         minChore = d;
-        worstChore = `f${f} disc${i}`;
+        worstChore = `f${f} disc${i} @(${x.toFixed(0)},${y.toFixed(0)}) r${rad2.toFixed(0)}`;
       }
     }
     const stageActive = (i) => f >= T.stagesPop.first + i * T.stagesPop.stagger && f <= T.remOut.start + T.remOut.dur;
@@ -17916,6 +17918,7 @@ for (const variant of ["desktop", "mobile"]) {
           logoCx,
           logoCy,
           logoRect: { x: L.logo.x, y: L.logo.y, w: L.logo.size, h: L.logo.size },
+          logoClearActive: f >= T.logoIn.start,
           capsules,
           head
         });
@@ -17946,6 +17949,23 @@ for (const variant of ["desktop", "mobile"]) {
   add(`[${variant}] relief vs character min clearance`, `${minReliefChar.toFixed(2)} px (${worstReliefChar})`, "\u2265 40 px", minReliefChar >= 40);
   add(`[${variant}] relief vs chair/desk/gear min clearance`, `${minReliefFurn.toFixed(2)} px (${worstReliefFurn})`, "\u2265 40 px", minReliefFurn >= 40);
   add(`[${variant}] logo clear zone vs chores min`, `${minLogoDisc.toFixed(2)} px (${worstLogo})`, "\u2265 40 px", minLogoDisc >= 40);
+}
+{
+  const B = filmPose(95);
+  const C = filmPose(200);
+  const D = filmPose(370);
+  const bLean = Math.abs(((B.torso + 90 + 180) % 360 + 360) % 360 - 180);
+  const dLean = Math.abs(((D.torso + 90 + 180) % 360 + 360) % 360 - 180);
+  add("pose B lean from vertical", bLean.toFixed(2) + " deg", "20 +/- 2 deg", Math.abs(bLean - 20) <= 2);
+  add("pose D lean from vertical", dLean.toFixed(2) + " deg", "25 +/- 2 deg", Math.abs(dLean - 25) <= 2);
+  const rc = solve(C);
+  const elbowCapBottom = rc.elbowN[1] + 13.5;
+  add("pose C: elbow cap bottom vs desk top 283", elbowCapBottom.toFixed(2) + " (local)", "283 +/- 6 (resting)", Math.abs(elbowCapBottom - 283) <= 6);
+  const wristHeadGap = Math.hypot(rc.wristN[0] - rc.head[0], rc.wristN[1] - rc.head[1]) - 30 - 13.5;
+  add("pose C: cheek pressed on palm", (-wristHeadGap).toFixed(2) + " px overlap", "0 to 8 px overlap", wristHeadGap <= 0 && wristHeadGap >= -8);
+  const rd = solve(D);
+  const footBottom = rd.ankleN[1] + 12;
+  add("pose D: foot bottom vs desk top 283", footBottom.toFixed(2) + " (local)", "283 +/- 10 (resting)", Math.abs(footBottom - 283) <= 10);
 }
 var armSeamStart = ARM_W * 1.2 + (ARM_W + 7) / 2;
 var legSeamStart = LEG_W * 1.2 + (LEG_W + 7) / 2;
