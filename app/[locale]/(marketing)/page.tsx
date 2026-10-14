@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { FeatureMarquee } from "@/components/marketing/feature-marquee";
 import { GetStartedButton } from "@/components/marketing/get-started-button";
+import { OumIntroFrame } from "@/components/marketing/oum-intro-frame";
 import { FallingTestimonials } from "@/components/marketing/falling-testimonials";
 import { ArrowUpRight } from "lucide-react";
 
@@ -34,6 +35,10 @@ function Hero() {
               </Button>
             </Link>
           </div>
+        </div>
+        {/* Right — OUM intro scene (isolated iframe; left headline & buttons untouched) */}
+        <div className="px-corners w-full">
+          <OumIntroFrame />
         </div>
       </div>
     </section>
