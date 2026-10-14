@@ -339,3 +339,17 @@
   opacity: 1;
   transform: translate(0, 0);
 }
+
+
+/* OUM pixel-art cream background — fixed; content scrolls over it */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #F5EFE1;
+  background-image: url("/pixel-bg.png");
+  background-size: 240px 240px;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
