@@ -353,3 +353,13 @@ body::before {
   image-rendering: pixelated;
   pointer-events: none;
 }
+
+
+/* OUM pixel-art — applied ON the cream sections themselves so nothing covers it */
+.bg-paper,
+.bg-paper-high {
+  background-image: url("/pixel-bg.png");
+  background-size: 256px 256px;
+  background-attachment: fixed;
+  image-rendering: pixelated;
+}
