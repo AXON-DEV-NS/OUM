@@ -36,7 +36,8 @@ export function Footer() {
   ];
 
   return (
-    <footer className="relative bg-ink text-paper-high">
+    <footer className="font-pixel relative bg-ink text-paper-high">
+      <div className="px-section-rule-light" aria-hidden="true" />
       <div className="container-wide pb-10 pt-20">
         <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-12">
           {/* Brand */}
@@ -73,7 +74,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-7 sm:flex-row">
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 pt-7 sm:flex-row">
+          <div className="px-section-rule-light mb-7 w-full" aria-hidden="true" />
           <p className="text-xs text-paper/40">
             &copy; {new Date().getFullYear()} {SITE_NAME}. {t("allRightsReserved")}
           </p>

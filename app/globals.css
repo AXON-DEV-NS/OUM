@@ -379,3 +379,47 @@ hr,
   background-repeat: repeat-x;
   background-position: center;
 }
+
+
+/* PX-GLOBAL-PIXEL-SYSTEM: pixel-art scoped to borders/dividers only.
+   Surfaces, fills and body typography stay clean and modern. */
+
+/* 1) hard square corners everywhere -> instant 8-bit geometry, zero layout risk */
+*, *::before, *::after { border-radius: 0 !important; }
+
+/* 2) every text input gets a stepped pixel outline (fill untouched) */
+input[type="text"], input[type="email"], input[type="password"],
+input[type="search"], input[type="tel"], input[type="url"],
+input[type="number"], textarea, select {
+  --px: var(--px-line, #1B1915);
+  box-shadow:
+    -3px 0 0 0 var(--px),
+    3px 0 0 0 var(--px),
+    0 -3px 0 0 var(--px),
+    0 3px 0 0 var(--px);
+  margin: 3px;
+}
+
+/* 3) the single fixed canvas: stationary cream behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #F5EFE1;
+  pointer-events: none;
+}
+html, body { background-color: #F5EFE1; background-attachment: fixed; }
+
+/* 4) pixel font utility — FOOTER ONLY (see footer.tsx) */
+.font-pixel { font-family: var(--font-pixel), "Courier New", monospace !important; }
+
+/* 5) reusable pixel divider for section/colour intersections */
+.px-section-rule {
+  border: 0;
+  height: 8px;
+  background-image: linear-gradient(90deg, var(--px-line, #1B1915) 50%, transparent 50%);
+  background-size: 8px 8px;
+  background-repeat: repeat-x;
+  background-position: center;
+}

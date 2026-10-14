@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, Inter, Press_Start_2P } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ToastProvider } from "@/components/ui/toast";
@@ -21,6 +21,14 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+/** Pixel font — footer ONLY (see .font-pixel + footer.tsx). */
+const pixel = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-pixel",
 });
 
 export const metadata: Metadata = {
@@ -97,7 +105,7 @@ export default async function RootLayout({
       lang={locale}
       dir="ltr"
       translate="no"
-      className={`notranslate ${fraunces.variable} ${inter.variable}`}
+      className={`notranslate ${fraunces.variable} ${inter.variable} ${pixel.variable}`}
     >
       <body className="font-sans antialiased bg-paper text-ink">
         <NextIntlClientProvider messages={messages} locale={locale}>
