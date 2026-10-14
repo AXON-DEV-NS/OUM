@@ -9,14 +9,7 @@ import { ArrowUpRight } from "lucide-react";
 function Hero() {
   return (
     <section className="grain-overlay relative overflow-hidden border-b border-line bg-paper">
-      <section className="relative mx-auto max-w-5xl px-6 pt-24 pb-16 text-center">
-        <h1 className="font-display text-5xl font-semibold tracking-tight text-ink md:text-6xl">
-          Let AI run your YouTube channel.
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-lg text-ink-mute">
-          OUM researches, scripts, voices, edits and publishes — autonomously.
-        </p>
-      </section>
+      
       <div className="container-wide relative z-10 grid min-h-[calc(100vh-4rem)] items-start gap-8 py-16 lg:grid-cols-2 lg:items-center lg:gap-14 sm:py-20">
         {/* Left — headline & actions */}
         <div className="max-w-xl text-left">
