@@ -6,7 +6,6 @@ import { GetStartedButton } from "@/components/marketing/get-started-button";
 import { HeroVideo } from "@/components/marketing/hero-video";
 import { VideoModalButton } from "@/components/marketing/video-modal";
 import { MeetOum } from "@/components/marketing/meet-oum";
-import { buttonVariants } from "@/components/ui/button";
 import { FallingTestimonials } from "@/components/marketing/falling-testimonials";
 import { ArrowUpRight } from "lucide-react";
 
@@ -32,7 +31,7 @@ function Hero() {
 
           <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
             <GetStartedButton />
-            <VideoModalButton className={buttonVariants({ variant: "secondary", size: "lg" }) + " w-full sm:w-auto pixel-btn"}>
+            <VideoModalButton className="w-full sm:w-auto">
               See how it works
             </VideoModalButton>
           </div>

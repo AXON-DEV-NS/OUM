@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
+import { buttonVariants } from "@/components/ui/button";
 
 /**
  * Accessible video modal — same film, with controls + audio, restarted at 0.
@@ -70,7 +71,9 @@ export function VideoModalButton({
       <button
         ref={openerRef}
         type="button"
-        className={className}
+        className={["pixel-btn", buttonVariants({ variant: "secondary", size: "lg" }), className]
+          .filter(Boolean)
+          .join(" ")}
         onClick={() => {
           track("modal_open", { source: "see_how_it_works" });
           setOpen(true);
