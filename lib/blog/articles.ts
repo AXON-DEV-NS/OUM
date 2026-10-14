@@ -30,7 +30,7 @@ export const BLOG_POSTS: BlogPost[] = [
     coverImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80',
     author: {
       name: 'Dr. Tariq Mansour',
-      role: 'Head of AI Research at VOVO',
+      role: 'Head of AI Research at OUM',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
     },
     seoKeywords: [
@@ -43,7 +43,7 @@ export const BLOG_POSTS: BlogPost[] = [
     content: `
 ## The Shift from Manual Editing to Autonomous Systems
 
-In 2024, creators spent an average of 18 hours scripting, recording, b-rolling, and color-grading a single 10-minute YouTube video. By 2026, autonomous agentic platforms like VOVO Agent AI have shrunk that lifecycle down to under 12 minutes—without sacrificing cinematic depth or narrative authenticity.
+In 2024, creators spent an average of 18 hours scripting, recording, b-rolling, and color-grading a single 10-minute YouTube video. By 2026, autonomous agentic platforms like OUM have shrunk that lifecycle down to under 12 minutes—without sacrificing cinematic depth or narrative authenticity.
 
 What drove this paradigm shift? It wasn't just better text prompts; it was the unification of multimodal reasoning with deterministic video pipelines.
 
@@ -66,7 +66,7 @@ Modern autonomous studios operate in synchronized cycles:
 
 YouTube's recommendation system has evolved. Keyword stuffing and clickbait titles now lead to severe retention penalties if viewers leave within the first 15 seconds.
 
-VOVO Agent AI's neural director structures every script with psychological hook pacing:
+OUM's neural director structures every script with psychological hook pacing:
 
 1. **0–5 Seconds:** Visual disruption and counter-intuitive question.
 2. **6–25 Seconds:** The stakes and proof of outcome.
@@ -75,7 +75,7 @@ VOVO Agent AI's neural director structures every script with psychological hook 
 
 ### 3. Case Study: Scaling From Zero to 100k Subscribers
 
-A creator in the technology documentary space deployed VOVO Agent AI to orchestrate 3 weekly long-form videos. Within 90 days:
+A creator in the technology documentary space deployed OUM to orchestrate 3 weekly long-form videos. Within 90 days:
 
 - **Total Production Time:** Reduced from 54 hours/week to 45 minutes of review time.
 - **Average CTR:** Increased from 4.2% to 11.8% using AI-generated thumbnail variants.
@@ -140,7 +140,7 @@ Visuals only account for 50% of retention. In our tests across 450,000 video ses
 
 ### Harnessing Generative B-Roll Without Looking Synthetic
 
-The biggest mistake creators make with AI video is generating generic, floaty b-roll. With VOVO Agent AI, video generators receive contextual scene prompts derived from the script's exact semantic anchors. This ensures visual coherence and cinematic realism.
+The biggest mistake creators make with AI video is generating generic, floaty b-roll. With OUM, video generators receive contextual scene prompts derived from the script's exact semantic anchors. This ensures visual coherence and cinematic realism.
     `.trim(),
   },
   {
@@ -172,7 +172,7 @@ Personal brand channels are notoriously difficult to delegate—the creator must
 
 - They can be systematized, automated, and outsourced completely.
 - They sell at 35x–48x monthly net profit multiples on creator marketplaces.
-- You can operate 5 distinct niche channels concurrently from a single VOVO dashboard.
+- You can operate 5 distinct niche channels concurrently from a single OUM dashboard.
 
 ### The High-RPM Niches of 2026
 
@@ -186,13 +186,13 @@ RPM (Revenue Per Mille) varies dramatically depending on audience purchasing pow
 ### The 4-Step Production Blueprint
 
 #### Step 1: Research & Niche Validation
-Use VOVO Agent AI's integrated Tavily search engine to uncover topics with high search velocity but low competition scores.
+Use OUM's integrated Tavily search engine to uncover topics with high search velocity but low competition scores.
 
 #### Step 2: Cinematic Script Generation
 Generate documentary-style narration with dramatic pacing, narrative tension, and verified technical citations.
 
 #### Step 3: Studio Voice Synthesis
-Connect ElevenLabs via VOVO's secure API vault to synthesize warm, documentary-grade narration. Select voices calibrated for narrative authority.
+Connect ElevenLabs via OUM's secure API vault to synthesize warm, documentary-grade narration. Select voices calibrated for narrative authority.
 
 #### Step 4: Video Generation with Higgsfield AI
 Direct Higgsfield AI to render custom 4K cinematic scenes matching the thematic palette of your script.
@@ -218,7 +218,7 @@ To hit $10,000/month consistently, do not rely on YouTube AdSense alone:
     coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&auto=format&fit=crop&q=80',
     author: {
       name: 'Dr. Tariq Mansour',
-      role: 'Head of AI Research at VOVO',
+      role: 'Head of AI Research at OUM',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
     },
     seoKeywords: [
@@ -239,7 +239,7 @@ The output was inevitably bland, generic, and unwatchable. Large language models
 
 ### The Agentic Multi-Agent Solution
 
-VOVO Agent AI solves this through a decentralized team of specialized micro-agents:
+OUM solves this through a decentralized team of specialized micro-agents:
 
 1. **The Lead Researcher (Agent A):** Scans arXiv, Techmeme, and industry whitepapers to compile factual foundations.
 2. **The Story Architect (Agent B):** Adapts the facts into the 3-Act Hero's Journey framework.
@@ -303,7 +303,7 @@ AI search engines do not like conversational fluff. They favor high information-
 - *Optimal:* "Autonomous video automation reduces per-video production expenditure from $450 to $18, achieving a 25x ROI within 60 days."
 
 #### 2. Clean Semantic Schema & Structured JSON-LD
-AI search crawlers parse structured data before raw HTML. Every article on VOVO Agent AI includes:
+AI search crawlers parse structured data before raw HTML. Every article on OUM includes:
 - \`Article\` Schema with canonical citation URLs.
 - \`HowTo\` and \`FAQPage\` schemas for procedural steps.
 - Clear entity relationships linking software tools (Higgsfield, ElevenLabs, OpenAI) to measurable outcomes.

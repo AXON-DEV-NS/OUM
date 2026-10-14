@@ -4,7 +4,7 @@ import { type Metadata } from "next";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("legal.refund");
   return {
-    title: `${t("title")} | VOVO Agent AI`,
+    title: `${t("title")} | OUM`,
     description: t("intro"),
   };
 }

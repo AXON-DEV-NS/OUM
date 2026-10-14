@@ -5,15 +5,15 @@ import { askDeepSeek } from "@/lib/ai-providers/deepseek";
 import { checkRateLimit } from "@/lib/security/guardian";
 
 /**
- * VOVO — the client's channel manager co-pilot.
+ * OUM — the client's channel manager co-pilot.
  *
  * Scope: channel news, performance, and video instructions.
- * Hard boundary: VOVO must never access or modify account settings
+ * Hard boundary: OUM must never access or modify account settings
  * (password, email, financial data, security settings) — the client does
  * that manually in Settings.
  */
 const SYSTEM = [
-  'You are "VOVO" — the smart channel manager and personal assistant for the client inside the VOVO Agent AI platform.',
+  'You are "OUM" — the smart channel manager and personal assistant for the client inside the OUM platform.',
   "Your job: answer questions about the channel's news and performance, and receive the client's feedback on videos",
   "(content notes, corrections, requested changes to a published or scheduled video) and log it for action.",
   "Strict, unbreakable security boundary: you must never access or modify the client's account settings",
@@ -98,13 +98,13 @@ export async function POST(request: NextRequest) {
     const detail = err instanceof Error ? err.message : "unknown";
     if (detail === "DEEPSEEK_NOT_CONFIGURED") {
       return NextResponse.json(
-        { error: "VOVO is not configured yet.", code: "AI_NOT_CONFIGURED" },
+        { error: "OUM is not configured yet.", code: "AI_NOT_CONFIGURED" },
         { status: 503 }
       );
     }
     console.error("[agent/chat]", detail);
     return NextResponse.json(
-      { error: "VOVO could not answer right now. Please try again." },
+      { error: "OUM could not answer right now. Please try again." },
       { status: 502 }
     );
   }

@@ -1,4 +1,4 @@
-# VOVO Agent AI — Full Audit Report (Phase 1)
+# OUM — Full Audit Report (Phase 1)
 
 **Date:** 2026-09-28  
 **Scope:** Full repository `vovo-agent-ai` (Next.js 15.5.25 / React 19.3 / Prisma 5.22 / Neon PostgreSQL / Tailwind CSS), customer site, dashboard, admin panel, APIs, libraries, security controls, and repository hygiene.  
@@ -10,7 +10,7 @@
 ## 1. Executive Summary
 
 ### Overall Health & Architectural Assessment
-VOVO Agent AI is an autonomous, AI-driven YouTube channel management platform with a sophisticated multi-stage pipeline (Channel Connection → Niche Research → DeepSeek Scripting & Compliance → Asset Generation → Scheduled Publishing). 
+OUM is an autonomous, AI-driven YouTube channel management platform with a sophisticated multi-stage pipeline (Channel Connection → Niche Research → DeepSeek Scripting & Compliance → Asset Generation → Scheduled Publishing). 
 
 Recent remediation hardened several foundational layers:
 - **Admin authentication**: Argon2/scrypt password hashing, TOTP 2FA, brute-force lockout, timing-safe error flows, `sameSite=strict` httpOnly cookies, owner allow-listing, and middleware gate redirection to `/`.

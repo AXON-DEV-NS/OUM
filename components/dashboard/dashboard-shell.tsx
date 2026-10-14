@@ -202,7 +202,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         </main>
       </div>
 
-      {/* VOVO — channel manager assistant (account settings are out of scope) */}
+      {/* OUM — channel manager assistant (account settings are out of scope) */}
       <VovoAssistant />
     </div>
   );

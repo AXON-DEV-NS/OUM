@@ -88,11 +88,11 @@ export async function POST(request: NextRequest) {
     // Dispatch email notification
     const result = await sendNotificationEmail({
       to: email,
-      subject: `Your verification code is ${code} — VOVO Agent AI`,
-      text: `Hello,\n\nYour verification code is: ${code}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nVOVO Agent AI Team`,
+      subject: `Your verification code is ${code} — OUM`,
+      text: `Hello,\n\nYour verification code is: ${code}\n\nThis code will expire in 10 minutes.\nIf you did not request this code, please ignore this email.\n\nOUM Team`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 32px; text-align: center;">
-          <h2 style="margin: 0 0 16px 0; color: #111110; font-size: 24px;">VOVO Agent AI</h2>
+          <h2 style="margin: 0 0 16px 0; color: #111110; font-size: 24px;">OUM</h2>
           <p style="color: #4b5563; font-size: 15px; margin-bottom: 24px;">Use the verification code below to complete your sign-in:</p>
           <div style="background: #f3f4f6; border-radius: 8px; padding: 18px 24px; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #111110; margin-bottom: 24px;">
             ${code}

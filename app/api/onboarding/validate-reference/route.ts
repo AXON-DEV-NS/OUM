@@ -106,7 +106,7 @@ async function validateChannel(raw: string): Promise<{ ok: boolean; title?: stri
       method: "GET",
       redirect: "follow",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      headers: { "user-agent": "Mozilla/5.0 (compatible; VOVO-Agent-AI/1.0)" },
+      headers: { "user-agent": "Mozilla/5.0 (compatible; OUM-Agent-AI/1.0)" },
     });
     if (res.status === 200) return { ok: true };
     if (res.status === 404) return { ok: false, error: "No channel found at this link." };

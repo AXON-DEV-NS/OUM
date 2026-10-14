@@ -1,4 +1,4 @@
-# VOVO Agent AI
+# OUM
 
 Autonomous AI-powered YouTube channel manager. Research, script drafting, compliance checks, asset generation, and scheduled publishing — creators stay in control with 1-click review.
 

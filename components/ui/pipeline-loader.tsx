@@ -140,8 +140,8 @@ export function PipelineLoader() {
           <span className="absolute inset-0 -m-1.5 rounded-3xl bg-gradient-to-br from-green-500/30 to-gold-400/30 blur-[2px]" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/vovo25.jpg"
-            alt="VOVO Agent AI"
+            src="/oum.png"
+            alt="OUM"
             width={52}
             height={52}
             className="relative h-[52px] w-[52px] rounded-2xl object-cover shadow-card ring-1 ring-line"

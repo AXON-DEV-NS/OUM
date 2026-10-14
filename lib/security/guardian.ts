@@ -491,7 +491,7 @@ export async function querySecurityGuardian(question: string): Promise<string> {
 
         const answer = await askDeepSeek({
           system:
-            'You are the security guardian of the VOVO Agent AI platform. Answer in English, concisely and professionally, relying only on the attached data, and never invent numbers. Use light Markdown.',
+            'You are the security guardian of the OUM platform. Answer in English, concisely and professionally, relying only on the attached data, and never invent numbers. Use light Markdown.',
           user: `Administrator question: ${q}\n\nReal system data:\n${context}`,
           maxTokens: 600,
         });

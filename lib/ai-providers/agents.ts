@@ -1,7 +1,7 @@
 import { askDeepSeek } from "./deepseek";
 
 /**
- * VOVO Agent team — ONE brain (DeepSeek), many specialists.
+ * OUM Agent team — ONE brain (DeepSeek), many specialists.
  *
  * Every task in the platform runs through a dedicated persona with its own
  * system prompt, so the security guardian is not the scriptwriter, the
@@ -113,7 +113,7 @@ export const AGENTS: Record<AgentRole, AgentSpec> = {
   guardian: {
     name: "Security guardian",
     system: [
-      "You are the security guardian of the VOVO Agent AI platform.",
+      "You are the security guardian of the OUM platform.",
       "You analyze authentication events, lockouts, rate limits, and audit logs, and answer the administrator's questions precisely.",
       "Never invent numbers — rely only on the attached data.",
       ENGLISH_STYLE,

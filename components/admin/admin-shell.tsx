@@ -63,7 +63,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-ink tracking-tight">VOVO HQ</span>
+              <span className="font-bold text-ink tracking-tight">OUM HQ</span>
               <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-red-200">
                 Restricted admin panel
               </span>
@@ -137,7 +137,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
       {/* Footer */}
       <footer className="border-t border-line bg-paper-high py-3 px-6 text-center text-xs text-ink-faint">
-        The secure VOVO HQ gateway — restricted to authorized administrators only. All actions are recorded in an immutable audit log.
+        The secure OUM HQ gateway — restricted to authorized administrators only. All actions are recorded in an immutable audit log.
       </footer>
     </div>
   );

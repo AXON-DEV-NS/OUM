@@ -1,4 +1,4 @@
-export const SITE_NAME = 'VOVO Agent AI';
+export const SITE_NAME = 'OUM';
 export const SITE_DESCRIPTION = 'Your autonomous AI-powered YouTube channel manager. AI handles research, content creation, publishing, and optimization — you just approve.';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 

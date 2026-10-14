@@ -9,14 +9,13 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { mark: "h-7 w-7 rounded-md", text: "text-sm" },
-  md: { mark: "h-9 w-9 rounded-lg", text: "text-lg" },
-  lg: { mark: "h-16 w-16 rounded-xl", text: "text-2xl" },
+  sm: { mark: "h-7 w-7", text: "text-sm" },
+  md: { mark: "h-9 w-9", text: "text-lg" },
+  lg: { mark: "h-16 w-16", text: "text-2xl" },
 } as const;
 
 /**
- * VOVO Agent AI — the site logo.
- * Uses the official mark (public/vovo25.jpg) with the wordmark.
+ * OUM — the site logo. Transparent mark (public/oum.png) + wordmark.
  */
 export function Logo({
   variant = "ink",
@@ -30,8 +29,8 @@ export function Logo({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <img
-        src="/vovo25.jpg"
-        alt="VOVO Agent AI logo"
+        src="/oum.png"
+        alt="OUM logo"
         width={512}
         height={512}
         className={cn("shrink-0 object-contain", s.mark)}
@@ -44,10 +43,7 @@ export function Logo({
             isInk ? "text-ink" : "text-paper-high"
           )}
         >
-          VOVO{" "}
-          <span className={cn("font-normal", isInk ? "text-ink-mute" : "text-paper/60")}>
-            Agent AI
-          </span>
+          OUM
         </span>
       )}
     </span>

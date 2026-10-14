@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "VOVO Agent AI",
+    "appName": "OUM",
     "getStarted": "Get Started",
     "learnMore": "Learn More",
     "signUp": "Sign Up",
@@ -88,13 +88,13 @@
     "stat3Label": "Active Channels",
     "stat4Value": "99.9%",
     "stat4Label": "Uptime",
-    "testimonial1": "VOVO Agent AI completely transformed how I run my channel. I used to spend 20+ hours a week on content — now I spend 2 hours reviewing AI drafts.",
+    "testimonial1": "OUM completely transformed how I run my channel. I used to spend 20+ hours a week on content — now I spend 2 hours reviewing AI drafts.",
     "testimonial1Author": "Sarah Chen",
     "testimonial1Role": "Tech Creator, 850K subscribers",
     "testimonial2": "The competitor analysis alone is worth the subscription. The AI found a content gap I never would have discovered on my own.",
     "testimonial2Author": "Ahmed Al-Rashid",
     "testimonial2Role": "Business Channel, 320K subscribers",
-    "testimonial3": "I was skeptical about AI content, but VOVO's output quality rivals what my human team was producing — at a fraction of the cost.",
+    "testimonial3": "I was skeptical about AI content, but OUM's output quality rivals what my human team was producing — at a fraction of the cost.",
     "testimonial3Author": "Maria Rodriguez",
     "testimonial3Role": "Lifestyle Creator, 1.2M subscribers"
   },
@@ -174,7 +174,7 @@
         },
         {
           "question": "Do you own my content?",
-          "answer": "Absolutely not. You retain 100% ownership of all content — scripts, thumbnails, videos, and any other creative assets produced through VOVO Agent AI."
+          "answer": "Absolutely not. You retain 100% ownership of all content — scripts, thumbnails, videos, and any other creative assets produced through OUM."
         },
         {
           "question": "How does the AI produce videos?",
@@ -216,7 +216,7 @@
     "privacy": {
       "title": "Privacy Policy",
       "lastUpdated": "Last updated: September 2025",
-      "intro": "VOVO Agent AI (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.",
+      "intro": "OUM (\"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.",
       "sections": [
         {
           "heading": "Information We Collect",
@@ -224,7 +224,7 @@
         },
         {
           "heading": "How We Use Your Information",
-          "content": "Your data is used to: provide and maintain the VOVO Agent AI service, personalize AI-generated content strategies, analyze platform usage to improve features, communicate service updates and support responses, and ensure platform security and prevent abuse. We do not sell your personal data to third parties."
+          "content": "Your data is used to: provide and maintain the OUM service, personalize AI-generated content strategies, analyze platform usage to improve features, communicate service updates and support responses, and ensure platform security and prevent abuse. We do not sell your personal data to third parties."
         },
         {
           "heading": "YouTube Data & API Services",
@@ -251,15 +251,15 @@
     "terms": {
       "title": "Terms of Service",
       "lastUpdated": "Last updated: September 2025",
-      "intro": "Welcome to VOVO Agent AI. By accessing or using our platform, you agree to be bound by these Terms of Service. Please read them carefully.",
+      "intro": "Welcome to OUM. By accessing or using our platform, you agree to be bound by these Terms of Service. Please read them carefully.",
       "sections": [
         {
           "heading": "Service Description",
-          "content": "VOVO Agent AI provides an AI-powered platform for YouTube channel management. Our service includes automated content research, script writing, thumbnail generation, video production assistance, publishing, and performance optimization. The AI operates autonomously based on your configured preferences; you retain approval authority over all published content."
+          "content": "OUM provides an AI-powered platform for YouTube channel management. Our service includes automated content research, script writing, thumbnail generation, video production assistance, publishing, and performance optimization. The AI operates autonomously based on your configured preferences; you retain approval authority over all published content."
         },
         {
           "heading": "Account & Eligibility",
-          "content": "You must be at least 18 years old to use VOVO Agent AI. You are responsible for maintaining the security of your account and for all activities that occur under your account. You must provide accurate and complete information during registration and keep your account information updated."
+          "content": "You must be at least 18 years old to use OUM. You are responsible for maintaining the security of your account and for all activities that occur under your account. You must provide accurate and complete information during registration and keep your account information updated."
         },
         {
           "heading": "Subscription & Payment",
@@ -267,7 +267,7 @@
         },
         {
           "heading": "Content Ownership",
-          "content": "You retain full ownership of all content created through VOVO Agent AI, including scripts, thumbnails, videos, and metadata. We claim no intellectual property rights over your content. By using the service, you grant us a limited license to process your content solely for the purpose of providing the service."
+          "content": "You retain full ownership of all content created through OUM, including scripts, thumbnails, videos, and metadata. We claim no intellectual property rights over your content. By using the service, you grant us a limited license to process your content solely for the purpose of providing the service."
         },
         {
           "heading": "Acceptable Use",
@@ -275,7 +275,7 @@
         },
         {
           "heading": "Limitation of Liability",
-          "content": "VOVO Agent AI is provided \"as is\" without warranties of any kind. We are not liable for any indirect, incidental, or consequential damages arising from use of the platform. Our total liability shall not exceed the amount paid by you in the 12 months preceding the claim. We do not guarantee specific growth results or channel performance."
+          "content": "OUM is provided \"as is\" without warranties of any kind. We are not liable for any indirect, incidental, or consequential damages arising from use of the platform. Our total liability shall not exceed the amount paid by you in the 12 months preceding the claim. We do not guarantee specific growth results or channel performance."
         },
         {
           "heading": "Termination",
@@ -286,7 +286,7 @@
     "refund": {
       "title": "Refund Policy",
       "lastUpdated": "Last updated: September 2026",
-      "intro": "At VOVO Agent AI, customer satisfaction and trust are our top priorities. This policy explains how refund requests are handled for our subscriptions.",
+      "intro": "At OUM, customer satisfaction and trust are our top priorities. This policy explains how refund requests are handled for our subscriptions.",
       "sections": [
         {
           "heading": "Refund Requests",
@@ -333,14 +333,14 @@
         },
         {
           "heading": "Easy Plan Reactivation",
-          "content": "If you ever decide to return to VOVO Agent AI, your account preferences, connected YouTube channels, and historical performance models will be ready for instant reactivation."
+          "content": "If you ever decide to return to OUM, your account preferences, connected YouTube channels, and historical performance models will be ready for instant reactivation."
         }
       ]
     }
   },
   "login": {
     "title": "Welcome Back",
-    "subtitle": "Sign in to your VOVO Agent AI account",
+    "subtitle": "Sign in to your OUM account",
     "google": "Continue with Google",
     "or": "or",
     "magicLink": {
@@ -396,7 +396,7 @@
       "title": "Connect Your YouTube Channel",
       "step1": {
         "title": "Choose a Channel",
-        "desc": "Select the YouTube channel you want to connect to VOVO Agent AI."
+        "desc": "Select the YouTube channel you want to connect to OUM."
       },
       "step2": {
         "title": "Review Permissions",

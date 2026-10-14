@@ -19,7 +19,7 @@ export const NOTIFICATION_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLower
  * owner during testing).
  */
 export const EMAIL_FROM =
-  process.env.EMAIL_FROM?.trim() || "VOVO Platform <onboarding@resend.dev>";
+  process.env.EMAIL_FROM?.trim() || "OUM Platform <onboarding@resend.dev>";
 
 /**
  * Resolves the configured Resend / Email provider API key from env or secrets store.
@@ -140,12 +140,12 @@ export async function notifyContactSubmission(data: {
   ipAddress?: string;
 }) {
   const title = data.subject?.trim() || "New inquiry message";
-  const subject = `[VOVO New Contact] ${title} — from ${data.name}`;
+  const subject = `[OUM New Contact] ${title} — from ${data.name}`;
 
   const html = `
     <div dir="ltr" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
       <div style="background: #111110; padding: 24px; color: #ffffff; text-align: center;">
-        <h1 style="margin: 0; font-size: 20px; font-weight: bold;">VOVO Agent AI</h1>
+        <h1 style="margin: 0; font-size: 20px; font-weight: bold;">OUM</h1>
         <p style="margin: 6px 0 0 0; font-size: 13px; color: #9ca3af;">You received a new contact / inquiry message through the website</p>
       </div>
       <div style="padding: 24px;">
@@ -164,13 +164,13 @@ export async function notifyContactSubmission(data: {
         </div>
       </div>
       <div style="background: #f9fafb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
-        This message was received via the Contact Us page on the VOVO Agent AI platform
+        This message was received via the Contact Us page on the OUM platform
       </div>
     </div>
   `;
 
   const text = `
-New contact message on the VOVO Agent AI platform:
+New contact message on the OUM platform:
 Name: ${data.name}
 Email: ${data.email}
 Subject: ${title}
@@ -215,7 +215,7 @@ export async function notifySupportTicketCreated(data: {
   const priorityBadge =
     data.priority === "URGENT" ? "🔴 Critical" : data.priority === "HIGH" ? "🟠 High priority" : "🔵 Normal";
 
-  const subject = `🚨 [VOVO Support Ticket - ${data.priority}] ${data.subject}`;
+  const subject = `🚨 [OUM Support Ticket - ${data.priority}] ${data.subject}`;
 
   const html = `
     <div dir="ltr" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
@@ -239,7 +239,7 @@ export async function notifySupportTicketCreated(data: {
         </div>
       </div>
       <div style="background: #f9fafb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
-        Support &amp; incidents alert system — VOVO HQ
+        Support &amp; incidents alert system — OUM HQ
       </div>
     </div>
   `;
@@ -272,7 +272,7 @@ export async function notifySupportTicketReply(data: {
   userEmail?: string;
   content: string;
 }) {
-  const subject = `💬 [VOVO Customer Reply] on support ticket #${data.ticketId}`;
+  const subject = `💬 [OUM Customer Reply] on support ticket #${data.ticketId}`;
 
   const html = `
     <div dir="ltr" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">

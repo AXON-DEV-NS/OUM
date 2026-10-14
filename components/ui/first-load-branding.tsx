@@ -59,7 +59,7 @@ export function FirstLoadBranding() {
     <div
       role="status"
       aria-live="polite"
-      aria-label="VOVO Agent AI"
+      aria-label="OUM"
       className={cn(
         "fixed inset-0 z-[9998] flex items-center justify-center bg-paper/60 backdrop-blur-md transition-opacity duration-500 ease-out",
         state === "leaving" && "pointer-events-none opacity-0"

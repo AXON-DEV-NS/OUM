@@ -25,8 +25,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "VOVO Agent AI",
-    template: "%s — VOVO Agent AI",
+    default: "OUM",
+    template: "%s — OUM",
   },
   description:
     "Your autonomous AI-powered YouTube channel manager. AI handles research, content creation, publishing, and optimization — you just approve.",
@@ -42,30 +42,30 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_SITE_URL || "https://vovo-five.vercel.app",
-    siteName: "VOVO Agent AI",
-    title: "VOVO Agent AI — Autonomous YouTube Channel Manager",
+    siteName: "OUM",
+    title: "OUM — Autonomous YouTube Channel Manager",
     description:
       "AI handles research, content creation, publishing, and optimization — you just approve.",
     images: [
       {
-        url: "/vovo25.jpg",
+        url: "/oum.png",
         width: 1200,
         height: 630,
-        alt: "VOVO Agent AI",
+        alt: "OUM",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "VOVO Agent AI — Autonomous YouTube Channel Manager",
+    title: "OUM — Autonomous YouTube Channel Manager",
     description:
       "AI handles research, content creation, publishing, and optimization — you just approve.",
-    images: ["/vovo25.jpg"],
+    images: ["/oum.png"],
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "VOVO Agent AI",
+    title: "OUM",
   },
   // Prevent Chrome/Google Translate from rewriting the DOM — its injected
   // <font> wrappers break React reconciliation (insertBefore crashes).

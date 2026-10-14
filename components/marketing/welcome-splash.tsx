@@ -83,7 +83,7 @@ export function WelcomeSplash() {
   return (
     <div
       role="dialog"
-      aria-label="Welcome to VOVO Agent AI"
+      aria-label="Welcome to OUM"
       className={cn(
         "fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-paper transition-opacity duration-500 ease-out",
         state === "leaving" && "pointer-events-none opacity-0"

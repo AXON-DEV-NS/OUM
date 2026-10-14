@@ -18,10 +18,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getBlogPostBySlug(slug);
-  if (!post) return { title: 'Article Not Found | VOVO Agent AI' };
+  if (!post) return { title: 'Article Not Found | OUM' };
 
   return {
-    title: `${post.title} | VOVO Agent AI Research`,
+    title: `${post.title} | OUM Research`,
     description: post.excerpt,
     keywords: post.seoKeywords,
     authors: [{ name: post.author.name }],
@@ -67,7 +67,7 @@ export default async function BlogPostPage({ params }: Props) {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'VOVO Agent AI',
+      name: 'OUM',
       logo: {
         '@type': 'ImageObject',
         url: 'https://vovo-agent.ai/icon-512.png',
@@ -254,7 +254,7 @@ export default async function BlogPostPage({ params }: Props) {
                 Automate Your YouTube Growth Today
               </h3>
               <p className="text-xs sm:text-sm text-gray-400 max-w-lg leading-relaxed">
-                Join thousands of creators using VOVO Agent AI to autonomously research trends, generate studio scripts, and publish high-retention videos.
+                Join thousands of creators using OUM to autonomously research trends, generate studio scripts, and publish high-retention videos.
               </p>
             </div>
 

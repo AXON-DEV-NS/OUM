@@ -46,7 +46,7 @@ function readConfig(prefix: "" | "SECONDARY_"): SmtpConfig | null {
     from:
       process.env[`SMTP_${prefix}FROM`]?.trim() ||
       process.env.EMAIL_FROM?.trim() ||
-      "VOVO Platform <no-reply@vovo.ai>",
+      "OUM Platform <no-reply@vovo.ai>",
   };
 }
 

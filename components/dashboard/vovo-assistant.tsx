@@ -11,11 +11,11 @@ interface ChatMessage {
 
 const GREETING: ChatMessage = {
   role: "vovo",
-  text: "Hi! I'm VOVO — your AI channel manager. Ask me about channel performance, or send feedback on any video (published or scheduled) and I'll log it for action. Note: your account settings (password, email, billing) are managed manually from the Settings page only.",
+  text: "Hi! I'm OUM — your AI channel manager. Ask me about channel performance, or send feedback on any video (published or scheduled) and I'll log it for action. Note: your account settings (password, email, billing) are managed manually from the Settings page only.",
 };
 
 /**
- * VOVO — the floating channel-manager assistant.
+ * OUM — the floating channel-manager assistant.
  * Brand colors only: paper / ink / green / gold.
  */
 export function VovoAssistant() {
@@ -66,7 +66,7 @@ export function VovoAssistant() {
       {/* Floating launcher */}
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Open VOVO assistant"
+        aria-label="Open OUM assistant"
         className={cn(
           "fixed bottom-6 right-6 z-[60] flex h-13 w-13 items-center justify-center rounded-full shadow-card transition-transform active:scale-95",
           open ? "bg-ink text-paper-high" : "bg-green-600 text-paper-high hover:bg-green-700"
@@ -84,7 +84,7 @@ export function VovoAssistant() {
               V
             </span>
             <div className="flex-1">
-              <p className="text-sm font-semibold">VOVO</p>
+              <p className="text-sm font-semibold">OUM</p>
               <p className="text-[10px] uppercase tracking-wider text-paper/50">
                 Channel manager
               </p>
@@ -108,7 +108,7 @@ export function VovoAssistant() {
             ))}
             {sending && (
               <div className="mr-auto flex items-center gap-2 rounded-xl border border-line bg-paper-high px-3 py-2 text-xs text-ink-mute">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> VOVO is typing...
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> OUM is typing...
               </div>
             )}
             <div ref={bottomRef} />
@@ -125,7 +125,7 @@ export function VovoAssistant() {
                     send();
                   }
                 }}
-                placeholder="Message VOVO..."
+                placeholder="Message OUM..."
                 className="h-10 flex-1 rounded-lg border border-line bg-paper px-3 text-xs text-ink placeholder:text-ink-faint focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20"
               />
               <button
@@ -138,7 +138,7 @@ export function VovoAssistant() {
               </button>
             </div>
             <p className="mt-2 text-center text-[10px] text-ink-faint">
-              VOVO can&apos;t access your account settings or payment data — those are managed manually only.
+              OUM can&apos;t access your account settings or payment data — those are managed manually only.
             </p>
           </div>
         </div>

@@ -4,11 +4,11 @@ import { BLOG_POSTS, getAllBlogCategories } from '@/lib/blog/articles';
 import { Sparkles, Clock, ArrowRight, BookOpen } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Blog & AI Creator Research | VOVO Agent AI',
+  title: 'Blog & AI Creator Research | OUM',
   description:
     'Read the latest guides, algorithm teardowns, and engineering insights on autonomous YouTube channel automation, generative video, and Generative Engine Optimization (GEO).',
   openGraph: {
-    title: 'Blog & AI Creator Research | VOVO Agent AI',
+    title: 'Blog & AI Creator Research | OUM',
     description:
       'Autonomous YouTube automation, algorithm teardowns, and Generative Engine Optimization.',
     type: 'website',
