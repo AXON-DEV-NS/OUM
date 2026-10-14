@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OUM — Connect Once. Relax. (30s Pixel Intro, HyperFrames 8K)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,700&family=JetBrains+Mono:wght@700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{--olive:#4A6238;--olive2:#739956;--ink:#181A16;--deep:#0B0E09;--gold:#C8A858;--gold2:#FFD56B;--cream:#F3E7CE;--red:#D94E4E;--ok:#52B788}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:none}
+body{background:#000;overflow:hidden}
+#composition{position:relative;width:7680px;height:4320px;overflow:hidden;background:var(--deep)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform:scale(4);transform-origin:0 0;overflow:hidden;color:var(--cream);font-family:'JetBrains Mono',monospace;background-color:var(--deep);background-image:linear-gradient(rgba(74,98,56,.14) 2px,transparent 2px),linear-gradient(90deg,rgba(74,98,56,.14) 2px,transparent 2px);background-size:32px 32px}
+.scan{position:absolute;inset:0;z-index:90;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 2px,transparent 2px 4px)}
+.hud{position:absolute;top:24px;left:40px;right:40px;height:76px;z-index:80;display:flex;justify-content:space-between;align-items:center;padding:0 28px;background:rgba(24,26,22,.96);border:4px solid var(--gold);box-shadow:8px 8px 0 #000}
+.hud b{font:20px 'Press Start 2P';color:var(--gold2)}
+.hud span{font:800 22px 'JetBrains Mono'}
+.hud em{font:16px 'Press Start 2P';color:var(--olive2);font-style:normal}
+.scene{position:absolute;inset:0;opacity:0;z-index:20}
+#s1{opacity:1}
+h1{font:700 104px/1.05 Fraunces,serif;text-align:center}
+h1 i{color:var(--gold2)}
+.hook{position:absolute;top:128px;left:0;right:0;text-align:center}
+#tabs{display:inline-block;margin-top:20px;font:24px 'Press Start 2P';background:var(--red);color:#fff;padding:12px 22px;box-shadow:6px 6px 0 #000}
+.cw{position:absolute;width:520px;background:#1E1414;border:4px solid var(--red);box-shadow:10px 10px 0 #000;padding:14px 18px;opacity:0}
+.cw h6{font:14px 'Press Start 2P';background:var(--red);color:#fff;padding:8px 10px;margin:-14px -18px 12px}
+.cw p{font:700 30px/1.15 Fraunces,serif}
+.conn{position:absolute;top:132px;left:0;right:0;text-align:center}
+.conn h1{font-size:116px}
+.conn p{font:800 30px 'JetBrains Mono';color:var(--gold2);margin-top:14px}
+#steps{position:absolute;left:59px;right:59px;top:800px;display:flex;gap:18px}
+.su{flex:1;background:var(--ink);border:4px solid var(--olive);box-shadow:8px 8px 0 #000;padding:14px 16px;opacity:0}
+.su.g{border-color:var(--gold2);background:#22291C}
+.su s{display:inline-block;text-decoration:none;font:14px 'Press Start 2P';background:var(--gold);color:var(--ink);padding:7px 10px;margin-bottom:10px}
+.su h3{font:700 32px/1.1 Fraunces,serif;margin-bottom:6px}
+.su p{font:700 21px/1.3 'JetBrains Mono';color:#B9C8AC}
+#beams{position:absolute;inset:0;width:1920px;height:1080px}
+.bm{stroke:var(--olive2);stroke-width:6;stroke-dasharray:14 10;opacity:0}
+.bm.g{stroke:var(--gold2)}
+.st{position:absolute;width:520px;height:118px;display:flex;align-items:center;gap:18px;padding:0 20px;background:var(--ink);border:4px solid #39482F;box-shadow:8px 8px 0 #000;opacity:0}
+.st.g{border-color:var(--gold2);background:#22291C;box-shadow:0 0 24px rgba(255,213,107,.3),8px 8px 0 #000}
+.st i{font:normal 24px 'Press Start 2P';background:var(--olive);padding:14px 10px;min-width:64px;text-align:center}
+.st.g i{background:var(--gold2);color:var(--ink)}
+.st span{font:700 32px/1.1 Fraunces,serif}
+.st u{position:absolute;top:-16px;right:12px;text-decoration:none;font:12px 'Press Start 2P';background:var(--gold2);color:var(--ink);padding:5px 8px}
+#pill{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#182214;border:3px solid var(--gold);padding:12px 30px;font:800 24px 'JetBrains Mono';color:var(--gold2);opacity:0}
+.rc{position:absolute;top:250px;width:600px;background:var(--ink);border:4px solid var(--gold2);box-shadow:12px 12px 0 #000;padding:26px;opacity:0}
+.rc h6{font:14px 'Press Start 2P';color:var(--gold2);border-bottom:3px solid #2F3829;padding-bottom:12px;margin-bottom:16px}
+.rc h2{font:700 40px/1.1 Fraunces,serif;margin-bottom:14px}
+.rc p{font:800 26px/1.3 'JetBrains Mono';margin-bottom:8px}
+.rc .big{font-size:36px;color:var(--ok)}
+.rc .gd{color:var(--gold2);font-size:22px}
+.btns{display:flex;gap:10px;margin-top:16px}
+.btns div{flex:1;text-align:center;padding:12px 0;font:800 20px 'JetBrains Mono';color:#000;border:3px solid #000}
+.fin{position:absolute;left:210px;right:210px;bottom:48px;background:var(--cream);color:var(--ink);border:6px solid var(--ink);box-shadow:16px 16px 0 var(--gold);padding:24px 40px;text-align:center;opacity:0}
+.fin b{display:block;font:54px 'Press Start 2P';color:var(--olive);margin-bottom:14px}
+.fin h1{font-size:70px}
+.fin h1 i{color:var(--olive)}
+.fin p{font:700 32px Fraunces,serif;color:var(--olive);margin:8px 0 16px}
+.pills{display:flex;justify-content:center;gap:14px}
+.pills span{background:var(--ink);color:var(--gold2);border:3px solid var(--gold);font:800 21px 'JetBrains Mono';padding:7px 18px}
+#rig{position:absolute;left:805px;top:500px;width:310px;height:280px;z-index:50}
+#rig svg{filter:drop-shadow(0 14px 0 rgba(0,0,0,.85))}
+.bub{position:absolute;left:50%;bottom:300px;transform:translateX(-50%);width:max-content;max-width:620px;background:var(--cream);color:var(--ink);border:5px solid var(--ink);box-shadow:8px 8px 0 var(--gold);padding:12px 24px;font:700 32px/1.15 Fraunces,serif;text-align:center}
+.bub:after{content:"";position:absolute;left:50%;bottom:-20px;width:18px;height:18px;margin-left:-9px;background:var(--cream);border:5px solid var(--ink);border-top:0;border-left:0;transform:rotate(45deg)}
+#ring{position:absolute;left:900px;top:580px;width:120px;height:120px;border:10px solid var(--gold2);border-radius:24px;box-shadow:0 0 40px var(--gold2);opacity:0;z-index:60}
+.ex{display:none}
+</style>
+</head>
+<body>
+<div id="composition" data-composition data-width="7680" data-height="4320" data-fps="30" data-duration="30">
+<div id="stage">
+<div class="scan"></div>
+<div class="hud"><b>OUM</b><span id="hs"></span><em id="ht"></em></div>
+
+<!-- 0–4.4s HOOK -->
+<div class="scene" id="s1">
+  <div class="hook"><h1>You're not a creator.<br>You're a <i>tab manager.</i></h1><div id="tabs"></div></div>
+  <div id="chaos"></div>
+</div>
+
+<!-- 4.6–12s CONNECT ONCE + 5-STEP SETUP -->
+<div class="scene" id="s2">
+  <div class="conn"><h1>Connect once. <i>Relax.</i></h1><p>Official Google OAuth. Never your password.</p></div>
+  <div id="steps"></div>
+</div>
+
+<!-- 12.2–21.4s 9-STAGE PIPELINE -->
+<div class="scene" id="s4">
+  <svg id="beams" viewBox="0 0 1920 1080"></svg>
+  <div id="cards"></div>
+  <div id="pill">Auto-checkpoints + cost caps + licensed fallbacks + originality shield</div>
+</div>
+
+<!-- 21.6–25.6s APPROVAL + WEEKLY REPORT -->
+<div class="scene" id="s5">
+  <div class="rc" id="rl" style="left:40px">
+    <h6>TELEGRAM // READY TO APPROVE</h6>
+    <h2>Ep. 12: Lost Empire Mysteries</h2>
+    <p class="big">QUALITY 92/100</p>
+    <p style="font-size:22px;color:#B9C8AC">+ 9:16 Short + 3 tested thumbnails</p>
+    <div class="btns"><div style="background:var(--ok)">APPROVE</div><div style="background:var(--gold)">EDIT</div><div style="background:var(--cream)">SNOOZE</div></div>
+  </div>
+  <div class="rc" id="rr" style="left:1280px">
+    <h6>WHATSAPP // WEEKLY REPORT (SAMPLE)</h6>
+    <h2>Your week, in one minute</h2>
+    <p>3 episodes + 3 Shorts</p>
+    <p>+850 subs / +18% watch time</p>
+    <p class="gd">Niche memory: mystery-question hooks keep viewers longest.</p>
+  </div>
+</div>
+
+<!-- 25.8–30s FINALE -->
+<div class="scene" id="s6">
+  <div class="fin" id="fin">
+    <b>OUM</b>
+    <h1>Connect once. <i>Relax.</i></h1>
+    <p>Your AI director runs the whole channel. You just approve.</p>
+    <div class="pills"><span>Google OAuth</span><span>9-stage autopilot</span><span>Rival analysis</span><span>Thumbnails + Shorts</span></div>
+  </div>
+</div>
+
+<div id="ring"></div>
+
+<!-- OUM avatar: the one who runs the channel -->
+<div id="rig">
+  <div class="bub" id="bub"></div>
+  <svg viewBox="0 0 340 300" width="310" height="280"><g id="bob">
+    <g id="legs"></g>
+    <g stroke="#080907" stroke-width="6"><rect x="18" y="98" width="46" height="62" rx="15" fill="#4A6238"/><rect x="276" y="98" width="46" height="62" rx="15" fill="#4A6238"/></g>
+    <rect x="44" y="101" width="16" height="56" fill="#181A16"/><rect x="280" y="101" width="16" height="56" fill="#181A16"/>
+    <rect x="56" y="24" width="228" height="204" rx="34" fill="#181A16" stroke="#080907" stroke-width="7"/>
+    <g fill="none" stroke="#C8A858" stroke-width="5.5" stroke-linecap="round"><path d="M72 64Q72 40 98 40"/><path d="M268 64Q268 40 242 40"/><path d="M72 188Q72 212 98 212"/><path d="M268 188Q268 212 242 212"/></g>
+    <g fill="#C8A858"><circle cx="114" cy="40" r="4"/><circle cx="72" cy="80" r="4"/><circle cx="226" cy="40" r="4"/><circle cx="268" cy="80" r="4"/><circle cx="114" cy="212" r="4"/><circle cx="72" cy="172" r="4"/><circle cx="226" cy="212" r="4"/><circle cx="268" cy="172" r="4"/></g>
+    <rect x="86" y="52" width="168" height="148" rx="24" fill="#4A6238" stroke="#0E120C" stroke-width="5"/>
+    <g class="ex" id="e-normal"><rect x="108" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><circle cx="122" cy="104" r="7.5" fill="#F3E7CE"/><circle cx="140" cy="124" r="3.8" fill="#F3E7CE"/><rect x="186" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><circle cx="200" cy="104" r="7.5" fill="#F3E7CE"/><circle cx="218" cy="124" r="3.8" fill="#F3E7CE"/></g>
+    <g class="ex" id="e-confused"><rect x="108" y="90" width="46" height="46" rx="13" fill="#F3E7CE" stroke="#0B0C0A" stroke-width="3"/><circle cx="122" cy="118" r="10" fill="#0B0C0A"/><rect x="186" y="90" width="46" height="46" rx="13" fill="#F3E7CE" stroke="#0B0C0A" stroke-width="3"/><circle cx="216" cy="106" r="10" fill="#0B0C0A"/></g>
+    <g class="ex" id="e-angry"><polygon points="106,94 154,110 154,136 106,136" fill="#0B0C0A"/><polygon points="234,94 186,110 186,136 234,136" fill="#0B0C0A"/></g>
+    <g class="ex" id="e-wink"><path d="M110 118Q131 92 152 118" fill="none" stroke="#0B0C0A" stroke-width="10" stroke-linecap="round"/><rect x="186" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><circle cx="200" cy="104" r="7.5" fill="#F3E7CE"/><circle cx="218" cy="124" r="3.8" fill="#F3E7CE"/></g>
+    <g class="ex" id="e-happy"><path d="M110 120Q131 92 152 120" fill="none" stroke="#0B0C0A" stroke-width="10" stroke-linecap="round"/><path d="M188 120Q209 92 230 120" fill="none" stroke="#0B0C0A" stroke-width="10" stroke-linecap="round"/></g>
+    <g class="ex" id="e-excited"><rect x="108" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><path d="M131 95L135 108L148 113L135 118L131 131L127 118L114 113L127 108Z" fill="#FFD56B"/><rect x="186" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><path d="M209 95L213 108L226 113L213 118L209 131L205 118L192 113L205 108Z" fill="#FFD56B"/></g>
+  </g></svg>
+</div>
+</div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const hud=(a,b)=>($('#hs').textContent=a);
+
+// ---- content ----
+const chaos=[["TAB 01 / SCRIPT AI","Generic scripts. Zero market research."],["TAB 02 / RIVAL SHEET","Hours of manual competitor analysis."],["TAB 03 / IMAGE AI","Your hero's face changes every shot."],["TAB 04 / 6 MORE SITES","Voice, edit, thumbnail, upload. By hand."],["TAB 05 / RISK","Reused content. Missing AI disclosure."],["TAB 06 / THUMBNAIL","Great video. Nobody clicks."]];
+const setup=[["Connect","Official Google OAuth. No password."],["Niche & Audience","Pick niche, language and region."],["Study Rivals","1–3 reference videos + 1–3 rival channels, analyzed for you.",1],["Lock Your Hero","Up to 5 photos keep one face in every shot."],["Pick a Mode","Copilot review or full Autopilot."]];
+const stages=[["Market & Trend Analysis","01 · I research your niche, rivals and trends. No spreadsheets.","normal"],["Viral Script & Hook","02 · I write the script, with a hook for the first 5 seconds.","wink"],["Video & Voice","03 · Scenes and voice, with your hero's face locked.","normal"],["Smart Montage","04 · Smart edit, licensed music, subtitles.","normal"],["Thumbnail Studio",
+"05 · Three thumbnails, tested in the CTR Lab.","wink",1],["Triple QA Check","06 · Triple QA: technical, policy, retention.","angry",1],["Approval Gate","07 · You approve on Telegram. Or go full Autopilot.","happy",1],["SEO & Smart Publish","08 · SEO, AI disclosure, best-time scheduling.","normal"],["Growth After Publish","09 · A Short, a first comment, and I learn for next time.","excited",1]];
+
+// ---- build DOM ----
+chaos.forEach(([h,p],i)=>$('#chaos').insertAdjacentHTML('beforeend',`<div class="cw" style="left:${i%2?1350:50}px;top:${440+(i>>1)*180}px"><h6>${h}</h6><p>${p}</p></div>`));
+setup.forEach(([h,p,g],i)=>$('#steps').insertAdjacentHTML('beforeend',`<div class="su ${g?'g':''}"><s>STEP 0${i+1}</s><h3>${h}</h3><p>${p}</p></div>`));
+const pos=i=>i<4?[50,175+i*160,570,0]:i==4?[700,150,960,1]:[1350,175+(i-5)*160,1350,0];
+stages.forEach(([n,,,g],i)=>{const[x,y,ex]=pos(i),top=i==4,ey=top?y+118:y+59;
+ $('#beams').insertAdjacentHTML('beforeend',`<line id="b${i}" class="bm ${g?'g':''}" x1="960" y1="640" x2="${ex}" y2="${ey}"/>`);
+ $('#cards').insertAdjacentHTML('beforeend',`<div class="st ${g?'g':''}" id="c${i}" style="left:${x}px;top:${y}px"><i>0${i+1}</i><span>${n}</span>${g?'<u>NEW v2.0</u>':''}</div>`)});
+[[78,218,18],[132,222,0],[208,222,0],[262,218,-18]].forEach(([x,y,r],i)=>$('#legs').insertAdjacentHTML('beforeend',`<g class="lg" data-x="${x}" data-y="${y}" data-r="${r}"><rect x="-14" y="0" width="28" height="50" rx="14" fill="#181A16" stroke="#080907" stroke-width="5"/><rect x="-11" y="20" width="22" height="26" rx="11" fill="#4A6238"/><circle cy="38" r="5" fill="#C8A858"/></g>`));
+
+// ---- beats: time, expression, bubble text, HUD status ----
+const beats=[[0,"confused","","ALERT // 10 TABS OPEN. 0 VIDEOS PUBLISHED"],
+[3.5,"angry","Enough tabs. I'll take it from here.","CLEARING TOOL CHAOS..."],
+[4.8,"wink","One click, and your channel is connected.","SETUP // 5 STEPS, A FEW MINUTES"],
+[7.8,"normal","Rivals, references, your hero's face. I study it all.","CALIBRATION // RIVAL ANALYSIS: AUTO"],
+[11.4,"happy","Done. That's the last setup you'll do.","CHANNEL LINKED // ALL SYSTEMS GO"],
+...stages.map((s,i)=>[12.4+i*.95,s[2],s[1],`PIPELINE // STAGE 0${i+1} OF 09 RUNNING`]),
+[21.6,"happy","Every week: a report, straight to your phone.","REPORTS // TELEGRAM + WHATSAPP"],
+[25.7,"excited","OUM runs your channel. You just relax.","SYSTEM READY // AUTOPILOT ACTIVE"],
+[28.3,"wink","03:12 AM. You're asleep. I'm publishing.","03:12 AM // YOU: SLEEPING. OUM: PUBLISHING"]];
+
+// ---- timeline (GSAP) ----
+const tl=gsap.timeline({paused:true}),cw=$$('.cw');
+const fade=(s,a,b)=>{tl.fromTo(s,{opacity:0},{opacity:1,duration:.25},a);tl.to(s,{opacity:0,duration:.25},b)};
+tl.from('.hook',{y:-40,duration:.3,ease:'steps(4)'},0);
+tl.from('#rig',{scale:.6,duration:.4,ease:'back.out(2)'},0);
+cw.forEach((w,i)=>tl.fromTo(w,{scale:.5,opacity:0},{scale:1,opacity:1,duration:.3,ease:'back.out(1.6)'},.5+i*.45));
+tl.to('.hook',{opacity:0,duration:.2},3.5);
+tl.to(cw,{scale:.2,opacity:0,y:-100,duration:.4,stagger:.05,ease:'power3.in'},3.7);
+tl.to('#s1',{opacity:0,duration:.25},4.2);
+fade('#s2',4.6,11.9);
+tl.from('.conn',{y:-40,duration:.4,ease:'steps(5)'},4.6);
+$$('.su').forEach((s,i)=>tl.fromTo(s,{y:60,opacity:0},{y:0,opacity:1,duration:.4,ease:'steps(5)'},7.6+i*.6));
+fade('#s4',12.2,21.4);
+stages.forEach((_,i)=>{const t=12.4+i*.95;
+ tl.fromTo('#b'+i,{opacity:0},{opacity:1,duration:.2},t);
+ tl.fromTo('#c'+i,{scale:.7,opacity:0},{scale:1,opacity:1,duration:.35,ease:'back.out(1.7)'},t+.1)});
+tl.fromTo('#pill',{opacity:0,y:30},{opacity:1,y:0,duration:.4},20.2);
+fade('#s5',21.6,25.5);
+tl.fromTo('#rl',{x:-80,opacity:0},{x:0,opacity:1,duration:.5,ease:'back.out(1.5)'},21.8);
+tl.fromTo('#rr',{x:80,opacity:0},{x:0,opacity:1,duration:.5,ease:'back.out(1.5)'},22.5);
+fade('#s6',25.8,31);
+tl.to('#rig',{y:-120,duration:.5,ease:'steps(6)'},25.7);
+tl.fromTo('#fin',{y:100,opacity:0},{y:0,opacity:1,duration:.6,ease:'back.out(1.4)'},25.9);
+
+// ---- deterministic per-frame state (pure function of time) ----
+let last=-1;
+function render(t){
+ let b=beats[0];beats.forEach(x=>{if(x[0]<=t)b=x});
+ if(b!==last){last=b;$$('.ex').forEach(g=>g.style.display=g.id==='e-'+b[1]?'block':'none');
+  $('#bub').style.display=b[2]?'block':'none';$('#bub').textContent=b[2];hud(b[3]);}
+ $('#tabs').textContent='TABS OPEN: '+String(Math.min(10,1+Math.floor(t/.35))).padStart(2,'0');
+ $$('.lg').forEach((g,i)=>g.setAttribute('transform',`translate(${g.dataset.x},${+g.dataset.y-((Math.floor(t/.15)+i)%2?8:0)}) rotate(${g.dataset.r})`));
+ $('#bob').style.transform=`translateY(${Math.floor(t/.3)%2?-6:0}px)`;
+ cw.forEach((w,i)=>w.style.translate=`${(Math.floor(t*10+i)%3-1)*3}px 0`);
+ $$('.bm').forEach(l=>l.style.strokeDashoffset=-t*40);
+ const p=(t-3.8)/1,r=$('#ring');r.style.opacity=p>=0&&p<=1?1-p:0;r.style.transform=`scale(${.2+Math.max(0,Math.min(1,p))*17.8})`;
+ $('#ht').textContent=`00:${String(Math.min(30,Math.floor(t))).padStart(2,'0')} / 00:30`;
+}
+window.hyperframes={seek:t=>tl.seek(t,false)};
+render(0);
+if(!navigator.webdriver){
+ const fit=()=>$('#composition').style.zoom=Math.min(innerWidth/7680,innerHeight/4320);fit();onresize=fit;
+ tl.repeat(-1).play(0);gsap.ticker.add(()=>render(tl.time()));
+}
+</script>
+</body>
+</html>

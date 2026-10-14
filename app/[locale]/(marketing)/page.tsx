@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { FeatureMarquee } from "@/components/marketing/feature-marquee";
 import { GetStartedButton } from "@/components/marketing/get-started-button";
-import { OumIntroFrame } from "@/components/marketing/oum-intro-frame";
+import { HeroVideo } from "@/components/marketing/hero-video";
+import { VideoModalButton } from "@/components/marketing/video-modal";
+import { MeetOum } from "@/components/marketing/meet-oum";
+import { buttonVariants } from "@/components/ui/button";
 import { FallingTestimonials } from "@/components/marketing/falling-testimonials";
 import { ArrowUpRight } from "lucide-react";
 
@@ -29,16 +32,14 @@ function Hero() {
 
           <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
             <GetStartedButton />
-            <Link href="/#how-it-works">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                See how it works
-              </Button>
-            </Link>
+            <VideoModalButton className={buttonVariants({ variant: "secondary", size: "lg" }) + " w-full sm:w-auto pixel-btn"}>
+              See how it works
+            </VideoModalButton>
           </div>
         </div>
-        {/* Right — OUM intro scene (isolated iframe; left headline & buttons untouched) */}
-        <div className="px-corners w-full">
-          <OumIntroFrame />
+        {/* Right — OUM hero film (rendered video, reserved 16:9, no CLS) */}
+        <div className="w-full">
+          <HeroVideo />
         </div>
       </div>
     </section>
@@ -113,6 +114,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <MeetOum />
       <HowItWorks />
       <FeatureMarquee />
       <TrustedBy />

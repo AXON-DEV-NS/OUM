@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OUM hero intro (HyperFrames, 30s, 4K)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{--ink:#0E120C;--panel:#161C12;--olive:#4A6238;--sage:#8FB06E;--gold:#C8A858;--gold2:#FFD56B;--cream:#F3E7CE;--mute:#A3AF95}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden}
+/* 4K frame (3840x2160 = 1920x1080 stage x2). For 8K: 7680x4320, scale(4), and the same numbers in data-width/data-height. */
+#comp{position:relative;width:3840px;height:2160px;overflow:hidden;background:var(--ink)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform:scale(2);transform-origin:0 0;overflow:hidden;color:var(--cream);font-family:Inter,system-ui,sans-serif;background:radial-gradient(ellipse 60% 55% at 50% 30%,#1B2416 0%,var(--ink) 70%)}
+#grid{position:absolute;inset:0;background-image:linear-gradient(rgba(143,176,110,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(143,176,110,.05) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse at 50% 35%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 35%,#000 20%,transparent 75%)}
+#halo{position:absolute;left:510px;top:-65px;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(143,176,110,.26),transparent 65%)}
+#top{position:absolute;left:64px;right:64px;top:34px;display:flex;justify-content:space-between;align-items:center;color:var(--mute);font-size:17px;letter-spacing:.5px}
+#top b{font:400 30px Fraunces,Georgia,serif;color:var(--cream);display:flex;align-items:center;gap:12px}
+#top b:before{content:"";width:14px;height:14px;border-radius:4px;background:var(--sage);box-shadow:0 0 14px var(--sage)}
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:4px;background:var(--gold);transform-origin:0 0}
+#bot{position:absolute;left:810px;top:250px;width:300px;height:270px}
+#bot svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 18px 24px rgba(0,0,0,.55))}
+#cap{position:absolute;left:0;top:575px;width:1920px;height:240px}
+.ln{position:absolute;inset:0;text-align:center;opacity:0}
+h1{font:400 78px/1.06 Fraunces,Georgia,serif;letter-spacing:-1.5px}
+h1 i{color:var(--sage)}
+.ln p{margin-top:22px;font-size:30px;color:var(--mute)}
+.nw{display:inline-block;vertical-align:middle;margin-left:16px;padding:6px 16px;border-radius:999px;background:var(--gold2);color:var(--ink);font:600 20px Inter,sans-serif;letter-spacing:0;font-style:normal;position:relative;top:-6px}
+.card{position:absolute;width:420px;padding:24px 26px;border-radius:18px;background:rgba(22,28,18,.94);border:1.5px solid rgba(200,168,88,.5);box-shadow:0 26px 60px rgba(0,0,0,.45);opacity:0}
+.card small{display:block;font-size:17px;color:var(--gold);margin-bottom:8px}
+.card b{display:block;font:400 30px/1.15 Fraunces,Georgia,serif;margin-bottom:8px}
+.card span{font-size:20px;line-height:1.4;color:var(--mute)}
+.btn{display:flex;gap:12px;margin-top:18px}
+.btn u{text-decoration:none;padding:10px 24px;border-radius:999px;font-weight:600;font-size:18px;background:var(--sage);color:var(--ink)}
+.btn u+u{background:none;border:1.5px solid var(--gold);color:var(--gold2)}
+.chip{position:absolute;top:850px;width:200px;padding:14px 0;text-align:center;border:1.5px dashed rgba(163,175,149,.55);border-radius:10px;color:var(--mute);font-size:23px;opacity:0}
+#toast{position:absolute;left:660px;top:104px;width:600px;display:flex;gap:18px;align-items:center;padding:16px 24px;border-radius:16px;background:var(--cream);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.5);opacity:0}
+#toast i{width:44px;height:44px;border-radius:12px;background:var(--olive);display:grid;place-items:center}
+#toast i:before{content:"";border-left:14px solid var(--cream);border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+#toast b{display:block;font:400 26px Fraunces,Georgia,serif}
+#toast span{font-size:18px;color:#5C6650}
+#track{position:absolute;left:192px;top:880px;width:1536px;height:36px;opacity:0}
+#rail,#fill{position:absolute;left:18px;top:17px;width:1500px;height:2px;background:rgba(163,175,149,.3);transform-origin:0 0}
+#fill{background:var(--gold);transform:scaleX(0)}
+.nd{position:absolute;top:0;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:600;background:var(--panel);border:1.5px solid var(--olive);color:var(--mute)}
+.nd.g{border-color:var(--gold)}
+#pills{position:absolute;left:0;top:880px;width:1920px;display:flex;justify-content:center;gap:16px}
+.pill{padding:12px 26px;border-radius:999px;border:1.5px solid rgba(200,168,88,.6);color:var(--gold2);font-weight:600;font-size:20px;opacity:0}
+</style>
+</head>
+<body>
+<div id="comp" data-composition data-composition-id="oum-intro" data-start="0" data-duration="30" data-width="3840" data-height="2160" data-fps="60">
+<div id="stage">
+  <div id="grid"></div><div id="halo"></div>
+  <div id="top"><b>OUM</b><span>Autonomous YouTube director</span></div>
+
+  <div id="bot"><svg viewBox="0 0 340 300">
+    <defs>
+      <g id="lg"><rect x="-14" width="28" height="50" rx="14" fill="#181A16" stroke="#080907" stroke-width="5"/><rect x="-11" y="22" width="22" height="24" rx="11" fill="#4A6238"/></g>
+      <path id="cn" d="M78 62Q78 44 98 44M112 44h.1M78 76h.1" fill="none" stroke="#C8A858" stroke-width="6" stroke-linecap="round"/>
+      <g id="ey"><rect width="46" height="46" rx="13" fill="#0B0C0A"/><circle cx="14" cy="14" r="7.5" fill="#F3E7CE"/><circle cx="32" cy="34" r="3.8" fill="#F3E7CE"/></g>
+      <path id="sp" d="M23 5L27 18L40 23L27 28L23 41L19 28L6 23L19 18Z" fill="#FFD56B"/>
+    </defs>
+    <use class="lg" href="#lg" x="82" y="216"/><use class="lg" href="#lg" x="134" y="222"/><use class="lg" href="#lg" x="206" y="222"/><use class="lg" href="#lg" x="258" y="216"/>
+    <rect x="20" y="96" width="44" height="64" rx="15" fill="#4A6238" stroke="#080907" stroke-width="6"/>
+    <rect x="276" y="96" width="44" height="64" rx="15" fill="#4A6238" stroke="#080907" stroke-width="6"/>
+    <rect x="56" y="24" width="228" height="204" rx="34" fill="#181A16" stroke="#080907" stroke-width="7"/>
+    <use href="#cn"/><use href="#cn" transform="translate(340 0) scale(-1 1)"/><use href="#cn" transform="translate(0 252) scale(1 -1)"/><use href="#cn" transform="translate(340 252) scale(-1 -1)"/>
+    <rect x="86" y="52" width="168" height="148" rx="24" fill="#4A6238" stroke="#0E120C" stroke-width="5"/>
+    <g id="e-normal"><use href="#ey" x="108" y="90"/><use href="#ey" x="186" y="90"/></g>
+    <g id="e-wink" opacity="0"><path d="M110 116Q131 92 152 116" fill="none" stroke="#0B0C0A" stroke-width="10" stroke-linecap="round"/><use href="#ey" x="186" y="90"/></g>
+    <g id="e-happy" opacity="0"><path d="M110 120Q131 92 152 120M188 120Q209 92 230 120" fill="none" stroke="#0B0C0A" stroke-width="10" stroke-linecap="round"/></g>
+    <g id="e-excited" opacity="0"><rect x="108" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><rect x="186" y="90" width="46" height="46" rx="13" fill="#0B0C0A"/><use href="#sp" x="108" y="90"/><use href="#sp" x="186" y="90"/></g>
+    <g id="e-angry" opacity="0"><path d="M106 94L154 108V134H106Z M234 94L186 108V134H234Z" fill="#0B0C0A"/></g>
+  </svg></div>
+
+  <div id="toast"><i></i><div><b>Published: Episode 12</b><span>Quality score 92/100, scheduled by OUM</span></div></div>
+  <div id="cap"></div>
+  <div id="track"><div id="rail"></div><div id="fill"></div></div>
+  <div class="card" id="c1" style="left:170px;top:250px;width:520px"><small>Telegram approval</small><b>Episode 12: The Lost Empire</b><span>Quality 92/100, three thumbnails tested, Short ready.</span><div class="btn"><u>Approve</u><u>Request edit</u></div></div>
+  <div class="card" id="c2" style="left:1230px;top:250px;width:520px"><small>Weekly report (sample)</small><b>+850 subscribers</b><span>3 videos and 3 Shorts published. Retention up 18%. Mystery-first hooks performed best.</span></div>
+  <div id="pills"></div>
+  <div id="bar"></div>
+</div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),S=$("#stage"),tl=gsap.timeline({paused:true,defaults:{ease:"power2.out"}});
+const mk=(h,c,p)=>{const e=document.createElement("div");e.className=c;e.innerHTML=h;(p||S).appendChild(e);return e};
+const face=(n,t)=>["normal","wink","happy","excited","angry"].forEach(x=>tl.set("#e-"+x,{opacity:x==n?1:0},t));
+// caption: start t, duration d (0 = stays), headline h, sub-line s
+const L=(t,d,h,s)=>{const e=mk(`<h1>${h}</h1><p>${s}</p>`,"ln",$("#cap"));tl.fromTo(e,{opacity:0,y:26},{opacity:1,y:0,duration:.6},t);if(d)tl.to(e,{opacity:0,y:-18,duration:.35,ease:"power2.in"},t+d-.35)};
+
+/* Ambient calm: breathing glow, gentle float, soft footsteps, progress line (all end at 30s) */
+tl.to("#halo",{scale:1.08,duration:2,yoyo:true,repeat:14,ease:"sine.inOut"},0)
+  .to("#bot svg",{y:-9,duration:1.2,yoyo:true,repeat:24,ease:"sine.inOut"},0)
+  .fromTo("#bar",{scaleX:0},{scaleX:1,duration:30,ease:"none"},0)
+  .from("#bot",{scale:.7,opacity:0,duration:.5,ease:"back.out(1.6)"},0);
+gsap.utils.toArray(".lg").forEach((l,i)=>tl.to(l,{y:6,duration:.3,yoyo:true,repeat:i%2?98:99,ease:"sine.inOut"},i%2?.3:0));
+
+/* 1. HOOK 0-3.8s */
+face("normal",0);
+L(.05,1.45,"It's 3:07 AM.","You're fast asleep.");
+L(1.5,2.3,"Your channel just <i>published.</i>","You didn't lift a finger.");
+tl.fromTo("#toast",{opacity:0,y:-30,scale:.94},{opacity:1,y:0,scale:1,duration:.55,ease:"back.out(1.6)"},1.7)
+  .to("#toast",{opacity:0,y:-20,duration:.4,ease:"power2.in"},3.4);
+face("wink",1.7);face("normal",3.7);
+
+/* 2. THE PROBLEM 3.8-6.6s */
+L(3.8,2.8,"Six tools. Ten tabs. <i>Zero sleep.</i>","Script, voice, video, thumbnails, SEO, upload. All by hand.");
+["Script","Voice","Video","Thumbnails","SEO","Upload"].forEach((c,i)=>{const x=310+i*220,e=mk(c,"chip");e.style.left=x+"px";
+  tl.fromTo(e,{opacity:0,scale:.85},{opacity:1,scale:1,duration:.4,ease:"back.out(1.6)"},4.1+i*.18)
+    .to(e,{x:960-x-100,y:-490,scale:.2,opacity:0,duration:.6,ease:"power3.in"},6.5+i*.05)});
+
+/* 3. THE ANSWER 6.6-9.4s */
+L(6.6,2.8,"One agent. <i>Your whole channel.</i>","From research to publishing, around the clock.");
+face("happy",6.9);face("normal",8.6);
+tl.to("#bot",{scale:1.08,duration:.25,yoyo:true,repeat:1},6.9);
+
+/* 4. SETUP 9.4-13.2s */
+L(9.4,3.8,"Connect once. <i>Teach it your taste.</i>","A few minutes of setup. No passwords shared.");
+face("wink",10);face("normal",11.2);
+[["Connect","Official Google sign-in. OUM never sees your password."],["Teach","Your niche, up to three rival channels, and five photos of your hero."],["Choose","Review every video yourself, or hand over full autopilot."]].forEach(([h,p],i)=>{
+  const e=mk(`<small>Step ${i+1}</small><b>${h}</b><span>${p}</span>`,"card");e.style.cssText=`left:${300+i*450}px;top:820px`;
+  tl.fromTo(e,{opacity:0,y:30},{opacity:1,y:0,duration:.5},10+i*.5).to(e,{opacity:0,y:-20,duration:.35,ease:"power2.in"},12.9)});
+
+/* 5. NINE-STAGE PIPELINE 13.3-22.75s (the 4th value marks stages that are new in 2.0) */
+const P=[["Market and trend research","Niche, rivals and trends. The strongest idea wins.","normal"],
+["Script and hook","A script built around the first five seconds.","wink"],
+["Video and voice","Scenes and narration, with your hero's face locked in.","normal"],
+["Smart montage","Cuts, transitions, licensed music and subtitles.","normal"],
+["Thumbnail studio","Two or three distinct designs, tested for clicks.","wink",1],
+["Triple quality check","Technical, policy and rights, creative and retention.","angry",1],
+["Approval gate","Preview on Telegram or WhatsApp, or let autopilot decide.","happy",1],
+["SEO and publishing","Title, chapters, AI disclosure and smart scheduling.","normal"],
+["Growth after publishing","A Short, a first comment, and a niche memory that learns.","excited",1]];
+const T=$("#track");
+P.forEach(([h,s,x,n],i)=>{const t=13.3+i*1.05;
+  L(t,1.05,h+(n?'<em class="nw">New in 2.0</em>':""),s);
+  const d=mk(i+1,"nd"+(n?" g":""),T);d.style.left=i*187.5+"px";
+  tl.fromTo(d,{opacity:0,scale:.5},{opacity:1,scale:1,duration:.4},13.1+i*.04)
+    .to(d,{backgroundColor:"#FFD56B",color:"#0E120C",scale:1.35,duration:.3},t)
+    .to(d,{backgroundColor:"#4A6238",color:"#F3E7CE",scale:1,duration:.3},t+1.05);
+  face(x,t)});
+tl.fromTo("#track",{opacity:0},{opacity:1,duration:.5},13)
+  .fromTo("#fill",{scaleX:0},{scaleX:1,duration:8.3,ease:"none"},13.4)
+  .to("#track",{opacity:0,duration:.4},22.75);
+
+/* 6. YOU KEEP THE SWITCH 22.9-26.7s */
+L(22.9,3.8,"You always keep <i>the switch.</i>","Approve each video yourself, or hand over full autopilot.");
+face("happy",22.9);
+[["#c1",23.3,-40],["#c2",23.8,40]].forEach(([c,t,x])=>tl.fromTo(c,{opacity:0,x},{opacity:1,x:0,duration:.6},t).to(c,{opacity:0,y:-20,duration:.4,ease:"power2.in"},26.3));
+
+/* 7. FINALE 26.8-30s */
+L(26.8,0,"Set it once. <i>Sleep while it grows.</i>","Connect your channel. OUM runs the rest.");
+face("excited",26.8);
+tl.to("#bot",{scale:1.1,duration:.5},26.8);
+["Official Google sign-in","Nine-stage pipeline","Copilot or autopilot","Thumbnails and Shorts"].forEach((p,i)=>tl.fromTo(mk(p,"pill",$("#pills")),{opacity:0,y:20},{opacity:1,y:0,duration:.5},27.5+i*.18));
+
+/* HyperFrames hooks: register the paused timeline + deterministic seek */
+window.__timelines=window.__timelines||{};window.__timelines["oum-intro"]=tl;
+window.hyperframes={seek:t=>tl.seek(t)};
+if(!navigator.webdriver)tl.play(0);
+</script>
+</body>
+</html>
