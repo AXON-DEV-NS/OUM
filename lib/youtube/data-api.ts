@@ -27,10 +27,10 @@ const TTL = {
 // ─── Cache ───────────────────────────────────────────────────────────────────
 
 const globalForYt = globalThis as unknown as {
-  __vovoYtCache?: Map<string, { payload: unknown; expiresAt: number }>;
+  __oumYtCache?: Map<string, { payload: unknown; expiresAt: number }>;
 };
-const memoryCache = globalForYt.__vovoYtCache ?? new Map<string, { payload: unknown; expiresAt: number }>();
-globalForYt.__vovoYtCache = memoryCache;
+const memoryCache = globalForYt.__oumYtCache ?? new Map<string, { payload: unknown; expiresAt: number }>();
+globalForYt.__oumYtCache = memoryCache;
 
 async function cached<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> {
   const now = Date.now();

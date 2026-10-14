@@ -225,7 +225,7 @@ To hit $10,000/month consistently, do not rely on YouTube AdSense alone:
       'agentic ai systems',
       'multi agent youtube automation',
       'prompt engineering dead',
-      'vovo agent architecture',
+      'oum agent architecture',
       'multimodal ai workflow'
     ],
     content: `

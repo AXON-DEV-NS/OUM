@@ -60,7 +60,7 @@ export function Footer() {
                   <ul className="space-y-3.5">
                     {col.links.map((link) => (
                       <li key={link.href + link.label}>
-                        <Link href={link.href} className="vovo-footer-link text-sm">
+                        <Link href={link.href} className="oum-footer-link text-sm">
                           {link.label}
                           <ArrowUpRight className="h-3.5 w-3.5 text-gold-400" />
                         </Link>

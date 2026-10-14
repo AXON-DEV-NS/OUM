@@ -1,6 +1,6 @@
 {
-  "name": "VOVO Agent AI",
-  "short_name": "VOVO",
+  "name": "OUM",
+  "short_name": "OUM",
   "description": "Your autonomous AI-powered YouTube channel manager.",
   "start_url": "/",
   "scope": "/",

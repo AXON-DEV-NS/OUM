@@ -19,7 +19,7 @@ function encryptionKey(): Buffer {
       "Fatal Security Error: SECRETS_ENCRYPTION_KEY or NEXTAUTH_SECRET must be configured in production."
     );
   }
-  return crypto.createHash("sha256").update("vovo-dev-local-only-key").digest();
+  return crypto.createHash("sha256").update("oum-dev-local-only-key").digest();
 }
 
 export function encryptSecret(plaintext: string): string {

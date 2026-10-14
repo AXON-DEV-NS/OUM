@@ -5,12 +5,12 @@ import { Loader2, MessageCircle, Send, ShieldCheck, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 interface ChatMessage {
-  role: "user" | "vovo";
+  role: "user" | "oum";
   text: string;
 }
 
 const GREETING: ChatMessage = {
-  role: "vovo",
+  role: "oum",
   text: "Hi! I'm OUM — your AI channel manager. Ask me about channel performance, or send feedback on any video (published or scheduled) and I'll log it for action. Note: your account settings (password, email, billing) are managed manually from the Settings page only.",
 };
 
@@ -18,7 +18,7 @@ const GREETING: ChatMessage = {
  * OUM — the floating channel-manager assistant.
  * Brand colors only: paper / ink / green / gold.
  */
-export function VovoAssistant() {
+export function OumAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
   const [input, setInput] = useState("");
@@ -47,14 +47,14 @@ export function VovoAssistant() {
       setMessages((prev) => [
         ...prev,
         {
-          role: "vovo",
+          role: "oum",
           text: res.ok && data.reply ? data.reply : data.error || "Couldn't get a reply right now. Please try again.",
         },
       ]);
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "vovo", text: "Connection failed. Check your network and try again." },
+        { role: "oum", text: "Connection failed. Check your network and try again." },
       ]);
     } finally {
       setSending(false);

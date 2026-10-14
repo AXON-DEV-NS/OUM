@@ -294,7 +294,7 @@ Recent remediation hardened several foundational layers:
 - **Status:** **REMEDIATED**. Plan pricing edits, promo codes, free grants, auto-trial toggles, user warnings, and account reports persist in PostgreSQL.
 
 ### ADM-2 🟢 Visual Consistency & Design Language
-- **Evaluation:** The admin panel (`vovo-hq-secure-gateway`) utilizes the site's palette (warm paper background, refined borders, dark ink typography, gold accents). Layouts, status badges, and typography align with the customer dashboard.
+- **Evaluation:** The admin panel (`oum-hq-secure-gateway`) utilizes the site's palette (warm paper background, refined borders, dark ink typography, gold accents). Layouts, status badges, and typography align with the customer dashboard.
 
 ### ADM-3 🟢 Admin Security Gate
 - **Evaluation:** Protected by a strict two-layer barrier:

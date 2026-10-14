@@ -13,7 +13,7 @@ const APP_ROUTE_PREFIXES = [
   "/settings",
   "/support",
   "/onboarding",
-  "/vovo-hq-secure-gateway",
+  "/oum-hq-secure-gateway",
 ];
 
 /**
@@ -31,9 +31,9 @@ export function FirstLoadBranding() {
 
   useEffect(() => {
     // Shown once per full document load — never on soft navigation.
-    const w = window as unknown as { __vovoFirstLoadShown?: boolean };
-    if (w.__vovoFirstLoadShown) return;
-    w.__vovoFirstLoadShown = true;
+    const w = window as unknown as { __oumFirstLoadShown?: boolean };
+    if (w.__oumFirstLoadShown) return;
+    w.__oumFirstLoadShown = true;
 
     const path = window.location.pathname;
     const isAppRoute = APP_ROUTE_PREFIXES.some(

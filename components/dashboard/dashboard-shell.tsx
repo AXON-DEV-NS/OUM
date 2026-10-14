@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
 import { Logo } from "@/components/ui/logo";
-import { VovoAssistant } from "@/components/dashboard/vovo-assistant";
+import { OumAssistant } from "@/components/dashboard/oum-assistant";
 import { cn } from "@/lib/cn";
 import {
   LayoutDashboard,
@@ -203,7 +203,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
       </div>
 
       {/* OUM — channel manager assistant (account settings are out of scope) */}
-      <VovoAssistant />
+      <OumAssistant />
     </div>
   );
 }

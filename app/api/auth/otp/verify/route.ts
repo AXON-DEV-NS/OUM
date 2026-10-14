@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      redirect: role === "ADMIN" ? "/vovo-hq-secure-gateway" : "/onboarding",
+      redirect: role === "ADMIN" ? "/oum-hq-secure-gateway" : "/onboarding",
     });
   } catch (error) {
     console.error("[OTP Verify Error]", error);

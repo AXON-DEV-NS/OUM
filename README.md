@@ -6,7 +6,7 @@ Autonomous AI-powered YouTube channel manager. Research, script drafting, compli
 
 - **Multi-Stage AI Pipeline**: Connect channel → Niche research & search intelligence → DeepSeek script drafting & compliance review → Media asset synthesis → Scheduled YouTube publishing.
 - **Creator Dashboard**: Live metrics, content calendar, script review with feedback loop (Mistake Log), channel analytics, and support tickets.
-- **Admin Control Gateway (`/vovo-hq-secure-gateway`)**:
+- **Admin Control Gateway (`/oum-hq-secure-gateway`)**:
   - Secure owner access gated by TOTP 2FA, scrypt password hashing, and brute-force lockouts.
   - Plan pricing overrides, dynamic promo code generation, free access grants, and guardian security monitoring.
   - Direct persistence into Neon PostgreSQL (`prisma/schema.prisma`).

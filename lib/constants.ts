@@ -2,7 +2,7 @@ export const SITE_NAME = 'OUM';
 export const SITE_DESCRIPTION = 'Your autonomous AI-powered YouTube channel manager. AI handles research, content creation, publishing, and optimization — you just approve.';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-export const ADMIN_ROUTE_PREFIX = 'vovo-hq-secure-gateway' as const;
+export const ADMIN_ROUTE_PREFIX = 'oum-hq-secure-gateway' as const;
 export const ADMIN_ROUTES = {
   base: `/${ADMIN_ROUTE_PREFIX}`,
   login: `/${ADMIN_ROUTE_PREFIX}/login`,

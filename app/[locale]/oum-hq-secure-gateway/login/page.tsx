@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.push(data.redirect || "/vovo-hq-secure-gateway/overview");
+      router.push(data.redirect || "/oum-hq-secure-gateway/overview");
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");

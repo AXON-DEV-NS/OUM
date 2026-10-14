@@ -208,14 +208,14 @@ export async function listContactInquiries(): Promise<ContactInquiry[]> {
 
 declare global {
   // eslint-disable-next-line no-var
-  var __vovoAdminDemo: DemoState | undefined;
+  var __oumAdminDemo: DemoState | undefined;
 }
 
 export function getStore(): DemoState {
-  if (!globalThis.__vovoAdminDemo) {
-    globalThis.__vovoAdminDemo = seed();
+  if (!globalThis.__oumAdminDemo) {
+    globalThis.__oumAdminDemo = seed();
   }
-  return globalThis.__vovoAdminDemo;
+  return globalThis.__oumAdminDemo;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1319,11 +1319,11 @@ export async function getAccountReport(query: string) {
 // -------------------------------------------------------------
 
 function generateApiKey(): string {
-  return `vovo_live_${randomBytes(16).toString("hex")}`;
+  return `oum_live_${randomBytes(16).toString("hex")}`;
 }
 
 function generateApiSecret(): string {
-  return `vovo_sk_${randomBytes(32).toString("hex")}`;
+  return `oum_sk_${randomBytes(32).toString("hex")}`;
 }
 
 export function maskApiKey(key: string): string {

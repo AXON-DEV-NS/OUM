@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      redirect: isOwner ? "/vovo-hq-secure-gateway" : "/onboarding",
+      redirect: isOwner ? "/oum-hq-secure-gateway" : "/onboarding",
       user: {
         email,
         name,

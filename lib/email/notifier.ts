@@ -235,7 +235,7 @@ export async function notifySupportTicketCreated(data: {
           <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${data.description}</div>
         </div>
         <div style="text-align: center;">
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/vovo-hq-secure-gateway/overview" style="display: inline-block; background: #111110; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">Open the admin panel</a>
+          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/oum-hq-secure-gateway/overview" style="display: inline-block; background: #111110; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">Open the admin panel</a>
         </div>
       </div>
       <div style="background: #f9fafb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb;">

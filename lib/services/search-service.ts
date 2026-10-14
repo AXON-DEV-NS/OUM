@@ -44,11 +44,11 @@ interface ProviderState {
 }
 
 const globalForSearch = globalThis as unknown as {
-  __vovoSearchState?: Map<string, ProviderState>;
+  __oumSearchState?: Map<string, ProviderState>;
 };
 const memoryState =
-  globalForSearch.__vovoSearchState ?? new Map<string, ProviderState>();
-globalForSearch.__vovoSearchState = memoryState;
+  globalForSearch.__oumSearchState ?? new Map<string, ProviderState>();
+globalForSearch.__oumSearchState = memoryState;
 
 function nextMonthStart(): Date {
   const now = new Date();
@@ -116,11 +116,11 @@ function isUsable(state: ProviderState): boolean {
 // ─── Cache ───────────────────────────────────────────────────────────────────
 
 const globalForCache = globalThis as unknown as {
-  __vovoSearchCache?: Map<string, { payload: SearchResult[]; expiresAt: number }>;
+  __oumSearchCache?: Map<string, { payload: SearchResult[]; expiresAt: number }>;
 };
 const memoryCache =
-  globalForCache.__vovoSearchCache ?? new Map<string, { payload: SearchResult[]; expiresAt: number }>();
-globalForCache.__vovoSearchCache = memoryCache;
+  globalForCache.__oumSearchCache ?? new Map<string, { payload: SearchResult[]; expiresAt: number }>();
+globalForCache.__oumSearchCache = memoryCache;
 
 function cacheKey(query: string, maxResults: number): string {
   return `search:${query.trim().toLowerCase().replace(/\s+/g, " ")}:${maxResults}`;

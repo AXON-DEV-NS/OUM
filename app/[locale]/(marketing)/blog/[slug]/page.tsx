@@ -70,7 +70,7 @@ export default async function BlogPostPage({ params }: Props) {
       name: 'OUM',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://vovo-agent.ai/icon-512.png',
+        url: 'https://vovo-five.vercel.app/icon-512.png',
       },
     },
     keywords: post.seoKeywords.join(', '),

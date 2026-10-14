@@ -102,6 +102,6 @@ export async function POST(request: NextRequest) {
   console.log(`[admin-login] SUCCESS from ${ipAddress}`);
   return NextResponse.json({
     success: true,
-    redirect: "/vovo-hq-secure-gateway/overview",
+    redirect: "/oum-hq-secure-gateway/overview",
   });
 }

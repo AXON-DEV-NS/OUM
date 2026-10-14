@@ -12,7 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/vovo-hq-secure-gateway/',
+          '/oum-hq-secure-gateway/',
           '/api/admin/',
           '/dashboard/',
           '/onboarding/',
@@ -28,7 +28,7 @@ export default function robots(): MetadataRoute.Robots {
           '/legal/*',
         ],
         disallow: [
-          '/vovo-hq-secure-gateway/',
+          '/oum-hq-secure-gateway/',
           '/api/',
           '/dashboard/',
         ],
