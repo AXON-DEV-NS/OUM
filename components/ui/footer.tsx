@@ -43,7 +43,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-5">
             <Link href="/" className="group mb-6 inline-flex transition-opacity duration-200 hover:opacity-80">
-              <Logo variant="paper" />
+              <Logo variant="paper" size="lg" />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-paper/55">
               {t("builtWith")}

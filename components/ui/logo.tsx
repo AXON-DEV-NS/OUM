@@ -12,7 +12,7 @@ const SIZES = {
   sm: { mark: "h-7 w-7", text: "text-sm" },
   md: { mark: "h-9 w-9", text: "text-lg" },
   lg: { mark: "h-16 w-16", text: "text-2xl" },
-  nav: { mark: "h-11 w-11", text: "text-[1.35rem]" },
+  nav: { mark: "h-11 w-11", text: "text-2xl" },
 } as const;
 
 /**
@@ -27,15 +27,23 @@ export function Logo({
   const s = SIZES[size];
   const isInk = variant === "ink";
 
+  const mark = (
+    <img
+      src="/oum.png"
+      alt="OUM logo"
+      width={512}
+      height={512}
+      className={cn("shrink-0 object-contain", s.mark)}
+    />
+  );
+
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <img
-        src="/oum.png"
-        alt="OUM logo"
-        width={512}
-        height={512}
-        className={cn("shrink-0 object-contain", s.mark)}
-      />
+    <span className={cn("inline-flex items-center gap-3", className)}>
+      {size === "nav" ? (
+        <span className="bg-ink p-1 px-corners">{mark}</span>
+      ) : (
+        mark
+      )}
       {!markOnly && (
         <span
           className={cn(
