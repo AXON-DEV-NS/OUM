@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   description:
     "Your autonomous AI-powered YouTube channel manager. AI handles research, content creation, publishing, and optimization — you just approve.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://vovo-five.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://oum-five.vercel.app"
   ),
   manifest: "/manifest.json",
   icons: {
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://vovo-five.vercel.app",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://oum-five.vercel.app",
     siteName: "OUM",
     title: "OUM — Autonomous YouTube Channel Manager",
     description:
