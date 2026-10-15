@@ -3,8 +3,7 @@ import { createRemoteJWKSet, jwtVerify } from "jose";
 import { createSession } from "@/lib/auth/session";
 import { resolveUserRole } from "@/lib/auth/roles";
 
-const FIREBASE_PROJECT_ID =
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "vovo-5b434";
+const FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
 const JWKS = createRemoteJWKSet(
   new URL(
@@ -18,6 +17,12 @@ const JWKS = createRemoteJWKSet(
 
 export async function POST(request: NextRequest) {
   try {
+    if (!FIREBASE_PROJECT_ID) {
+      return NextResponse.json(
+        { error: "Firebase auth is not configured." },
+        { status: 500 }
+      );
+    }
     const body = await request.json().catch(() => ({}));
     const { idToken } = body;
 
