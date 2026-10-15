@@ -220,5 +220,19 @@ if(!navigator.webdriver){
  tl.repeat(-1).play(0);gsap.ticker.add(()=>render(tl.time()));
 }
 </script>
+<style>
+/* CLEAN MODE (?clean=1): hide every text overlay, keep the graphic boxes,
+   beams, avatar and motion untouched. Used for the hero render. */
+.clean #cap,.clean #toast,.clean .chip,.clean #pill,.clean #pills,.clean #fin,
+.clean #bub,.clean #hs,.clean #ht,.clean #tabs,.clean .rc .btns,.clean .st u,
+.clean .su s,.clean .hook,.clean .conn{display:none!important}
+.clean .st span,.clean .su h3,.clean .su p,
+.clean .rc h2,.clean .rc p,.clean .rc h6,
+.clean .cw h6,.clean .cw p{visibility:hidden!important}
+.clean .nd{color:transparent!important}
+.clean .st i{color:transparent!important}
+.clean .v2-tag{display:none!important}
+</style>
+<script>try{if(new URLSearchParams(location.search).has("clean"))document.documentElement.classList.add("clean")}catch(e){}</script>
 </body>
 </html>
