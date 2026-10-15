@@ -23,7 +23,7 @@ export function Navbar() {
     pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-line bg-paper backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full bg-paper backdrop-blur-sm">
       <nav className="container-wide flex h-16 items-center justify-between">
         <Link href="/" className="group transition-opacity duration-200 hover:opacity-80">
           <Logo size="nav" />
@@ -134,6 +134,7 @@ export function Navbar() {
           </div>
         </div>
       )}
+      <div className="px-section-rule" aria-hidden="true" />
     </header>
   );
 }

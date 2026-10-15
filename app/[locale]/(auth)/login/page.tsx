@@ -460,6 +460,14 @@ export default function LoginPage() {
             mode === "signup" ? "translate-x-0" : "translate-x-full"
           )}
         >
+          <div
+            aria-hidden="true"
+            className={cn("absolute inset-y-0 w-2", mode === "signup" ? "right-0" : "left-0")}
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, #E8DFC8 0 8px, transparent 8px 16px)",
+            }}
+          />
           <div className="w-full">{panelContent}</div>
         </div>
       </div>
