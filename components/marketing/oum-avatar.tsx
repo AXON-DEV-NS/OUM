@@ -14,31 +14,39 @@ export type OumExpression =
   | "sleepy";
 
 /**
- * OUM avatar — the robot that runs the channels.
- * · pupils follow the cursor (quantized to 2px pixel steps)
+ * OUM avatar built on the REAL logo artwork (public/oum-avatar.png — the
+ * production logo with its eyes digitally cleared), with a vector expression
+ * layer mapped 1:1 onto the logo's eye zones (crop-local coords, 840x560).
+ * · pupils follow the cursor (quantized to 2px pixel steps) · blinks ~every 4s
  * · winks when "[data-cta]" (Get Started) is hovered or focused
  * · excited while the hero film plays · sleepy after 40 s of page idleness
  * · honors prefers-reduced-motion (static normal face)
  */
+const W = 840;
+const H = 560;
+// eye zones in crop-local coords (measured from the real logo)
+const L = { x: 238, y: 165, w: 154, h: 145 };
+const R = { x: 478, y: 165, w: 154, h: 145 };
+
 export function OumAvatar({ className = "" }: { className?: string }) {
   const [expr, setExpr] = useState<OumExpression>("normal");
   const [pupil, setPupil] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const boxRef = useRef<SVGSVGElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const revert = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
-    const q = (v: number) => Math.max(-4, Math.min(4, Math.round(v / 2) * 2));
+    const q = (v: number) => Math.max(-6, Math.min(6, Math.round(v / 2) * 2));
 
     const onMove = (e: MouseEvent) => {
-      const svg = boxRef.current;
-      if (!svg) return;
-      const r = svg.getBoundingClientRect();
+      const box = boxRef.current;
+      if (!box) return;
+      const r = box.getBoundingClientRect();
       const cx = r.left + r.width / 2;
-      const cy = r.top + r.height * 0.45;
-      setPupil({ x: q(((e.clientX - cx) / r.width) * 24), y: q(((e.clientY - cy) / r.height) * 16) });
+      const cy = r.top + r.height * 0.42;
+      setPupil({ x: q(((e.clientX - cx) / r.width) * 30), y: q(((e.clientY - cy) / r.height) * 22) });
       setExpr((p) => (p === "sleepy" ? "normal" : p));
     };
     const flash = (next: OumExpression, ms: number) => {
@@ -62,6 +70,15 @@ export function OumAvatar({ className = "" }: { className?: string }) {
       window.clearTimeout(idle);
       idle = window.setTimeout(() => setExpr("sleepy"), 40000);
     };
+    // natural blink: 140 ms lid-close every ~4.5 s (skipped while busy)
+    const blink = window.setInterval(() => {
+      setExpr((p) => {
+        if (p !== "normal") return p;
+        window.setTimeout(() => setExpr("normal"), 140);
+        return "sleepy";
+      });
+    }, 4500);
+
     document.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseover", onOver, { passive: true });
     document.addEventListener("focusin", onFocusIn);
@@ -77,99 +94,85 @@ export function OumAvatar({ className = "" }: { className?: string }) {
       document.removeEventListener("click", poke);
       window.clearTimeout(revert.current);
       window.clearTimeout(idle);
+      window.clearInterval(blink);
     };
   }, []);
 
-  const hidden = (k: OumExpression) => (expr === k ? "block" : "none");
-  const eye = (
-    key: string,
-    x: number,
-  ) => (
+  const on = (k: OumExpression) => (expr === k ? undefined : "none");
+  const eye = (key: string, z: typeof L) => (
     <g key={key}>
-      <rect x={x} y={90} width={46} height={46} rx={13} fill="#0B0C0A" />
-      <circle cx={x + 14 + pupil.x} cy={104 + pupil.y} r={7.5} fill="#F3E7CE" />
-      <circle cx={x + 32 + pupil.x} cy={124 + pupil.y} r={3.8} fill="#F3E7CE" />
+      <rect x={z.x} y={z.y} width={z.w} height={z.h} rx={26} fill="#0B0C0A" />
+      <circle cx={z.x + 57 + pupil.x} cy={z.y + 60 + pupil.y} r={19} fill="#F3E7CE" />
+      <circle cx={z.x + 117 + pupil.x} cy={z.y + 102 + pupil.y} r={9} fill="#F3E7CE" />
     </g>
+  );
+  const arc = (key: string, z: typeof L, up: boolean) => (
+    <path
+      key={key}
+      d={up ? `M${z.x} ${z.y + 110} Q${z.x + 77} ${z.y - 20} ${z.x + 154} ${z.y + 110}` : `M${z.x} ${z.y + 40} Q${z.x + 77} ${z.y + 175} ${z.x + 154} ${z.y + 40}`}
+      fill="none"
+      stroke="#0B0C0A"
+      strokeWidth={20}
+      strokeLinecap="round"
+    />
   );
 
   return (
-    <svg
-      ref={boxRef}
-      viewBox="0 0 340 300"
-      role="img"
-      aria-label={`OUM robot avatar, expression: ${expr}`}
-      className={`h-auto w-full max-w-[310px] [image-rendering:pixelated] ${className}`}
-    >
-      <g>
-        {[78, 132, 208, 262].map((x, i) => (
-          <g key={x} transform={`translate(${x} ${i % 2 ? 222 : 218}) rotate(${i === 0 ? 18 : i === 3 ? -18 : 0})`}>
-            <rect x={-14} y={0} width={28} height={50} rx={14} fill="#181A16" stroke="#080907" strokeWidth={5} />
-            <rect x={-11} y={20} width={22} height={26} rx={11} fill="#4A6238" />
-            <circle cy={38} r={5} fill="#C8A858" />
-          </g>
-        ))}
-        <g stroke="#080907" strokeWidth={6}>
-          <rect x={18} y={98} width={46} height={62} rx={15} fill="#4A6238" />
-          <rect x={276} y={98} width={46} height={62} rx={15} fill="#4A6238" />
+    <div ref={boxRef} className={`relative w-full ${className}`} style={{ aspectRatio: `${W} / ${H}` }}>
+      <img
+        src="/oum-avatar.png"
+        alt=""
+        aria-hidden="true"
+        width={W}
+        height={H}
+        className="absolute inset-0 h-full w-full object-cover [image-rendering:pixelated]"
+        draggable={false}
+      />
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label={`OUM robot avatar, expression: ${expr}`}
+        className="absolute inset-0 h-full w-full [image-rendering:pixelated]"
+      >
+        <g display={on("normal")}>{eye("n1", L)}{eye("n2", R)}</g>
+        <g display={on("happy")}>{arc("h1", L, true)}{arc("h2", R, true)}</g>
+        <g display={on("angry")}>
+          <polygon points={`${L.x},${L.y + 24} ${L.x + 154},${L.y + 44} ${L.x + 154},${L.y + 118} ${L.x},${L.y + 118}`} fill="#0B0C0A" />
+          <polygon points={`${R.x + 154},${R.y + 24} ${R.x},${R.y + 44} ${R.x},${R.y + 118} ${R.x + 154},${R.y + 118}`} fill="#0B0C0A" />
         </g>
-        <rect x={44} y={101} width={16} height={56} fill="#181A16" />
-        <rect x={280} y={101} width={16} height={56} fill="#181A16" />
-        <rect x={56} y={24} width={228} height={204} rx={34} fill="#181A16" stroke="#080907" strokeWidth={7} />
-        <g fill="none" stroke="#C8A858" strokeWidth={5.5} strokeLinecap="round">
-          <path d="M72 64Q72 40 98 40" /><path d="M268 64Q268 40 242 40" />
-          <path d="M72 188Q72 212 98 212" /><path d="M268 188Q268 212 242 212" />
+        <g display={on("sad")}>
+          {arc("s1", L, false)}{arc("s2", R, false)}
+          <circle cx={L.x + 128} cy={L.y + 132} r={10} fill="#8FB06E" />
         </g>
-        <g fill="#C8A858">
-          <circle cx={114} cy={40} r={4} /><circle cx={72} cy={80} r={4} />
-          <circle cx={226} cy={40} r={4} /><circle cx={268} cy={80} r={4} />
-          <circle cx={114} cy={212} r={4} /><circle cx={72} cy={172} r={4} />
-          <circle cx={226} cy={212} r={4} /><circle cx={268} cy={172} r={4} />
+        <g display={on("surprised")}>
+          <rect x={L.x} y={L.y} width={L.w} height={L.h} rx={70} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={8} />
+          <circle cx={L.x + 77} cy={L.y + 72} r={17} fill="#0B0C0A" />
+          <rect x={R.x} y={R.y} width={R.w} height={R.h} rx={70} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={8} />
+          <circle cx={R.x + 77} cy={R.y + 72} r={17} fill="#0B0C0A" />
         </g>
-        <rect x={86} y={52} width={168} height={148} rx={24} fill="#4A6238" stroke="#0E120C" strokeWidth={5} />
-
-        <g style={{ display: hidden("normal") }}>{eye("n1", 108)}{eye("n2", 186)}</g>
-        <g style={{ display: hidden("happy") }}>
-          <path d="M110 120Q131 92 152 120" fill="none" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
-          <path d="M188 120Q209 92 230 120" fill="none" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
+        <g display={on("confused")}>
+          <rect x={L.x} y={L.y} width={L.w} height={L.h} rx={26} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={6} />
+          <circle cx={L.x + 50 + pupil.x} cy={L.y + 95 + pupil.y} r={19} fill="#0B0C0A" />
+          <rect x={R.x} y={R.y} width={R.w} height={R.h} rx={26} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={6} />
+          <circle cx={R.x + 104 + pupil.x} cy={R.y + 50 + pupil.y} r={19} fill="#0B0C0A" />
         </g>
-        <g style={{ display: hidden("angry") }}>
-          <polygon points="106,94 154,110 154,136 106,136" fill="#0B0C0A" />
-          <polygon points="234,94 186,110 186,136 234,136" fill="#0B0C0A" />
+        <g display={on("wink")}>
+          <path d={`M${L.x} ${L.y + 100} Q${L.x + 77} ${L.y - 10} ${L.x + 154} ${L.y + 100}`} fill="none" stroke="#0B0C0A" strokeWidth={20} strokeLinecap="round" />
+          {eye("w2", R)}
         </g>
-        <g style={{ display: hidden("sad") }}>
-          <path d="M110 108Q131 132 152 108" fill="none" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
-          <path d="M188 108Q209 132 230 108" fill="none" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
-          <circle cx={150} cy={140} r={5} fill="#8FB06E" />
+        <g display={on("excited")}>
+          <rect x={L.x} y={L.y} width={L.w} height={L.h} rx={26} fill="#0B0C0A" />
+          <path d={`M${L.x + 45} ${L.y + 25} L${L.x + 55} ${L.y + 60} L${L.x + 90} ${L.y + 70} L${L.x + 55} ${L.y + 80} L${L.x + 45} ${L.y + 115} L${L.x + 35} ${L.y + 80} L${L.x} ${L.y + 70} L${L.x + 35} ${L.y + 60} Z`} fill="#FFD56B" />
+          <rect x={R.x} y={R.y} width={R.w} height={R.h} rx={26} fill="#0B0C0A" />
+          <path d={`M${R.x + 45} ${R.y + 25} L${R.x + 55} ${R.y + 60} L${R.x + 90} ${R.y + 70} L${R.x + 55} ${R.y + 80} L${R.x + 45} ${R.y + 115} L${R.x + 35} ${R.y + 80} L${R.x} ${R.y + 70} L${R.x + 35} ${R.y + 60} Z`} fill="#FFD56B" />
         </g>
-        <g style={{ display: hidden("surprised") }}>
-          <rect x={108} y={90} width={46} height={46} rx={23} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={4} />
-          <circle cx={131} cy={113} r={9} fill="#0B0C0A" />
-          <rect x={186} y={90} width={46} height={46} rx={23} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={4} />
-          <circle cx={209} cy={113} r={9} fill="#0B0C0A" />
+        <g display={on("sleepy")}>
+          <path d={`M${L.x} ${L.y + 90} H${L.x + 154}`} stroke="#0B0C0A" strokeWidth={20} strokeLinecap="round" />
+          <path d={`M${R.x} ${R.y + 90} H${R.x + 154}`} stroke="#0B0C0A" strokeWidth={20} strokeLinecap="round" />
+          <text x={L.x + 160} y={L.y + 30} fill="#F3E7CE" fontSize={56} fontWeight={800} fontFamily="'JetBrains Mono', monospace">z</text>
+          <text x={L.x + 200} y={L.y - 20} fill="#F3E7CE" fontSize={38} fontWeight={800} fontFamily="'JetBrains Mono', monospace">z</text>
         </g>
-        <g style={{ display: hidden("confused") }}>
-          <rect x={108} y={90} width={46} height={46} rx={13} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={3} />
-          <circle cx={122} cy={118} r={10} fill="#0B0C0A" />
-          <rect x={186} y={90} width={46} height={46} rx={13} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={3} />
-          <circle cx={216} cy={106} r={10} fill="#0B0C0A" />
-        </g>
-        <g style={{ display: hidden("wink") }}>
-          <path d="M110 118Q131 92 152 118" fill="none" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
-          {eye("w2", 186)}
-        </g>
-        <g style={{ display: hidden("excited") }}>
-          <rect x={108} y={90} width={46} height={46} rx={13} fill="#0B0C0A" />
-          <path d="M131 95L135 108L148 113L135 118L131 131L127 118L114 113L127 108Z" fill="#FFD56B" />
-          <rect x={186} y={90} width={46} height={46} rx={13} fill="#0B0C0A" />
-          <path d="M209 95L213 108L226 113L213 118L209 131L205 118L192 113L205 108Z" fill="#FFD56B" />
-        </g>
-        <g style={{ display: hidden("sleepy") }}>
-          <path d="M110 112H152" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
-          <path d="M188 112H230" stroke="#0B0C0A" strokeWidth={10} strokeLinecap="round" />
-          <text x={244} y={86} fill="#F3E7CE" fontSize={30} fontWeight={800} fontFamily="'JetBrains Mono', monospace">z</text>
-          <text x={264} y={62} fill="#F3E7CE" fontSize={20} fontWeight={800} fontFamily="'JetBrains Mono', monospace">z</text>
-        </g>
-      </g>
-    </svg>
+      </svg>
+    </div>
   );
 }
