@@ -26,7 +26,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 w-full border-b border-line bg-paper backdrop-blur-sm">
       <nav className="container-wide flex h-16 items-center justify-between">
         <Link href="/" className="group transition-opacity duration-200 hover:opacity-80">
-          <Logo />
+          <Logo size="nav" />
         </Link>
 
         {/* Desktop: nav items — the active page's item hides and the rest re-arrange */}

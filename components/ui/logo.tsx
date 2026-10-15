@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 
 interface LogoProps {
   variant?: "ink" | "paper";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "nav";
   className?: string;
   /** Show only the mark — used by collapsed sidebars */
   markOnly?: boolean;
@@ -12,6 +12,7 @@ const SIZES = {
   sm: { mark: "h-7 w-7", text: "text-sm" },
   md: { mark: "h-9 w-9", text: "text-lg" },
   lg: { mark: "h-16 w-16", text: "text-2xl" },
+  nav: { mark: "h-11 w-11", text: "text-[1.35rem]" },
 } as const;
 
 /**
