@@ -70,7 +70,6 @@ export function HeroVideo() {
           >
             <source src="/media/oum-intro.webm" type="video/webm" />
             <source src="/media/oum-intro.mp4" type="video/mp4" />
-            <track kind="captions" src="/media/oum-intro.vtt" srcLang="en" label="English" default />
           </video>
         )}
         <div className="px-scanlines pointer-events-none absolute inset-0" aria-hidden="true" />

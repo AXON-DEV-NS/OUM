@@ -117,7 +117,6 @@ export function VideoModalButton({
             >
               <source src="/media/oum-intro.webm" type="video/webm" />
               <source src="/media/oum-intro.mp4" type="video/mp4" />
-              <track kind="captions" src="/media/oum-intro.vtt" srcLang="en" label="English" default />
             </video>
           </div>
         </div>
