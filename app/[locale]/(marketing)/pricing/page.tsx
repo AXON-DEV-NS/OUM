@@ -23,7 +23,8 @@ function FAQItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border-b border-line">
+    <div>
+      <div className="px-section-rule" aria-hidden="true" />
       <button
         onClick={onToggle}
         className="relative flex w-full items-center justify-between overflow-hidden py-5 text-left"
@@ -190,7 +191,7 @@ export default function PricingPage() {
           <h2 className="display mb-8 text-center text-display-md">
             {t("faq.title")}
           </h2>
-          <div className="divide-y divide-line border-t border-line">
+          <div>
             {[0, 1, 2, 3, 4].map((i) => (
               <FAQItem
                 key={i}

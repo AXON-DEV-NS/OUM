@@ -40,7 +40,7 @@ export default function BlogIndexPage() {
         {/* Featured Article */}
         {featuredPost && (
           <div className="mb-16">
-            <div className="group relative rounded-3xl overflow-hidden border border-line bg-paper-high hover:border-emerald-500/40 transition-all duration-300 shadow-lg">
+            <div className="group relative rounded-none overflow-hidden bg-paper-high hover:border-emerald-500/40 transition-all duration-300 shadow-lg px-corners">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
                 <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto overflow-hidden">
                   <img
@@ -133,10 +133,10 @@ export default function BlogIndexPage() {
           {regularPosts.map((post) => (
             <article
               key={post.slug}
-              className="group flex flex-col justify-between rounded-3xl border border-line bg-paper-high p-6 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all duration-300"
+              className="group flex flex-col justify-between rounded-none bg-paper-high p-6 shadow-sm hover:shadow-md hover:border-emerald-500/40 transition-all duration-300 px-corners"
             >
               <div>
-                <div className="relative h-56 rounded-2xl overflow-hidden mb-5">
+                <div className="relative h-56 rounded-none overflow-hidden mb-5">
                   <img
                     src={post.coverImage}
                     alt={post.title}

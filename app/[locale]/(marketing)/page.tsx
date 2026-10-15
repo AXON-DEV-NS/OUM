@@ -11,7 +11,7 @@ import { ArrowUpRight } from "lucide-react";
 
 function Hero() {
   return (
-    <section className="grain-overlay relative overflow-hidden border-b border-line bg-paper">
+    <section className="grain-overlay relative overflow-hidden bg-paper">
       
       <div className="container-wide relative z-10 grid min-h-[calc(100vh-4rem)] items-start gap-8 py-16 lg:grid-cols-2 lg:items-center lg:gap-14 sm:py-20">
         {/* Left — headline & actions */}
@@ -41,6 +41,7 @@ function Hero() {
           <HeroVideo />
         </div>
       </div>
+      <div className="px-section-rule" aria-hidden="true" />
     </section>
   );
 }
@@ -90,7 +91,8 @@ function TrustedBy() {
 
 function PricingTeaser() {
   return (
-    <section className="section-padding-tight border-t border-line bg-paper-high">
+    <section className="section-padding-tight bg-paper-high">
+      <div className="px-section-rule" aria-hidden="true" />
       <div className="container-wide flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
         <div className="max-w-lg">
           <span className="eyebrow">Simple, transparent pricing</span>
