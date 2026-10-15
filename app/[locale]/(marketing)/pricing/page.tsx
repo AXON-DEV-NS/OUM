@@ -54,7 +54,7 @@ function FAQItem({
         )}
       >
         <div className="overflow-hidden">
-          <div className="mb-5 rounded-lg bg-ink px-6 py-5">
+          <div className="mb-5 rounded-none bg-ink px-6 py-5 px-corners-light">
             <p className="text-sm leading-relaxed text-paper/85">{answer}</p>
           </div>
         </div>
@@ -147,11 +147,11 @@ export default function PricingPage() {
         <div className="mx-auto mb-16 max-w-2xl text-center">
           <span className="eyebrow">{t("title")}</span>
           <h1 className="display mt-5 text-display-lg">{t("subtitle")}</h1>
-          <div className="mt-8 inline-flex items-center gap-1 rounded-full border border-line bg-paper-high p-1">
+          <div className="mt-8 inline-flex items-center gap-1 rounded-none border border-line bg-paper-high p-1 px-corners">
             <button
               onClick={() => handleToggle(false)}
               className={cn(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                "rounded-none px-4 py-1.5 text-sm font-medium transition-colors",
                 !annual ? "bg-ink text-paper-high" : "text-ink-mute hover:text-ink"
               )}
             >
@@ -160,7 +160,7 @@ export default function PricingPage() {
             <button
               onClick={() => handleToggle(true)}
               className={cn(
-                "flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                "flex items-center gap-2 rounded-none px-4 py-1.5 text-sm font-medium transition-colors",
                 annual ? "bg-ink text-paper-high" : "text-ink-mute hover:text-ink"
               )}
             >
