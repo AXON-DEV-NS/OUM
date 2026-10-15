@@ -412,7 +412,7 @@ export default function LoginPage() {
   const panelContent = (
     <>
       <Link href="/" className="group mb-10 inline-flex transition-opacity hover:opacity-80">
-        <Logo variant="paper" />
+        <Logo variant="paper" size="lg" />
       </Link>
 
       <div key={panelCopy} className="animate-fade-in">
