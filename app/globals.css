@@ -464,3 +464,18 @@ html, body { background-color: #F5EFE1; background-attachment: fixed; }
 .pixel-frame img {
   image-rendering: pixelated;
 }
+
+/* PX avatar life: stepped idle bob + blinking HUD LED (pixel timing) */
+@keyframes avatar-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.avatar-bob { animation: avatar-bob 1.6s steps(2, end) infinite; }
+@keyframes led-blink {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0.25; }
+}
+.hud-led-blink { animation: led-blink 1.2s steps(1, end) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .avatar-bob, .hud-led-blink { animation: none; }
+}

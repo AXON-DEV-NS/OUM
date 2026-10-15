@@ -13,26 +13,49 @@ export type OumExpression =
   | "wink"
   | "sleepy";
 
+const CYCLE: OumExpression[] = [
+  "happy",
+  "excited",
+  "wink",
+  "surprised",
+  "confused",
+  "sad",
+  "angry",
+  "sleepy",
+  "normal",
+];
+
 /**
- * OUM avatar built on the REAL logo artwork (public/oum-avatar.png — the
- * production logo with its eyes digitally cleared), with a vector expression
- * layer mapped 1:1 onto the logo's eye zones (crop-local coords, 840x560).
- * · pupils follow the cursor (quantized to 2px pixel steps) · blinks ~every 4s
- * · winks when "[data-cta]" (Get Started) is hovered or focused
- * · excited while the hero film plays · sleepy after 40 s of page idleness
- * · honors prefers-reduced-motion (static normal face)
+ * OUM avatar on the REAL logo artwork (public/oum-avatar.png — transparent
+ * robot, eyes cleared) + 1:1 vector expression layer (crop-local 840x560),
+ * matched to the reference expression sheet:
+ * happy ∩∩ · angry slanted · sad droop + blue tears · surprised solid-round ·
+ * excited gold stars · confused mismatched · wink · sleepy lids + zzz.
+ * Interactions: cursor-tracked pupils (2px steps) · 4s blink · wink on
+ * Get-Started hover/focus · excited while the hero film plays · sleepy when
+ * the page idles · click / Enter / Space cycles expressions with a bounce.
  */
 const W = 840;
 const H = 560;
-// eye zones in crop-local coords (measured from the real logo)
 const L = { x: 238, y: 165, w: 154, h: 145 };
 const R = { x: 478, y: 165, w: 154, h: 145 };
 
-export function OumAvatar({ className = "" }: { className?: string }) {
+export function OumAvatar({
+  className = "",
+  onExpressionChange,
+}: {
+  className?: string;
+  onExpressionChange?: (e: OumExpression) => void;
+}) {
   const [expr, setExpr] = useState<OumExpression>("normal");
   const [pupil, setPupil] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [bounce, setBounce] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
   const revert = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    onExpressionChange?.(expr);
+  }, [expr, onExpressionChange]);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -70,7 +93,6 @@ export function OumAvatar({ className = "" }: { className?: string }) {
       window.clearTimeout(idle);
       idle = window.setTimeout(() => setExpr("sleepy"), 40000);
     };
-    // natural blink: 140 ms lid-close every ~4.5 s (skipped while busy)
     const blink = window.setInterval(() => {
       setExpr((p) => {
         if (p !== "normal") return p;
@@ -98,6 +120,13 @@ export function OumAvatar({ className = "" }: { className?: string }) {
     };
   }, []);
 
+  const cycle = () => {
+    const next = CYCLE[(CYCLE.indexOf(expr) + 1) % CYCLE.length] ?? "normal";
+    window.clearTimeout(revert.current);
+    setExpr(next);
+    revert.current = window.setTimeout(() => setExpr("normal"), 2500);
+  };
+
   const on = (k: OumExpression) => (expr === k ? undefined : "none");
   const eye = (key: string, z: typeof L) => (
     <g key={key}>
@@ -109,16 +138,40 @@ export function OumAvatar({ className = "" }: { className?: string }) {
   const arc = (key: string, z: typeof L, up: boolean) => (
     <path
       key={key}
-      d={up ? `M${z.x} ${z.y + 110} Q${z.x + 77} ${z.y - 20} ${z.x + 154} ${z.y + 110}` : `M${z.x} ${z.y + 40} Q${z.x + 77} ${z.y + 175} ${z.x + 154} ${z.y + 40}`}
+      d={
+        up
+          ? `M${z.x} ${z.y + 110} Q${z.x + 77} ${z.y - 20} ${z.x + 154} ${z.y + 110}`
+          : `M${z.x} ${z.y + 40} Q${z.x + 77} ${z.y + 175} ${z.x + 154} ${z.y + 40}`
+      }
       fill="none"
       stroke="#0B0C0A"
       strokeWidth={20}
       strokeLinecap="round"
     />
   );
+  const tear = (key: string, x: number, y: number) => (
+    <g key={key}>
+      <circle cx={x} cy={y} r={13} fill="#7FB3D5" stroke="#0B0C0A" strokeWidth={5} />
+      <rect x={x - 13} y={y - 30} width={26} height={24} rx={8} fill="#7FB3D5" stroke="#0B0C0A" strokeWidth={5} />
+    </g>
+  );
 
   return (
-    <div ref={boxRef} className={`relative w-full ${className}`} style={{ aspectRatio: `${W} / ${H}` }}>
+    <div
+      ref={boxRef}
+      role="button"
+      tabIndex={0}
+      aria-label={`OUM robot avatar, feeling ${expr} — activate to change expression`}
+      onClick={cycle}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          cycle();
+        }
+      }}
+      className={`avatar-bob relative w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 ${className}`}
+      style={{ aspectRatio: `${W} / ${H}` }}
+    >
       <img
         src="/oum-avatar.png"
         alt=""
@@ -142,13 +195,11 @@ export function OumAvatar({ className = "" }: { className?: string }) {
         </g>
         <g display={on("sad")}>
           {arc("s1", L, false)}{arc("s2", R, false)}
-          <circle cx={L.x + 128} cy={L.y + 132} r={10} fill="#8FB06E" />
+          {tear("t1", L.x + 40, L.y + 185)}{tear("t2", R.x + 114, R.y + 185)}
         </g>
         <g display={on("surprised")}>
-          <rect x={L.x} y={L.y} width={L.w} height={L.h} rx={70} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={8} />
-          <circle cx={L.x + 77} cy={L.y + 72} r={17} fill="#0B0C0A" />
-          <rect x={R.x} y={R.y} width={R.w} height={R.h} rx={70} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={8} />
-          <circle cx={R.x + 77} cy={R.y + 72} r={17} fill="#0B0C0A" />
+          <rect x={L.x} y={L.y} width={L.w} height={L.h} rx={70} fill="#0B0C0A" />
+          <rect x={R.x} y={R.y} width={R.w} height={R.h} rx={70} fill="#0B0C0A" />
         </g>
         <g display={on("confused")}>
           <rect x={L.x} y={L.y} width={L.w} height={L.h} rx={26} fill="#F3E7CE" stroke="#0B0C0A" strokeWidth={6} />
