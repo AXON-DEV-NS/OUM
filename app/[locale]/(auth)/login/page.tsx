@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/ui/logo";
 import { useTransitionStore } from "@/lib/transition-store";
 import { AlertCircle, ArrowLeft, CheckCircle, Loader2, Mail } from "lucide-react";
-import { auth, googleProvider } from "@/lib/firebase";
+import { auth, googleProvider, githubProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 
 type Mode = "signup" | "signin";
@@ -88,6 +88,89 @@ function GoogleSignInButton({ label, returnUrl }: { label: string; returnUrl?: s
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
           <GoogleGlyph />
+        )}
+        {loading ? "Signing in..." : label}
+      </Button>
+      {error && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-2.5 text-xs text-red-600">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GithubGlyph() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 015.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.13 0 .31.2.68.8.56A10.52 10.52 0 0023.5 12C23.5 5.65 18.35.5 12 .5z" />
+    </svg>
+  );
+}
+
+function GithubSignInButton({ label, returnUrl }: { label: string; returnUrl?: string }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function onClick() {
+    setError("");
+    setLoading(true);
+    const fbAuth = auth;
+    if (!fbAuth) {
+      setError("GitHub sign-in isn't configured yet. Please use the email verification code instead.");
+      setLoading(false);
+      return;
+    }
+    try {
+      const result = await signInWithPopup(fbAuth, githubProvider);
+      const idToken = await result.user.getIdToken();
+
+      const res = await fetch("/api/auth/firebase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        window.location.href = returnUrl || data.redirect || "/dashboard";
+        return;
+      }
+
+      setError(data.error || "Failed to authenticate with server. Please try again.");
+      setLoading(false);
+    } catch (err: any) {
+      console.error("[GitHub Auth Error Details]:", err);
+      if (err?.code === "auth/popup-closed-by-user" || err?.code === "auth/cancelled-popup-request") {
+        setLoading(false);
+        return;
+      }
+      if (err?.code === "auth/popup-blocked") {
+        setError("Sign-in popup was blocked by your browser. Please allow popups for this site.");
+      } else if (err?.code === "auth/account-exists-with-different-credential") {
+        setError("An account already exists with this email through another sign-in method. Use that method instead.");
+      } else if (err?.code === "auth/unauthorized-domain") {
+        setError("This domain is not authorized in Firebase Console (Authentication > Settings > Authorized domains).");
+      } else {
+        setError(err?.message || "GitHub sign-in failed. Please try again.");
+      }
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="w-full">
+      <Button
+        variant="secondary"
+        size="lg"
+        className="mb-4 w-full"
+        onClick={onClick}
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <GithubGlyph />
         )}
         {loading ? "Signing in..." : label}
       </Button>
@@ -346,6 +429,7 @@ function SignUpForm({ onToggle, returnUrl, onSwitchMode }: FormShellProps) {
       <p className="mb-8 mt-2 text-ink-mute">Put your channel on autopilot.</p>
 
       <GoogleSignInButton label="Sign up with Google" returnUrl={returnUrl} />
+      <GithubSignInButton label="Sign up with GitHub" returnUrl={returnUrl} />
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
