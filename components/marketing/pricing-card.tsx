@@ -58,7 +58,7 @@ function PeelCells({ color }: { color: string }) {
   });
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-2xl">
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-none">
       {cells}
     </div>
   );
@@ -122,16 +122,16 @@ export function PricingCard({ plan, annual, authed, flipped, onFlip, peel }: Pri
         {/* ===== FRONT — everything except the price ===== */}
         <div
           className={cn(
-            "absolute inset-0 flex flex-col rounded-2xl border p-7",
+            "absolute inset-0 flex flex-col rounded-none p-7",
             annual
-              ? "border-paper/10 bg-ink text-paper-high"
-              : "border-line bg-paper-high text-ink",
+              ? "bg-ink text-paper-high px-corners-light"
+              : "bg-paper-high text-ink px-corners",
             plan.popular && !annual && "border-gold-400"
           )}
           style={{ backfaceVisibility: "hidden" }}
         >
           {plan.popular && (
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold-500 px-3 py-0.5 text-xs font-medium text-ink">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-none bg-gold-500 px-3 py-0.5 text-xs font-medium text-ink">
               Most Popular
             </span>
           )}
@@ -140,7 +140,7 @@ export function PricingCard({ plan, annual, authed, flipped, onFlip, peel }: Pri
             <h3 className="font-display text-xl font-semibold">{plan.name}</h3>
             <span
               className={cn(
-                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors",
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-none border transition-colors",
                 annual
                   ? "border-paper/20 text-paper/60"
                   : "border-line text-ink-faint"
@@ -217,7 +217,7 @@ export function PricingCard({ plan, annual, authed, flipped, onFlip, peel }: Pri
         {/* ===== BACK — price only ===== */}
         <div
           className={cn(
-            "absolute inset-0 flex flex-col items-center justify-center rounded-2xl text-paper-high",
+            "absolute inset-0 flex flex-col items-center justify-center rounded-none text-paper-high px-corners-light",
             annual ? "bg-green-600" : "bg-ink"
           )}
           style={{

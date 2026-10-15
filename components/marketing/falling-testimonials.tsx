@@ -56,7 +56,7 @@ export function FallingTestimonials() {
         >
           {/* Back — solid black, logo mark face-down */}
           <div
-            className="absolute inset-0 flex items-center justify-center rounded-xl bg-ink shadow-card"
+            className="absolute inset-0 flex items-center justify-center rounded-none bg-ink shadow-card px-corners-light"
             style={{ backfaceVisibility: "hidden" }}
           >
             <Logo variant="paper" size="lg" />
@@ -64,7 +64,7 @@ export function FallingTestimonials() {
 
           {/* Front — testimonial, face-up */}
           <div
-            className="absolute inset-0 flex flex-col rounded-xl border border-line bg-paper-high p-7 shadow-card"
+            className="absolute inset-0 flex flex-col rounded-none bg-paper-high p-7 shadow-card px-corners"
             style={{
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
@@ -77,7 +77,7 @@ export function FallingTestimonials() {
               {t.quote}
             </blockquote>
             <figcaption className="mt-auto flex items-center gap-3 border-t border-line pt-4">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-50 text-sm font-semibold text-green-700">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-green-50 text-sm font-semibold text-green-700">
                 {t.author.charAt(0)}
               </span>
               <span className="min-w-0">

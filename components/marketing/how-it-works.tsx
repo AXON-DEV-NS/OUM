@@ -99,14 +99,14 @@ export function HowItWorks() {
               <button
                 onClick={prevStep}
                 aria-label="Previous step"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink active:bg-paper-low"
+                className="flex h-11 w-11 items-center justify-center rounded-none border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink active:bg-paper-low px-corners"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={nextStep}
                 aria-label="Next step"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink active:bg-paper-low"
+                className="flex h-11 w-11 items-center justify-center rounded-none border border-line text-ink-soft transition-colors hover:border-ink hover:text-ink active:bg-paper-low px-corners"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
@@ -143,7 +143,7 @@ export function HowItWorks() {
                   {/* Front */}
                   <div
                     className={cn(
-                      "absolute inset-0 backface-hidden flex flex-col rounded-lg border bg-paper-high p-7 transition-colors",
+                      "absolute inset-0 backface-hidden flex flex-col rounded-none bg-paper-high p-7 transition-colors px-corners",
                       isCurrent && !isFlipped
                         ? "border-ink"
                         : "border-line hover:border-ink-soft"
@@ -165,7 +165,7 @@ export function HowItWorks() {
                   </div>
 
                   {/* Back */}
-                  <div className="absolute inset-0 backface-hidden rotate-y-180 flex flex-col rounded-lg border border-ink bg-ink p-7 text-paper-high">
+                  <div className="absolute inset-0 backface-hidden rotate-y-180 flex flex-col rounded-none bg-ink p-7 text-paper-high px-corners-light">
                     <h3 className="mb-4 font-display text-xl font-semibold">
                       {step.title}
                     </h3>

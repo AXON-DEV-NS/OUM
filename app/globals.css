@@ -479,3 +479,14 @@ html, body { background-color: #F5EFE1; background-attachment: fixed; }
 @media (prefers-reduced-motion: reduce) {
   .avatar-bob, .hud-led-blink { animation: none; }
 }
+
+/* light stepped 8-bit outline for dark surfaces (uses --px override) */
+.px-corners-light {
+  --px: #E8DFC8;
+  box-shadow:
+    -4px 0 0 0 var(--px),
+    4px 0 0 0 var(--px),
+    0 -4px 0 0 var(--px),
+    0 4px 0 0 var(--px);
+  margin: 4px;
+}

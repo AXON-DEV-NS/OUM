@@ -86,9 +86,9 @@ export function FeatureMarquee() {
           {cards.map((feature, i) => (
             <div
               key={i}
-              className="w-80 shrink-0 rounded-lg border border-paper/10 bg-paper/5 px-7 py-8"
+              className="w-80 shrink-0 rounded-none bg-paper/5 px-7 py-8 px-corners-light"
             >
-              <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-md bg-green-500/15 text-green-300">
+              <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-none bg-green-500/15 text-green-300">
                 <feature.icon className="h-5 w-5" strokeWidth={1.5} />
               </div>
               <h3 className="mb-2 font-display text-lg font-semibold text-paper-high">
