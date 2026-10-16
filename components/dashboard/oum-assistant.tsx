@@ -110,16 +110,26 @@ export function OumAssistant() {
       {/* Chat panel */}
       {open && (
         <div className="fixed bottom-24 right-6 z-[60] flex h-[30rem] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-none bg-paper-high shadow-card px-corners">
-          <div className="flex items-center gap-2.5 bg-ink px-4 py-3 text-paper-high">
-            <span className="block h-10 w-10 shrink-0 overflow-hidden bg-ink">
+          <div
+            className="relative flex items-center gap-3 overflow-hidden bg-ink px-4 py-3 text-paper-high"
+            style={{
+              backgroundImage:
+                "repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%)",
+              backgroundSize: "10px 10px",
+            }}
+          >
+            <span className="block h-10 w-10 shrink-0 overflow-hidden bg-ink outline outline-2 outline-offset-2 outline-gold-500/60">
               <OumAvatar expression={mood} />
             </span>
             <div className="flex-1">
-              <p className="text-sm font-semibold">OUM</p>
-              <p className="text-[10px] uppercase tracking-wider text-paper/50">
+              <p className="font-pixel text-[11px] leading-none text-paper-high">OUM</p>
+              <p className="font-pixel mt-2 text-[7px] uppercase tracking-[0.2em] text-gold-400">
                 Channel manager
               </p>
             </div>
+            <ShieldCheck className="h-4 w-4 text-green-300" aria-label="Account settings are off-limits" />
+          </div>
+          <div className="px-section-rule-light" aria-hidden="true" />
             <ShieldCheck className="h-4 w-4 text-green-300" aria-label="Account settings are off-limits" />
           </div>
 
