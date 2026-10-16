@@ -40,9 +40,12 @@ const R = { x: 480, y: 168, w: 152, h: 144 };
 
 export function OumAvatar({
   className = "",
+  expression,
   onExpressionChange,
 }: {
   className?: string;
+  /** external override (e.g. chat mood) — internal timers keep running underneath */
+  expression?: OumExpression;
   onExpressionChange?: (e: OumExpression) => void;
 }) {
   const [expr, setExpr] = useState<OumExpression>("normal");
@@ -51,8 +54,10 @@ export function OumAvatar({
   const revert = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    onExpressionChange?.(expr);
-  }, [expr, onExpressionChange]);
+    if (expression === undefined) onExpressionChange?.(expr);
+  }, [expr, expression, onExpressionChange]);
+
+  const shown = expression ?? expr;
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -124,7 +129,7 @@ export function OumAvatar({
     revert.current = window.setTimeout(() => setExpr("normal"), 2500);
   };
 
-  const on = (k: OumExpression) => (expr === k ? undefined : "none");
+  const on = (k: OumExpression) => (shown === k ? undefined : "none");
   const eye = (key: string, z: typeof L) => (
     <g key={key}>
       <rect x={z.x} y={z.y} width={z.w} height={z.h} fill="#0B0C0A" />
@@ -158,7 +163,7 @@ export function OumAvatar({
       ref={boxRef}
       role="button"
       tabIndex={0}
-      aria-label={`OUM robot avatar, feeling ${expr} — activate to change expression`}
+      aria-label={`OUM robot avatar, feeling ${shown} — activate to change expression`}
       onClick={cycle}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -182,7 +187,7 @@ export function OumAvatar({
         viewBox={`0 0 ${W} ${H}`}
         shapeRendering="crispEdges"
         role="img"
-        aria-label={`OUM robot avatar, expression: ${expr}`}
+        aria-label={`OUM robot avatar, expression: ${shown}`}
         className="absolute inset-0 h-full w-full"
       >
         <g display={on("normal")}>{eye("n1", L)}{eye("n2", R)}</g>
