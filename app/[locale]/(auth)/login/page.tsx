@@ -192,11 +192,25 @@ interface FormShellProps {
 function SignInForm({ onToggle, returnUrl }: FormShellProps) {
   return (
     <div className="w-full max-w-sm">
-      <h1 className="display text-3xl font-semibold text-ink">Welcome back</h1>
+      <span className="eyebrow eyebrow--gold">Member access</span>
+      <h1 className="display mt-4 text-3xl font-semibold text-ink">
+        Welcome{" "}
+        <em className="font-display font-normal italic text-green-700">back</em>.
+      </h1>
       <p className="mb-8 mt-2 text-ink-mute">Continue where you left off.</p>
 
       <GoogleSignInButton label="Continue with Google" returnUrl={returnUrl} />
       <GithubSignInButton label="Continue with GitHub" returnUrl={returnUrl} />
+
+      <div
+        className="mt-2 flex items-center gap-2.5 bg-ink px-4 py-3 px-corners-light"
+        aria-hidden="true"
+      >
+        <span className="hud-led-blink inline-block h-2.5 w-2.5 bg-green-400" />
+        <span className="font-mono text-[11px] tracking-widest text-gold-400">
+          AGENT ONLINE // 24-7
+        </span>
+      </div>
 
       <p className="mt-8 text-center text-sm text-ink-mute">
         New here?{" "}
@@ -211,11 +225,30 @@ function SignInForm({ onToggle, returnUrl }: FormShellProps) {
 function SignUpForm({ onToggle, returnUrl }: FormShellProps) {
   return (
     <div className="w-full max-w-sm">
-      <h1 className="display text-3xl font-semibold text-ink">Create your account</h1>
+      <span className="eyebrow eyebrow--gold">Start free — no card required</span>
+      <h1 className="display mt-4 text-3xl font-semibold text-ink">
+        Create your{" "}
+        <em className="font-display font-normal italic text-green-700">account</em>.
+      </h1>
       <p className="mb-8 mt-2 text-ink-mute">Put your channel on autopilot.</p>
 
       <GoogleSignInButton label="Sign up with Google" returnUrl={returnUrl} />
       <GithubSignInButton label="Sign up with GitHub" returnUrl={returnUrl} />
+
+      <ul className="mt-6 space-y-3">
+        <li className="flex gap-3 text-sm text-ink-soft">
+          <span className="mt-1.5 h-2 w-2 shrink-0 bg-gold-500" aria-hidden="true" />
+          Connect your channel securely — one click, no passwords shared.
+        </li>
+        <li className="flex gap-3 text-sm text-ink-soft">
+          <span className="mt-1.5 h-2 w-2 shrink-0 bg-gold-500" aria-hidden="true" />
+          Teach it your niche and lock your hero&apos;s look.
+        </li>
+        <li className="flex gap-3 text-sm text-ink-soft">
+          <span className="mt-1.5 h-2 w-2 shrink-0 bg-gold-500" aria-hidden="true" />
+          Approve every video — or hand over full autopilot.
+        </li>
+      </ul>
 
       <p className="mt-8 text-center text-sm text-ink-mute">
         Already have an account?{" "}
