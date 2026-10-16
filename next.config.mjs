@@ -12,20 +12,6 @@ const nextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: '/vovo-hq-secure-gateway/2fa',
-        destination: '/',
-        permanent: false,
-      },
-      {
-        source: '/:locale/vovo-hq-secure-gateway/2fa',
-        destination: '/',
-        permanent: false,
-      },
-    ];
-  },
 };
 
 export default withNextIntl(nextConfig);
