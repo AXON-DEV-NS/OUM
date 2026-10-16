@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/ui/logo";
 import { useTransitionStore } from "@/lib/transition-store";
-import { AlertCircle, ArrowLeft, CheckCircle, Loader2, Mail } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { auth, googleProvider, githubProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 
@@ -183,234 +183,19 @@ function GithubSignInButton({ label, returnUrl }: { label: string; returnUrl?: s
   );
 }
 
-interface OtpAuthFormProps {
-  mode: Mode;
-  returnUrl?: string;
-  onSwitchMode?: (mode: Mode) => void;
-}
-
-function OtpAuthForm({ mode, returnUrl, onSwitchMode }: OtpAuthFormProps) {
-  const [step, setStep] = useState<"email" | "otp">("email");
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [cooldown, setCooldown] = useState(0);
-
-  const isSignup = mode === "signup";
-
-  useEffect(() => {
-    if (!cooldown) return;
-    const t = setInterval(() => {
-      setCooldown((prev) => {
-        if (prev <= 1) {
-          clearInterval(t);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, [cooldown]);
-
-  async function handleSendOtp(e?: React.FormEvent) {
-    if (e) e.preventDefault();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    setNotice("");
-    try {
-      const res = await fetch("/api/auth/otp/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, mode }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.success) {
-        setStep("otp");
-        setCooldown(60);
-      } else if (data.code === "email_exists" && onSwitchMode) {
-        // Already registered → move the visitor to Sign In automatically.
-        setNotice(data.error || "This email is already registered. Please sign in.");
-        onSwitchMode("signin");
-      } else if (data.code === "account_not_found" && onSwitchMode) {
-        // No account yet → move the visitor to Sign Up automatically.
-        setNotice(data.error || "No account found with this email. Please create one.");
-        onSwitchMode("signup");
-      } else {
-        setError(data.error || "Failed to send verification code. Please try again.");
-      }
-    } catch {
-      setError("Network error. Please check your connection.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerifyOtp(e: React.FormEvent) {
-    e.preventDefault();
-    if (!code || code.trim().length !== 6) {
-      setError("Please enter the complete 6-digit code.");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/auth/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code, name }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.success) {
-        window.location.href = returnUrl || data.redirect || "/dashboard";
-        return;
-      }
-      setError(data.error || "Invalid code. Please check and try again.");
-    } catch {
-      setError("Failed to verify code. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (step === "otp") {
-    return (
-      <form onSubmit={handleVerifyOtp} className="space-y-4">
-        <div className="text-center mb-4">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-paper-high/10 text-ink">
-            <CheckCircle className="h-6 w-6 text-green-600" />
-          </div>
-          <h3 className="font-display font-semibold text-lg text-ink">
-            Enter 6-digit code
-          </h3>
-          <p className="text-xs text-ink-mute mt-1">
-            We sent a verification code to <span className="font-medium text-ink">{email}</span>
-          </p>
-          <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-            Didn&apos;t receive the code? Check your spam / junk folder.
-          </p>
-        </div>
-
-        <div>
-          <Input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            placeholder="• • • • • •"
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            required
-            autoFocus
-            className="text-center text-2xl tracking-[0.4em] font-mono font-bold h-14"
-            aria-label="Verification Code"
-          />
-        </div>
-
-        {error && <p className="text-xs text-red-600 text-center">{error}</p>}
-
-        <Button type="submit" size="lg" className="w-full" disabled={loading || code.length !== 6}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {loading ? "Verifying..." : "Verify & Continue"}
-        </Button>
-
-        <div className="flex items-center justify-between pt-2 text-xs text-ink-mute">
-          <button
-            type="button"
-            onClick={() => {
-              setStep("email");
-              setError("");
-              setCode("");
-            }}
-            className="inline-flex items-center gap-1 hover:text-ink font-medium"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Change email
-          </button>
-
-          {cooldown > 0 ? (
-            <span className="text-ink-faint">Resend in {cooldown}s</span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => handleSendOtp()}
-              className="text-green-600 hover:underline font-medium"
-              disabled={loading}
-            >
-              Resend code
-            </button>
-          )}
-        </div>
-      </form>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSendOtp} className="space-y-4">
-      {isSignup && (
-        <Input
-          type="text"
-          placeholder="Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          aria-label="Name"
-        />
-      )}
-      <Input
-        type="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        aria-label="Email address"
-      />
-      {notice && (
-        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-          {notice}
-        </p>
-      )}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button type="submit" size="lg" className="w-full" disabled={loading}>
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-        {loading ? "Sending code..." : "Send verification code"}
-      </Button>
-      <p className="text-center text-xs text-ink-faint">
-        You&apos;ll receive a 6-digit code by email — check your spam folder if it doesn&apos;t appear.
-      </p>
-    </form>
-  );
-}
-
 interface FormShellProps {
   onToggle: () => void;
   returnUrl?: string;
   onSwitchMode?: (mode: Mode) => void;
 }
 
-function SignInForm({ onToggle, returnUrl, onSwitchMode }: FormShellProps) {
+function SignInForm({ onToggle, returnUrl }: FormShellProps) {
   return (
     <div className="w-full max-w-sm">
       <h1 className="display text-3xl font-semibold text-ink">Welcome back</h1>
       <p className="mb-8 mt-2 text-ink-mute">Continue where you left off.</p>
 
       <GoogleSignInButton label="Continue with Google" returnUrl={returnUrl} />
-
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-line" />
-        </div>
-        <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
-          <span className="bg-paper px-3 text-ink-faint">or</span>
-        </div>
-      </div>
-
-      <OtpAuthForm mode="signin" returnUrl={returnUrl} onSwitchMode={onSwitchMode} />
 
       <p className="mt-8 text-center text-sm text-ink-mute">
         New here?{" "}
@@ -422,7 +207,7 @@ function SignInForm({ onToggle, returnUrl, onSwitchMode }: FormShellProps) {
   );
 }
 
-function SignUpForm({ onToggle, returnUrl, onSwitchMode }: FormShellProps) {
+function SignUpForm({ onToggle, returnUrl }: FormShellProps) {
   return (
     <div className="w-full max-w-sm">
       <h1 className="display text-3xl font-semibold text-ink">Create your account</h1>
@@ -430,17 +215,6 @@ function SignUpForm({ onToggle, returnUrl, onSwitchMode }: FormShellProps) {
 
       <GoogleSignInButton label="Sign up with Google" returnUrl={returnUrl} />
       <GithubSignInButton label="Sign up with GitHub" returnUrl={returnUrl} />
-
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-line" />
-        </div>
-        <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
-          <span className="bg-paper px-3 text-ink-faint">or</span>
-        </div>
-      </div>
-
-      <OtpAuthForm mode="signup" returnUrl={returnUrl} onSwitchMode={onSwitchMode} />
 
       <p className="mt-8 text-center text-sm text-ink-mute">
         Already have an account?{" "}
