@@ -196,6 +196,7 @@ function SignInForm({ onToggle, returnUrl }: FormShellProps) {
       <p className="mb-8 mt-2 text-ink-mute">Continue where you left off.</p>
 
       <GoogleSignInButton label="Continue with Google" returnUrl={returnUrl} />
+      <GithubSignInButton label="Continue with GitHub" returnUrl={returnUrl} />
 
       <p className="mt-8 text-center text-sm text-ink-mute">
         New here?{" "}
