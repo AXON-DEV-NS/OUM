@@ -41,11 +41,14 @@ const R = { x: 480, y: 168, w: 152, h: 144 };
 export function OumAvatar({
   className = "",
   expression,
+  animate = true,
   onExpressionChange,
 }: {
   className?: string;
   /** external override (e.g. chat mood) — internal timers keep running underneath */
   expression?: OumExpression;
+  /** idle bob; disable inside tiny badges where the jump would clip */
+  animate?: boolean;
   onExpressionChange?: (e: OumExpression) => void;
 }) {
   const [expr, setExpr] = useState<OumExpression>("normal");
@@ -171,7 +174,7 @@ export function OumAvatar({
           cycle();
         }
       }}
-      className={`avatar-bob relative w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 ${className}`}
+      className={`${animate ? "avatar-bob " : ""}relative w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 ${className}`}
       style={{ aspectRatio: `${W} / ${H}` }}
     >
       <img

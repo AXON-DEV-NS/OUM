@@ -118,8 +118,8 @@ export function OumAssistant() {
               backgroundSize: "10px 10px",
             }}
           >
-            <span className="block h-10 w-10 shrink-0 overflow-hidden bg-ink outline outline-2 outline-offset-2 outline-gold-500/60">
-              <OumAvatar expression={mood} />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden bg-ink outline outline-2 outline-offset-2 outline-gold-500/60">
+              <OumAvatar expression={mood} animate={false} />
             </span>
             <div className="flex-1">
               <p className="font-pixel text-[11px] leading-none text-paper-high">OUM</p>
