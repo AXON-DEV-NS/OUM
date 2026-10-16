@@ -97,13 +97,9 @@ export function OumAssistant() {
         {open ? (
           <X className="h-5 w-5" />
         ) : (
-          <img
-            src="/oum-avatar-px.png"
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover [image-rendering:pixelated]"
-            draggable={false}
-          />
+          <span className="pointer-events-none flex h-full w-full items-center justify-center overflow-hidden">
+            <OumAvatar interactive={false} animate={false} className="scale-[1.45]" />
+          </span>
         )}
       </button>
 
@@ -119,7 +115,7 @@ export function OumAssistant() {
             }}
           >
             <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden bg-ink outline outline-2 outline-offset-2 outline-gold-500/60">
-              <OumAvatar expression={mood} animate={false} />
+              <OumAvatar expression={mood} animate={false} interactive={false} />
             </span>
             <div className="flex-1">
               <p className="font-pixel text-[11px] leading-none text-paper-high">OUM</p>

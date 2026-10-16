@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 
 export type OumExpression =
   | "normal"
@@ -42,6 +43,7 @@ export function OumAvatar({
   className = "",
   expression,
   animate = true,
+  interactive = true,
   onExpressionChange,
 }: {
   className?: string;
@@ -49,6 +51,8 @@ export function OumAvatar({
   expression?: OumExpression;
   /** idle bob; disable inside tiny badges where the jump would clip */
   animate?: boolean;
+  /** false → plain image (no role/tabIndex/click handlers); use when nested inside a button */
+  interactive?: boolean;
   onExpressionChange?: (e: OumExpression) => void;
 }) {
   const [expr, setExpr] = useState<OumExpression>("normal");
@@ -161,20 +165,27 @@ export function OumAvatar({
     </g>
   );
 
+  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      cycle();
+    }
+  };
+  const interactProps = interactive
+    ? ({
+        role: "button",
+        tabIndex: 0,
+        "aria-label": `OUM robot avatar, feeling ${shown} — activate to change expression`,
+        onClick: cycle,
+        onKeyDown: onKey,
+      } as const)
+    : ({ "aria-hidden": true } as const);
+
   return (
     <div
       ref={boxRef}
-      role="button"
-      tabIndex={0}
-      aria-label={`OUM robot avatar, feeling ${shown} — activate to change expression`}
-      onClick={cycle}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          cycle();
-        }
-      }}
-      className={`${animate ? "avatar-bob " : ""}relative w-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 ${className}`}
+      {...interactProps}
+      className={`${animate ? "avatar-bob " : ""}relative w-full ${interactive ? "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 " : ""}${className}`}
       style={{ aspectRatio: `${W} / ${H}` }}
     >
       <img
