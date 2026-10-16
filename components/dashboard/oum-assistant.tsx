@@ -130,8 +130,6 @@ export function OumAssistant() {
             <ShieldCheck className="h-4 w-4 text-green-300" aria-label="Account settings are off-limits" />
           </div>
           <div className="px-section-rule-light" aria-hidden="true" />
-            <ShieldCheck className="h-4 w-4 text-green-300" aria-label="Account settings are off-limits" />
-          </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto bg-paper px-3 py-4">
             {messages.map((m, i) => (
