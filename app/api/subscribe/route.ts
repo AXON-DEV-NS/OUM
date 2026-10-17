@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PLANS } from "@/lib/plans";
 import { checkRateLimit } from "@/lib/security/guardian";
-import { setUserSubscription, usingDatabase, validatePromoCode, incrementPromoCodeUsage } from "@/lib/admin/data";
+import {
+  setUserSubscription,
+  usingDatabase,
+  validatePromoCode,
+  redeemPromoCode,
+  getActivePlans,
+} from "@/lib/admin/data";
 import { prisma } from "@/lib/db/prisma";
 import { getSession } from "@/lib/auth/session";
 
@@ -125,28 +131,67 @@ export async function POST(request: NextRequest) {
   }
 
   const basePrice = billing === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
-  let price = basePrice;
+
+  // Prices are owned by the admin panel (SystemSetting.plan_overrides) — the
+  // static PLANS values are only the seed/fallback, so the charge always
+  // matches the price the owner currently advertises.
+  let currentPrice = basePrice;
+  try {
+    const activePlans = await getActivePlans();
+    const activePlan = activePlans.find((p) => p.id === planId);
+    if (activePlan) {
+      currentPrice = billing === "yearly" ? activePlan.yearlyPrice : activePlan.monthlyPrice;
+    }
+  } catch {
+    // Admin lookup failed — fall back to the built-in plan prices.
+  }
+
+  let price = currentPrice;
   const promoCode = typeof body.promoCode === "string" ? body.promoCode.trim().toUpperCase() : "";
+  let promoRedeemed = false;
 
   if (promoCode) {
     const promoValidation = await validatePromoCode(promoCode);
-    if (promoValidation.valid && promoValidation.promo) {
-      if (promoValidation.promo.discountType === "percent") {
-        price = Math.max(0, Math.round(basePrice * (1 - promoValidation.promo.discountValue / 100)));
-      } else {
-        price = Math.max(0, basePrice - promoValidation.promo.discountValue);
-      }
-      await incrementPromoCodeUsage(promoCode);
+    if (!promoValidation.valid || !promoValidation.promo) {
+      // Never silently charge full price when a code was supplied.
+      return fieldError("promoCode", promoValidation.message || "This promo code is invalid.");
     }
+
+    const promo = promoValidation.promo;
+    if (promo.discountType === "percent") {
+      price = Math.max(0, Math.round(currentPrice * (1 - promo.discountValue / 100)));
+    } else {
+      price = Math.max(0, currentPrice - promo.discountValue);
+    }
+
+    // Atomic redemption: claims the code with a compare-and-swap so two
+    // concurrent checkouts can never exceed maxUses.
+    const redeemed = await redeemPromoCode(promo.code);
+    if (!redeemed.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            message:
+              redeemed.reason === "exhausted"
+                ? "This promo code has reached its usage limit."
+                : "This promo code is no longer valid.",
+            field: "promoCode",
+            code: "promo_unavailable",
+          },
+        },
+        { status: 409 }
+      );
+    }
+    promoRedeemed = true;
   }
 
-  console.log("[Subscribe] Payment simulated:", {
+  console.log("[Subscribe] Payment simulated (sandbox mode — no real charge):", {
     plan: plan.name,
     billing,
-    basePrice,
+    basePrice: currentPrice,
     price,
-    promoCode: promoCode || null,
-    email,
+    promoCode: promoRedeemed ? promoCode : null,
     at: new Date().toISOString(),
   });
 
@@ -166,7 +211,10 @@ export async function POST(request: NextRequest) {
     try {
       const user = await prisma.user.findUnique({ where: { email: targetEmail.toLowerCase() } });
       if (user) {
-        const periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        // The stored period must match the billing interval: yearly plans run
+        // for 365 days, monthly plans for 30.
+        const periodDays = billing === "yearly" ? 365 : 30;
+        const periodEnd = new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000);
         await prisma.subscription.upsert({
           where: { userId: user.id },
           create: {
@@ -185,11 +233,23 @@ export async function POST(request: NextRequest) {
       }
     } catch (e) {
       console.error("[Subscribe] Database subscription save error:", e);
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            message: "We couldn't activate your plan. Please try again in a moment.",
+            code: "persistence_failed",
+          },
+        },
+        { status: 500 }
+      );
     }
   }
 
   return NextResponse.json({
     ok: true,
+    // This endpoint simulates payment until a PCI-compliant provider is wired.
+    sandbox: true,
     subscription: {
       plan: plan.name,
       planId: plan.id,

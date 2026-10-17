@@ -7,6 +7,7 @@ import { TransitionOverlay } from "@/components/ui/transition-overlay";
 import { FirstLoadBranding } from "@/components/ui/first-load-branding";
 import { WelcomeSplash } from "@/components/marketing/welcome-splash";
 import { ThemeColorSync } from "@/components/ui/theme-color-sync";
+import "./px-frames.generated.css";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -43,8 +44,17 @@ export const metadata: Metadata = {
   ),
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/favicon-32.png", type: "image/png", sizes: "32x32" }],
-    apple: [{ url: "/icon-192.png", type: "image/png", sizes: "192x192" }],
+    icon: [
+      { url: "/favicon.ico?v=20261017b", sizes: "48x48 32x32 16x16" },
+      { url: "/icon-32.png?v=20261017b", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [
+      {
+        url: "/apple-touch-icon.png?v=20261017b",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
   },
   openGraph: {
     type: "website",
@@ -56,10 +66,10 @@ export const metadata: Metadata = {
       "AI handles research, content creation, publishing, and optimization — you just approve.",
     images: [
       {
-        url: "/oum.png",
+        url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "OUM",
+        alt: "OUM — Autonomous YouTube Channel Manager",
       },
     ],
   },
@@ -68,7 +78,7 @@ export const metadata: Metadata = {
     title: "OUM — Autonomous YouTube Channel Manager",
     description:
       "AI handles research, content creation, publishing, and optimization — you just approve.",
-    images: ["/oum.png"],
+    images: ["/og.png"],
   },
   appleWebApp: {
     capable: true,

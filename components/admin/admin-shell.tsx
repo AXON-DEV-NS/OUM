@@ -58,12 +58,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {/* Top Header */}
       <header className="sticky top-0 z-40 border-b border-line bg-paper-high/90 backdrop-blur-md px-6 py-3.5 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-red-600 text-paper-high font-bold flex items-center justify-center text-sm shadow-xs">
-            HQ
-          </div>
+          {/* Same OUM lockup as the rest of the site (mark + name) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/oum-logo.png"
+            alt="OUM logo"
+            width={694}
+            height={575}
+            className="h-7 w-7 shrink-0 object-contain"
+          />
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-ink tracking-tight">OUM HQ</span>
+              <span className="font-sans font-semibold text-ink tracking-tight">OUM HQ</span>
               <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-red-200">
                 Restricted admin panel
               </span>

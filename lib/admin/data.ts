@@ -873,6 +873,62 @@ export async function incrementPromoCodeUsage(code: string): Promise<void> {
   if (p) p.usedCount += 1;
 }
 
+/**
+ * Atomically redeems a promo code.
+ *
+ * Re-validates inside the write path and claims the redemption with a
+ * compare-and-swap on `usedCount`, so two concurrent checkouts can never
+ * push a code past its `maxUses` limit (the read-then-increment pattern
+ * allowed both requests to pass validation before either write landed).
+ *
+ * Returns `ok: false` with a reason when the code cannot be redeemed —
+ * callers should surface the reason instead of silently charging full price.
+ */
+export async function redeemPromoCode(
+  code: string
+): Promise<{ ok: boolean; reason?: "not_found" | "inactive" | "expired" | "exhausted" | "conflict" }> {
+  const c = code.trim().toUpperCase();
+
+  if (usingDatabase()) {
+    try {
+      // Up to 3 attempts: each retry re-reads the current counter after a
+      // lost compare-and-swap race with a concurrent checkout.
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const promo = await prisma.promoCode.findUnique({ where: { code: c } });
+        if (!promo) return { ok: false, reason: "not_found" };
+        if (!promo.active) return { ok: false, reason: "inactive" };
+        if (promo.expiryDate && promo.expiryDate.getTime() < Date.now()) {
+          return { ok: false, reason: "expired" };
+        }
+        if (promo.maxUses != null && promo.usedCount >= promo.maxUses) {
+          return { ok: false, reason: "exhausted" };
+        }
+
+        const claimed = await prisma.promoCode.updateMany({
+          where: { code: c, usedCount: promo.usedCount },
+          data: { usedCount: { increment: 1 } },
+        });
+        if (claimed.count === 1) return { ok: true };
+      }
+      return { ok: false, reason: "conflict" };
+    } catch (err) {
+      console.warn("[redeemPromoCode] DB error:", err);
+      return { ok: false, reason: "conflict" };
+    }
+  }
+
+  const store = getStore();
+  const p = store.promoCodes.find((x) => x.code === c);
+  if (!p) return { ok: false, reason: "not_found" };
+  if (!p.active) return { ok: false, reason: "inactive" };
+  if (p.expiryDate && new Date(p.expiryDate).getTime() < Date.now()) {
+    return { ok: false, reason: "expired" };
+  }
+  if (p.maxUses != null && p.usedCount >= p.maxUses) return { ok: false, reason: "exhausted" };
+  p.usedCount += 1;
+  return { ok: true };
+}
+
 // -------------------------------------------------------------
 // Warnings / offers / free access
 // -------------------------------------------------------------
@@ -984,40 +1040,71 @@ export async function getUserNotices(userId: string): Promise<UserNotice[]> {
   return getStore().notices.filter((n) => n.userId === userId);
 }
 
+const GRANT_PLAN_IDS = ["STARTER", "GROWTH", "AGENCY"] as const;
+
 export async function grantFreeAccess(input: {
   userId: string | null;
   planId: string | null;
   durationDays: number;
 }): Promise<FreeGrant> {
   const adminEmail = process.env.ADMIN_EMAIL || "admin";
-  if (usingDatabase()) {
-    const expiresAt = new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000);
-    const grant = await prisma.freeGrant.create({
-      data: {
-        userId: input.userId,
-        planId: input.planId,
-        durationDays: input.durationDays,
-        expiresAt,
-      },
-    });
 
-    if (input.userId && input.planId) {
-      await prisma.subscription.upsert({
-        where: { userId: input.userId },
-        create: {
+  // Validate before writing anything: a bad payload must never leave a
+  // half-created grant behind or fail later with a foreign-key error.
+  if (
+    !Number.isFinite(input.durationDays) ||
+    input.durationDays < 1 ||
+    input.durationDays > 3650
+  ) {
+    throw new Error("INVALID_DURATION");
+  }
+  const planId = input.planId ? input.planId.trim().toUpperCase() : null;
+  if (planId && !(GRANT_PLAN_IDS as readonly string[]).includes(planId)) {
+    throw new Error("INVALID_PLAN");
+  }
+
+  if (usingDatabase()) {
+    if (input.userId) {
+      const target = await prisma.user.findUnique({
+        where: { id: input.userId },
+        select: { id: true },
+      });
+      if (!target) throw new Error("USER_NOT_FOUND");
+    }
+
+    const expiresAt = new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000);
+
+    // Grant + subscription update land together or not at all.
+    const grant = await prisma.$transaction(async (tx) => {
+      const created = await tx.freeGrant.create({
+        data: {
           userId: input.userId,
-          plan: input.planId.toUpperCase() as any,
-          status: "ACTIVE",
-          currentPeriodStart: new Date(),
-          currentPeriodEnd: expiresAt,
-        },
-        update: {
-          plan: input.planId.toUpperCase() as any,
-          status: "ACTIVE",
-          currentPeriodEnd: expiresAt,
+          planId,
+          durationDays: input.durationDays,
+          expiresAt,
         },
       });
-    }
+
+      if (input.userId && planId) {
+        await tx.subscription.upsert({
+          where: { userId: input.userId },
+          create: {
+            userId: input.userId,
+            plan: planId as "STARTER" | "GROWTH" | "AGENCY",
+            status: "ACTIVE",
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: expiresAt,
+          },
+          update: {
+            plan: planId as "STARTER" | "GROWTH" | "AGENCY",
+            status: "ACTIVE",
+            currentPeriodEnd: expiresAt,
+          },
+        });
+      }
+
+      return created;
+    });
 
     await prisma.auditLog.create({
       data: {
@@ -1025,7 +1112,7 @@ export async function grantFreeAccess(input: {
         actorId: adminEmail,
         actorRole: "admin",
         targetUserId: input.userId,
-        metadata: { planId: input.planId, durationDays: input.durationDays },
+        metadata: { planId, durationDays: input.durationDays },
       },
     });
 
@@ -1040,20 +1127,23 @@ export async function grantFreeAccess(input: {
   }
 
   const store = getStore();
+  if (input.userId && !store.users.some((u) => u.id === input.userId)) {
+    throw new Error("USER_NOT_FOUND");
+  }
   const grant: FreeGrant = {
     id: `fg_${Date.now()}`,
     userId: input.userId,
-    planId: input.planId,
+    planId,
     durationDays: input.durationDays,
     expiresAt: new Date(Date.now() + input.durationDays * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date().toISOString(),
   };
   store.freeGrants.unshift(grant);
 
-  if (input.userId && input.planId) {
+  if (input.userId && planId) {
     const user = store.users.find((u) => u.id === input.userId);
     if (user) {
-      user.subscription = { plan: input.planId.toUpperCase(), status: "ACTIVE" };
+      user.subscription = { plan: planId, status: "ACTIVE" };
     }
   }
 
@@ -1063,7 +1153,7 @@ export async function grantFreeAccess(input: {
     actorId: adminEmail,
     actorRole: "admin",
     targetUserId: input.userId,
-    metadata: { planId: input.planId, durationDays: input.durationDays },
+    metadata: { planId, durationDays: input.durationDays },
     ipAddress: null,
     timestamp: new Date().toISOString(),
   });

@@ -70,15 +70,27 @@ async function transitionStatus(params: {
   comment?: string;
   extraFields?: Partial<{ reviewComment: string; scheduledAt: Date; publishedAt: Date }>;
 }) {
-  const [updated] = await prisma.$transaction([
-    prisma.contentItem.update({
-      where: { id: params.itemId },
+  return prisma.$transaction(async (tx) => {
+    // Compare-and-swap: the item only transitions while it is still in the
+    // expected state, so two concurrent review actions can never both pass
+    // the pre-check and double-apply. The loser gets INVALID_STATE.
+    const claimed = await tx.contentItem.updateMany({
+      where: { id: params.itemId, status: params.fromStatus },
       data: {
         status: params.toStatus,
         ...(params.extraFields ?? {}),
       },
-    }),
-    prisma.contentStatusEvent.create({
+    });
+
+    if (claimed.count !== 1) {
+      const current = await tx.contentItem.findUnique({
+        where: { id: params.itemId },
+        select: { status: true },
+      });
+      throw new Error(`INVALID_STATE:${current?.status ?? 'UNKNOWN'}`);
+    }
+
+    await tx.contentStatusEvent.create({
       data: {
         contentItemId: params.itemId,
         fromStatus: params.fromStatus,
@@ -86,9 +98,10 @@ async function transitionStatus(params: {
         actor: params.actor,
         comment: params.comment,
       },
-    }),
-  ]);
-  return updated;
+    });
+
+    return tx.contentItem.findUniqueOrThrow({ where: { id: params.itemId } });
+  });
 }
 
 /**
@@ -196,6 +209,21 @@ export async function advanceContentItemPipeline(itemId: string, userId: string)
   if (!item) throw new Error('NOT_FOUND');
 
   if (item.status === 'IDEA') {
+    // Atomically claim the item before running the (paid) AI pipeline so two
+    // concurrent generate requests can never both generate — the loser is
+    // rejected with INVALID_STATE. A compliance rejection reverts to IDEA.
+    const claimed = await prisma.contentItem.updateMany({
+      where: { id: item.id, status: 'IDEA' },
+      data: { status: 'GENERATING' },
+    });
+    if (claimed.count !== 1) {
+      const current = await prisma.contentItem.findUnique({
+        where: { id: item.id },
+        select: { status: true },
+      });
+      throw new Error(`INVALID_STATE:${current?.status ?? 'UNKNOWN'}`);
+    }
+
     // DeepSeek is the production brain: it writes the script, the Higgsfield
     // visual prompts, and the ElevenLabs voice directions — constrained by
     // the shared niche memory (proven patterns + forbidden pitfalls).
@@ -241,7 +269,7 @@ export async function advanceContentItemPipeline(itemId: string, userId: string)
       data: {
         scriptText,
         productionPlan: JSON.parse(JSON.stringify(planPayload)),
-        status: compliance.decision === 'APPROVE' ? 'SCRIPT' : item.status,
+        status: compliance.decision === 'APPROVE' ? 'SCRIPT' : 'IDEA',
         reviewComment:
           compliance.decision === 'APPROVE'
             ? null
@@ -255,7 +283,7 @@ export async function advanceContentItemPipeline(itemId: string, userId: string)
       data: {
         contentItemId: item.id,
         fromStatus: 'IDEA',
-        toStatus: compliance.decision === 'APPROVE' ? 'SCRIPT' : item.status,
+        toStatus: compliance.decision === 'APPROVE' ? 'SCRIPT' : 'IDEA',
         actor: 'ai_agent',
         comment:
           compliance.decision === 'APPROVE'
@@ -272,7 +300,7 @@ export async function advanceContentItemPipeline(itemId: string, userId: string)
       metadata: {
         itemId,
         fromStatus: 'IDEA',
-        toStatus: compliance.decision === 'APPROVE' ? 'SCRIPT' : item.status,
+        toStatus: compliance.decision === 'APPROVE' ? 'SCRIPT' : 'IDEA',
         provider: 'deepseek',
         compliance: compliance.decision,
       },
@@ -298,6 +326,24 @@ export async function advanceContentItemPipeline(itemId: string, userId: string)
       | null;
     if (!plan?.compliance || plan.compliance.decision !== 'APPROVE') {
       throw new Error('COMPLIANCE_REQUIRED');
+    }
+
+    // Atomically claim asset generation with a short lease: only one request
+    // may hold GENERATING at a time (concurrent duplicates are rejected), while
+    // a crashed run — stale updatedAt — is still retryable.
+    const staleBefore = new Date(Date.now() - 2 * 60 * 1000);
+    const claimed = await prisma.contentItem.updateMany({
+      where: {
+        id: item.id,
+        OR: [
+          { status: 'SCRIPT' },
+          { status: 'GENERATING', updatedAt: { lt: staleBefore } },
+        ],
+      },
+      data: { status: 'GENERATING' },
+    });
+    if (claimed.count !== 1) {
+      throw new Error('INVALID_STATE:GENERATING');
     }
 
     // Generate Video & Thumbnail using AI provider engine

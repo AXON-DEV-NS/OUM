@@ -5,9 +5,11 @@ import { checkUserAccess } from "@/lib/billing/subscription-service";
 export async function GET() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Guests are a normal state, not an error: a 401 here produced false
+    // error noise in the browser console on public pages such as /pricing.
+    return NextResponse.json({ authenticated: false, hasAccess: false });
   }
 
   const access = await checkUserAccess(session.userId, session.email);
-  return NextResponse.json(access);
+  return NextResponse.json({ authenticated: true, ...access });
 }

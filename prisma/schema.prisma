@@ -60,6 +60,7 @@ model Session {
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("sessions")
 }
 
@@ -103,6 +104,7 @@ model Channel {
   nicheRecord     Niche?        @relation(fields: [nicheId], references: [id], onDelete: SetNull)
 
   @@unique([userId, youtubeId])
+  @@index([nicheId])
   @@map("channels")
 }
 
@@ -189,6 +191,7 @@ model MistakeLog {
   niche       Niche    @relation(fields: [nicheId], references: [id], onDelete: Cascade)
 
   @@index([nicheId])
+  @@index([channelId])
   @@map("mistake_logs")
 }
 
@@ -216,6 +219,11 @@ model ContentItem {
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   statusHistory   ContentStatusEvent[]
 
+  @@index([channelId])
+  @@index([userId])
+  @@index([userId, status])
+  @@index([channelId, status])
+  @@index([scheduledAt])
   @@map("content_items")
 }
 
@@ -232,6 +240,7 @@ model ContentStatusEvent {
 
   contentItem   ContentItem   @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
 
+  @@index([contentItemId])
   @@map("content_status_events")
 }
 
@@ -275,6 +284,8 @@ model Invoice {
   subscription        Subscription    @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([subscriptionId])
+  @@index([userId, createdAt(sort: Desc)])
   @@map("invoices")
 }
 
@@ -295,6 +306,8 @@ model SupportTicket {
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages    TicketMessage[]
 
+  @@index([userId, updatedAt(sort: Desc)])
+  @@index([status, updatedAt(sort: Desc)])
   @@map("support_tickets")
 }
 
@@ -310,6 +323,7 @@ model TicketMessage {
 
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
+  @@index([ticketId])
   @@map("ticket_messages")
 }
 
@@ -327,6 +341,9 @@ model AuditLog {
   ipAddress    String?
   timestamp    DateTime @default(now())
 
+  @@index([actorId])
+  @@index([targetUserId])
+  @@index([timestamp(sort: Desc)])
   @@map("audit_logs")
 }
 
@@ -350,6 +367,7 @@ model SecurityEvent {
   details   Json?
   createdAt DateTime @default(now())
 
+  @@index([email, createdAt])
   @@map("security_events")
 }
 
@@ -524,6 +542,7 @@ model UserNotice {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([email])
   @@map("user_notices")
 }
 

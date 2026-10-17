@@ -28,7 +28,7 @@ export async function createAdminSession(payload: Omit<AdminSessionPayload, 'rol
     throw new Error('UNAUTHORIZED_ADMIN_EMAIL');
   }
 
-  const token = await new SignJWT({ ...payload, role: 'ADMIN' })
+  const token = await new SignJWT({ ...payload, role: 'ADMIN', type: 'session' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${ADMIN_SESSION_MAX_AGE}s`)
@@ -54,13 +54,13 @@ export async function getAdminSession(): Promise<AdminSessionPayload | null> {
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
-    if (payload.role !== 'ADMIN') return null;
+    if (payload.role !== 'ADMIN' || payload.type !== 'session') return null;
 
     const email = payload.email as string;
     if (!isAllowedAdminEmail(email)) return null;
 
     return {
-      userId: payload.userId as string,
+      userId: typeof payload.userId === 'string' ? payload.userId : '',
       email,
       name: payload.name as string | undefined,
       role: 'ADMIN',

@@ -247,7 +247,7 @@ export default function TicketThreadPage({
           <div className="flex items-center gap-2">
             <span
               className={cn(
-                "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+                "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium",
                 STATUS_STYLES[ticket.status]
               )}
             >
@@ -255,7 +255,7 @@ export default function TicketThreadPage({
             </span>
             <span
               className={cn(
-                "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium px-edge",
                 PRIORITY_STYLES[ticket.priority]
               )}
             >

@@ -35,12 +35,17 @@ export function decryptSecret(payload: string): string {
   const [iv64, tag64, data64] = payload.split(".");
   if (!iv64 || !tag64 || !data64) throw new Error("Invalid encrypted payload");
   const key = encryptionKey();
+  const tag = Buffer.from(tag64, "base64");
+  // GCM tags produced by encryptSecret are always 16 bytes — pin the length so
+  // a truncated tag can never be accepted (defends against tag-truncation).
+  if (tag.length !== 16) throw new Error("Invalid encrypted payload");
   const decipher = crypto.createDecipheriv(
     "aes-256-gcm",
     key,
-    Buffer.from(iv64, "base64")
+    Buffer.from(iv64, "base64"),
+    { authTagLength: 16 }
   );
-  decipher.setAuthTag(Buffer.from(tag64, "base64"));
+  decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(Buffer.from(data64, "base64")), decipher.final()]).toString(
     "utf8"
   );

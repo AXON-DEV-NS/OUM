@@ -431,7 +431,7 @@ export default function SupportPage() {
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                          "inline-flex items-center rounded-full border px-2 py-1 text-xs font-medium",
                           STATUS_STYLES[ticket.status]
                         )}
                       >
@@ -439,7 +439,7 @@ export default function SupportPage() {
                       </span>
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                          "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium px-edge",
                           PRIORITY_STYLES[ticket.priority]
                         )}
                       >

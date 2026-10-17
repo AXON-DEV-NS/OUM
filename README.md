@@ -56,3 +56,10 @@ To initialize or update the admin credentials and TOTP secret:
 node scripts/setup-admin.mjs "<your-secure-password>"
 ```
 Copy the generated values into `.env.local` and import the TOTP secret into your authenticator app.
+
+If you do not have the authenticator app at hand, print the current 6-digit
+code directly on this machine (reads `ADMIN_TOTP_SECRET` from `.env.local`):
+```bash
+node scripts/admin-totp.mjs          # current code
+node scripts/admin-totp.mjs --uri    # otpauth:// URI to import into an app
+```

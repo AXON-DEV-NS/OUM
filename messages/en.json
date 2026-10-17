@@ -483,6 +483,15 @@
     "monthView": "Month",
     "allChannels": "All Channels",
     "allStatuses": "All Statuses",
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
     "noItems": "No content items this period.",
     "noItemsDesc": "The AI will start generating content ideas once your channel is connected and niche is configured.",
     "statuses": {

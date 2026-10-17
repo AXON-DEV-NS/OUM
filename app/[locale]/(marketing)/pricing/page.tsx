@@ -73,10 +73,12 @@ export default function PricingPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   // Guests must create an account before checkout — subscriptions are always
-  // bound to a real account.
+  // bound to a real account. The endpoint answers 200 with an explicit
+  // `authenticated` flag so guest probes are not logged as errors.
   useEffect(() => {
     fetch("/api/billing/status")
-      .then((res) => setAuthed(res.status !== 401))
+      .then((res) => res.json().catch(() => null))
+      .then((data) => setAuthed(data?.authenticated === true))
       .catch(() => setAuthed(false));
   }, []);
 
@@ -152,8 +154,8 @@ export default function PricingPage() {
             <button
               onClick={() => handleToggle(false)}
               className={cn(
-                "rounded-none px-4 py-1.5 text-sm font-medium transition-colors",
-                !annual ? "bg-ink text-paper-high" : "text-ink-mute hover:text-ink"
+                "rounded-none px-4 py-1.5 text-sm font-medium transition-colors px-edge",
+                !annual ? "bg-ink text-paper-high px-edge-duo" : "text-ink-mute hover:text-ink"
               )}
             >
               {t("monthly")}
@@ -161,8 +163,8 @@ export default function PricingPage() {
             <button
               onClick={() => handleToggle(true)}
               className={cn(
-                "flex items-center gap-2 rounded-none px-4 py-1.5 text-sm font-medium transition-colors",
-                annual ? "bg-ink text-paper-high" : "text-ink-mute hover:text-ink"
+                "flex items-center gap-2 rounded-none px-4 py-1.5 text-sm font-medium transition-colors px-edge",
+                annual ? "bg-ink text-paper-high px-edge-duo" : "text-ink-mute hover:text-ink"
               )}
             >
               {t("yearly")}

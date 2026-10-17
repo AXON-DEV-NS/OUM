@@ -639,20 +639,20 @@ export default function OnboardingPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setBilling("monthly")}
-                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                          billing === "monthly" ? "bg-ink text-paper-high" : "bg-paper-low text-ink-soft"
+                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors px-edge ${
+                          billing === "monthly" ? "bg-ink text-paper-high px-edge-duo" : "bg-paper-low text-ink-soft"
                         }`}
                       >
                         Monthly
                       </button>
                       <button
                         onClick={() => setBilling("yearly")}
-                        className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                          billing === "yearly" ? "bg-ink text-paper-high" : "bg-paper-low text-ink-soft"
+                        className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors px-edge ${
+                          billing === "yearly" ? "bg-ink text-paper-high px-edge-duo" : "bg-paper-low text-ink-soft"
                         }`}
                       >
                         Yearly
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 px-edge">
                           Save 20%
                         </span>
                       </button>

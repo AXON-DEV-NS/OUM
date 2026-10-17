@@ -60,14 +60,18 @@
     @apply py-14 sm:py-20;
   }
 
-  /* Eyebrow: a short rule + letter-spaced label — editorial, not a bare badge */
+  /* Eyebrow: a short pixel-dash rule + letter-spaced label — editorial, not a bare badge */
   .eyebrow {
     @apply inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-green-600;
   }
 
   .eyebrow::before {
     content: "";
-    @apply h-px w-8 bg-green-500;
+    @apply w-8;
+    height: var(--px);
+    background-image: linear-gradient(90deg, #416b41 50%, transparent 50%);
+    background-size: calc(var(--px) * 2) 100%;
+    background-repeat: repeat-x;
   }
 
   .eyebrow--gold {
@@ -75,21 +79,25 @@
   }
 
   .eyebrow--gold::before {
-    @apply bg-gold-500;
+    background-image: linear-gradient(90deg, #c0851f 50%, transparent 50%);
   }
 
   .display {
     @apply font-display font-medium text-ink;
   }
 
-  /* Animated underline for inline links */
+  /* Animated pixel-dash underline for inline links */
   .link-underline {
     @apply relative;
   }
 
   .link-underline::after {
     content: "";
-    @apply absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-gold-500 transition-transform duration-300 ease-out;
+    @apply absolute -bottom-0.5 left-0 w-full origin-left scale-x-0 transition-transform duration-300 ease-out;
+    height: var(--px);
+    background-image: linear-gradient(90deg, #c0851f 50%, transparent 50%);
+    background-size: calc(var(--px) * 2) 100%;
+    background-repeat: repeat-x;
   }
 
   .link-underline:hover::after,
@@ -311,8 +319,10 @@
   left: 0;
   bottom: -3px;
   width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, #c0851f 0%, rgba(192, 133, 31, 0) 90%);
+  height: var(--px);
+  background-image: linear-gradient(90deg, #c0851f 50%, transparent 50%);
+  background-size: calc(var(--px) * 2) 100%;
+  background-repeat: repeat-x;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s var(--ease-premium);
@@ -340,105 +350,285 @@
   transform: translate(0, 0);
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   OUM PIXEL EDGE SYSTEM — ONE mechanism converts every edge on the site.
+   Mechanism: `border-image` frames built from generated SVG tiles
+   (app/px-frames.generated.css · regenerate: node scripts/pixel/gen-frames.mjs).
 
-
-
-
-
-
+   • --px (4px) is THE global pixel token: corner steps, frame thickness and
+     dash length are all integer multiples of it, aligned to the device grid.
+   • Frames are painted inside the element's own border area, so element
+     size and layout never change — zero layout shift.
+   • The frame belongs to the element itself, so every transform, transition
+     and animation carries it in perfect sync — no detached or ghost edges.
+   • Solid stair corners for containers & controls; pixel-dash (--px squares
+     with --px gaps) for dividers, separators, table lines and list separators.
+   • Smart colour rule: the edge colour always contrasts ≥3:1 against both the
+     inside and the outside surface; two-tone frames cover unpredictable
+     backgrounds (images, gradients, video).
+   ══════════════════════════════════════════════════════════════════════════ */
 
 /* OUM base — clean modern cream, locked fixed layer; content scrolls above it */
-html { background-color: #F5EFE1; }
+html {
+  background-color: #f5efe1;
+}
 body {
-  background-color: #F5EFE1;
+  background-color: #f5efe1;
   background-attachment: fixed;
 }
 
-/* Pixel-art scope: borders & dividers ONLY (surfaces stay clean/modern) */
-:root { --px-line: #1B1915; }
-
-/* stepped 8-bit outline for buttons/cards/modals/containers: the 4px corner
-   cut-outs reveal the page bg -> pixel corners, inner fill untouched */
-.px-corners {
-  --px: var(--px-line);
-  box-shadow:
-    -4px 0 0 0 var(--px),
-    4px 0 0 0 var(--px),
-    0 -4px 0 0 var(--px),
-    0 4px 0 0 var(--px);
-  margin: 4px;
+/* 1 · Hard square geometry — no smooth corners anywhere. Fills stay square,
+      so no rounded fill can ever peek past a stepped pixel edge. */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
 }
 
-/* 8-bit dashed divider — use on <hr> and section separators */
+/* Glow blobs are lighting, not edges — their blur keeps them round. */
+[class*="blur-2xl"],
+[class*="blur-3xl"] {
+  border-radius: 9999px !important;
+}
+
+/* 2 · Smooth shadow-based edges are removed (Tailwind ring / ring-offset).
+      The pixel frame is the only edge; focus stays clearly visible (§3). */
+*,
+*::before,
+*::after {
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+
+/* 3 · Focus ring — square pixel outline in gold-600: ≥3.5:1 against both the
+      cream surfaces (4.1:1) and the ink surfaces (3.8:1). */
+:focus-visible {
+  outline: 3px solid var(--px-gold, #9c6917) !important;
+  outline-offset: 3px !important;
+}
+
+/* 4 · THE FRAME RULE: every element that declares a border gets the pixel
+      frame. Scoped to border classes (and native fields) so plain layout
+      divs are never touched. */
+[class~="border"],
+[class*="border-"],
+input:not([type="hidden"]),
+select,
+textarea {
+  border-style: solid;
+  border-image-source: var(--px-frame);
+  border-image-slice: 4;
+  border-image-width: var(--px);
+  border-image-repeat: stretch;
+}
+
+/* Native fields without a border class still get a real border width */
+input:not([type="hidden"]):not([class*="border"]),
+select:not([class*="border"]),
+textarea:not([class*="border"]) {
+  border-width: 1px;
+  border-color: transparent;
+}
+
+/* Elements that deliberately declare “no visible border” stay invisible
+   (exact-word match so `focus:border-transparent` does not disable the frame) */
+[class~="border-0"],
+[class~="border-transparent"],
+input[type="hidden"] {
+  border-image-source: none !important;
+}
+
+/* 5 · Dividers & separators = pixel-dash: --px squares with --px gaps.
+      One-sided borders are separators by definition, so they dash too;
+      undeclared sides stay untouched (their tile slices are transparent). */
+[class*="border-dashed"] {
+  border-image-source: var(--px-frame-d);
+  border-image-repeat: repeat;
+}
+
+[class~="border-t"],
+[class~="border-t-2"] {
+  border-image-source: var(--px-frame-dt);
+  border-image-repeat: repeat;
+}
+
+[class~="border-b"] {
+  border-image-source: var(--px-frame-db);
+  border-image-repeat: repeat;
+}
+
+[class~="border-l"] {
+  border-image-source: var(--px-frame-dl);
+  border-image-repeat: repeat;
+}
+
+[class~="border-r"] {
+  border-image-source: var(--px-frame-dr);
+  border-image-repeat: repeat;
+}
+
+/* combined sides (later rules win in the cascade) */
+[class~="border-y"],
+[class~="border-t"][class~="border-b"] {
+  border-image-source: var(--px-frame-dy);
+  border-image-repeat: repeat;
+}
+
+[class~="border-x"],
+[class~="border-l"][class~="border-r"] {
+  border-image-source: var(--px-frame-dx);
+  border-image-repeat: repeat;
+}
+
+[class~="border-b"][class~="border-r"] {
+  border-image-source: var(--px-frame-dbr);
+  border-image-repeat: repeat;
+}
+
+/* full-border elements keep the full frame even if a side utility is present */
+[class~="border"][class~="border-t"],
+[class~="border"][class~="border-b"],
+[class~="border"][class~="border-l"],
+[class~="border"][class~="border-r"] {
+  border-image-source: var(--px-frame);
+  border-image-repeat: stretch;
+}
+
+/* accent bar (thick one-sided border) stays solid: it is a bar, not a rule */
+[class~="border-l-4"] {
+  border-image-source: var(--px-frame-sl);
+  border-image-repeat: stretch;
+}
+
+/* responsive divider (md:border-l …) */
+@media (min-width: 768px) {
+  [class~="md:border-l"] {
+    border-image-source: var(--px-frame-dl);
+    border-image-repeat: repeat;
+  }
+}
+
+/* Tailwind divide utilities — list / table separators become pixel-dash */
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-style: solid;
+  border-image-source: var(--px-frame-dt);
+  border-image-slice: 4;
+  border-image-width: var(--px);
+  border-image-repeat: repeat;
+}
+
+.divide-x > :not([hidden]) ~ :not([hidden]) {
+  border-style: solid;
+  border-image-source: var(--px-frame-dl);
+  border-image-slice: 4;
+  border-image-width: var(--px);
+  border-image-repeat: repeat;
+}
+
+/* 6 · Utilities — reusable pixel edges for elements without border classes
+      (badges, chips, toggles, icon tiles, avatars, toolbars …) */
+.px-edge,
+.px-corners {
+  border: 1px solid transparent;
+  border-style: solid;
+  border-image-source: var(--px-frame);
+  border-image-slice: 4;
+  border-image-width: var(--px);
+  border-image-repeat: stretch;
+}
+
+/* filled controls whose fill is dark (ink/green fills on cream) */
+.px-corners-duo,
+.px-edge-duo {
+  --px-frame: var(--px-frame-duo);
+}
+
+/* elements living on dark surfaces (footer, ink panels, video modal) */
+.px-corners-light,
+.px-edge-light {
+  --px-frame: var(--px-frame-light);
+  --px-frame-d: var(--px-frame-light-d);
+  --px-frame-st: var(--px-frame-light-st);
+  --px-frame-sb: var(--px-frame-light-sb);
+  --px-frame-sl: var(--px-frame-light-sl);
+  --px-frame-sr: var(--px-frame-light-sr);
+  --px-frame-sy: var(--px-frame-light-sy);
+  --px-frame-sx: var(--px-frame-light-sx);
+  --px-frame-sbr: var(--px-frame-light-sbr);
+  --px-frame-dt: var(--px-frame-light-dt);
+  --px-frame-db: var(--px-frame-light-db);
+  --px-frame-dl: var(--px-frame-light-dl);
+  --px-frame-dr: var(--px-frame-light-dr);
+  --px-frame-dy: var(--px-frame-light-dy);
+  --px-frame-dx: var(--px-frame-light-dx);
+  --px-frame-dbr: var(--px-frame-light-dbr);
+}
+
+/* stepped pixel circle for avatars, status dots and icon discs */
+:root {
+  --px-circle: polygon(
+    38% 0%, 62% 0%,
+    74% 6%, 86% 16%, 94% 28%,
+    100% 38%, 100% 62%,
+    94% 74%, 86% 86%, 74% 94%,
+    62% 100%, 38% 100%,
+    26% 94%, 14% 86%, 6% 74%,
+    0% 62%, 0% 38%,
+    6% 26%, 14% 14%, 26% 6%
+  );
+}
+
+/* every round avatar / disc / status dot becomes a stepped pixel circle.
+   A clipped silhouette owns its edge, so frame + border are switched off
+   there (a rectangular frame clipped by a circle would break). */
+img[class*="rounded-full"],
+[class*="rounded-full"][class*="justify-center"],
+[class~="w-2.5"][class~="h-2.5"][class*="rounded-full"],
+[class~="w-2"][class~="h-2"][class*="rounded-full"],
+[class~="w-1.5"][class~="h-1.5"][class*="rounded-full"],
+.px-circle {
+  clip-path: var(--px-circle);
+  border-image-source: none !important;
+  border-color: transparent !important;
+}
+
+/* 7 · Dividers: <hr>, .px-divider — square --px dashes with --px gaps on
+      the global token; same geometry at any width. */
 hr,
 .px-divider {
   border: 0;
-  height: 8px;
-  background-image: linear-gradient(90deg, var(--px-line) 50%, transparent 50%);
-  background-size: 8px 8px;
+  border-image-source: none !important;
+  height: var(--px);
+  background-image: linear-gradient(90deg, var(--px-ink, #1b1915) 50%, transparent 50%);
+  background-size: calc(var(--px) * 2) 100%;
   background-repeat: repeat-x;
   background-position: center;
 }
 
-
-/* PX-GLOBAL-PIXEL-SYSTEM: pixel-art scoped to borders/dividers only.
-   Surfaces, fills and body typography stay clean and modern. */
-
-/* 1) hard square corners everywhere -> instant 8-bit geometry, zero layout risk */
-*, *::before, *::after { border-radius: 0 !important; }
-
-/* 2) every text input gets a stepped pixel outline (fill untouched) */
-input[type="text"], input[type="email"], input[type="password"],
-input[type="search"], input[type="tel"], input[type="url"],
-input[type="number"], textarea, select {
-  --px: var(--px-line, #1B1915);
-  box-shadow:
-    -3px 0 0 0 var(--px),
-    3px 0 0 0 var(--px),
-    0 -3px 0 0 var(--px),
-    0 3px 0 0 var(--px);
-  margin: 3px;
-}
-
-/* 3) the single fixed canvas: stationary cream behind everything */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-color: #F5EFE1;
-  pointer-events: none;
-}
-html, body { background-color: #F5EFE1; background-attachment: fixed; }
-
-/* 4) pixel font utility — FOOTER ONLY (see footer.tsx) */
-.font-pixel { font-family: var(--font-pixel), "Courier New", monospace !important; }
-
-/* 5) reusable pixel divider for section/colour intersections */
+/* reusable pixel divider for section/colour intersections */
 .px-section-rule {
   border: 0;
-  height: 8px;
-  background-image: linear-gradient(90deg, var(--px-line, #1B1915) 50%, transparent 50%);
-  background-size: 8px 8px;
+  height: var(--px);
+  background-image: linear-gradient(90deg, var(--px-ink, #1b1915) 50%, transparent 50%);
+  background-size: calc(var(--px) * 2) 100%;
   background-repeat: repeat-x;
   background-position: center;
 }
 
-/* light 8-bit divider for dark surfaces (footer) */
+/* light pixel divider for dark surfaces (footer) */
 .px-section-rule-light {
   border: 0;
-  height: 8px;
-  background-image: linear-gradient(90deg, #C8B98F 50%, transparent 50%);
-  background-size: 8px 8px;
+  height: var(--px);
+  background-image: linear-gradient(90deg, var(--px-light, #e8dfc8) 50%, transparent 50%);
+  background-size: calc(var(--px) * 2) 100%;
   background-repeat: repeat-x;
   background-position: center;
 }
 
-
-/* PX-PIXEL-COMPONENTS: stepped 8-bit corners via 4px clip-path steps.
-   Hard offset shadows use a filter wrapper (drop-shadow follows the clip). */
+/* 8 · Clipped pixel silhouette with a two-tone cut frame — used where the
+      fill itself must follow the stepped silhouette (video modal). */
 .pixel-frame-outer {
-  filter: drop-shadow(8px 8px 0 #181A16);
+  filter: drop-shadow(var(--px) var(--px) 0 #181a16);
 }
 .pixel-frame {
   --px-clip: polygon(
@@ -448,8 +638,14 @@ html, body { background-color: #F5EFE1; background-attachment: fixed; }
     4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
   );
   clip-path: var(--px-clip);
-  border: 4px solid #181A16;
+  border: var(--px) solid transparent;
+  border-style: solid;
+  border-image-source: var(--px-frame-cut);
+  border-image-slice: 4;
+  border-image-width: var(--px);
+  border-image-repeat: stretch;
 }
+
 .px-scanlines {
   background: repeating-linear-gradient(
     0deg,
@@ -465,28 +661,72 @@ html, body { background-color: #F5EFE1; background-attachment: fixed; }
   image-rendering: pixelated;
 }
 
-/* PX avatar life: stepped idle bob + blinking HUD LED (pixel timing) */
+/* 9 · Scrollbars — square pixel thumb on a paper track. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--px-ink, #1b1915) #ede4d0;
+}
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #ede4d0;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--px-ink, #1b1915);
+  border: 4px solid #ede4d0;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b372f;
+}
+::-webkit-scrollbar-corner {
+  background: #ede4d0;
+}
+
+/* 10 · The single fixed canvas: stationary cream behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #f5efe1;
+  pointer-events: none;
+}
+
+/* 11 · pixel font utility — FOOTER ONLY (see footer.tsx) */
+.font-pixel {
+  font-family: var(--font-pixel), "Courier New", monospace !important;
+}
+
+/* Logo mark on dark surfaces: a 1px cream halo keeps the dark chassis
+   readable against ink backgrounds (footer, auth panels, admin chrome). */
+.logo-mark-paper {
+  filter: drop-shadow(1px 0 0 rgba(245, 239, 225, 0.6))
+    drop-shadow(-1px 0 0 rgba(245, 239, 225, 0.6))
+    drop-shadow(0 1px 0 rgba(245, 239, 225, 0.6))
+    drop-shadow(0 -1px 0 rgba(245, 239, 225, 0.6));
+}
+
+/* 12 · Avatar life: stepped idle bob + blinking HUD LED (pixel timing) */
 @keyframes avatar-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
 }
-.avatar-bob { animation: avatar-bob 1.6s steps(2, end) infinite; }
+.avatar-bob {
+  animation: avatar-bob 1.6s steps(2, end) infinite;
+}
 @keyframes led-blink {
   0%, 60% { opacity: 1; }
   61%, 100% { opacity: 0.25; }
 }
-.hud-led-blink { animation: led-blink 1.2s steps(1, end) infinite; }
-@media (prefers-reduced-motion: reduce) {
-  .avatar-bob, .hud-led-blink { animation: none; }
+.hud-led-blink {
+  animation: led-blink 1.2s steps(1, end) infinite;
 }
-
-/* light stepped 8-bit outline for dark surfaces (uses --px override) */
-.px-corners-light {
-  --px: #E8DFC8;
-  box-shadow:
-    -4px 0 0 0 var(--px),
-    4px 0 0 0 var(--px),
-    0 -4px 0 0 var(--px),
-    0 4px 0 0 var(--px);
-  margin: 4px;
+@media (prefers-reduced-motion: reduce) {
+  .avatar-bob,
+  .hud-led-blink {
+    animation: none;
+  }
 }

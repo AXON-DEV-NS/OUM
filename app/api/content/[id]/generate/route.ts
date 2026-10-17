@@ -46,6 +46,15 @@ export async function POST(
     if (message === "NOT_FOUND") {
       return NextResponse.json({ error: "Content item not found." }, { status: 404 });
     }
+    if (message.startsWith("INVALID_STATE:")) {
+      return NextResponse.json(
+        {
+          error: `This item can't be generated right now. Current state: ${message.split(":")[1]}`,
+          code: "INVALID_STATE",
+        },
+        { status: 409 }
+      );
+    }
     if (message === "DEEPSEEK_NOT_CONFIGURED") {
       return NextResponse.json(
         { error: "AI brain is not configured.", code: "AI_NOT_CONFIGURED" },

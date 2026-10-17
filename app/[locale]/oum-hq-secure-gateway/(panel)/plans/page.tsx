@@ -240,8 +240,8 @@ export default function AdminPlansPage() {
               <button
                 type="button"
                 onClick={() => setSiteTarget('all')}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                  siteTarget === 'all' ? 'bg-ink text-paper-high' : 'text-ink-mute hover:text-ink'
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors px-edge ${
+                  siteTarget === 'all' ? 'bg-ink text-paper-high px-edge-duo' : 'text-ink-mute hover:text-ink'
                 }`}
               >
                 Everyone
@@ -249,8 +249,8 @@ export default function AdminPlansPage() {
               <button
                 type="button"
                 onClick={() => setSiteTarget('user')}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                  siteTarget === 'user' ? 'bg-ink text-paper-high' : 'text-ink-mute hover:text-ink'
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors px-edge ${
+                  siteTarget === 'user' ? 'bg-ink text-paper-high px-edge-duo' : 'text-ink-mute hover:text-ink'
                 }`}
               >
                 Specific person

@@ -13,6 +13,19 @@ import { sendMail } from "@/lib/email/smtp-mailer";
 export const NOTIFICATION_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 
 /**
+ * Escapes user-controlled values before they are interpolated into the HTML
+ * notification emails — prevents markup/link injection into the owner's inbox.
+ */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
  * "From" address used by the email provider. For Resend this MUST be a
  * sender on a domain you verified in the Resend dashboard (e.g. your own
  * domain), NOT onboarding@resend.dev (which can only deliver to the account
@@ -20,6 +33,11 @@ export const NOTIFICATION_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLower
  */
 export const EMAIL_FROM =
   process.env.EMAIL_FROM?.trim() || "OUM Platform <onboarding@resend.dev>";
+
+/** Absolute site URL — used for the brand lockup mark in notification emails. */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+).replace(/\/$/, "");
 
 /**
  * Resolves the configured Resend / Email provider API key from env or secrets store.
@@ -118,10 +136,17 @@ export async function sendNotificationEmail(
   }
 
   // 3) Nothing could deliver — log as an incident and report failure.
+  // Never log the message body: it can contain OTP codes and magic links.
   console.error(
     `[Email Failed] To: ${recipient} | Subject: ${options.subject} | ${smtp.error || "no provider configured"}`
   );
-  console.log(`[INCIDENT / NOTIFICATION TO ${recipient}] Subject: ${options.subject}\nText:\n${options.text}`);
+  if (process.env.NODE_ENV !== "production") {
+    // Local development only: surface the body so flows can be tested without
+    // a live mail provider. Never enabled in production builds.
+    console.log(
+      `[Email Dev Preview] To: ${recipient} | Subject: ${options.subject}\n${options.text}`
+    );
+  }
   return {
     success: false,
     method: smtp.provider === "none" ? "none" : "failed",
@@ -145,22 +170,23 @@ export async function notifyContactSubmission(data: {
   const html = `
     <div dir="ltr" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
       <div style="background: #111110; padding: 24px; color: #ffffff; text-align: center;">
+        <img src="${SITE_URL}/icon-192.png" alt="OUM" width="44" height="44" style="display: block; margin: 0 auto 10px auto; border: 0;" />
         <h1 style="margin: 0; font-size: 20px; font-weight: bold;">OUM</h1>
         <p style="margin: 6px 0 0 0; font-size: 13px; color: #9ca3af;">You received a new contact / inquiry message through the website</p>
       </div>
       <div style="padding: 24px;">
         <div style="margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px;">
-          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>From:</strong> ${data.name}</p>
-          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
-          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Subject:</strong> ${title}</p>
-          ${data.ipAddress ? `<p style="margin: 0; font-size: 12px; color: #6b7280;"><strong>IP address:</strong> ${data.ipAddress}</p>` : ""}
+          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>From:</strong> ${escapeHtml(data.name)}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Email:</strong> <a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></p>
+          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Subject:</strong> ${escapeHtml(title)}</p>
+          ${data.ipAddress ? `<p style="margin: 0; font-size: 12px; color: #6b7280;"><strong>IP address:</strong> ${escapeHtml(data.ipAddress)}</p>` : ""}
         </div>
         <div style="margin-bottom: 24px;">
           <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #374151;">Message:</h3>
-          <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${data.message}</div>
+          <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${escapeHtml(data.message)}</div>
         </div>
         <div style="text-align: center;">
-          <a href="mailto:${data.email}?subject=Re: ${encodeURIComponent(title)}" style="display: inline-block; background: #dc2626; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">Reply to the customer</a>
+          <a href="mailto:${escapeHtml(data.email)}?subject=Re: ${encodeURIComponent(title)}" style="display: inline-block; background: #dc2626; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">Reply to the customer</a>
         </div>
       </div>
       <div style="background: #f9fafb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
@@ -220,19 +246,20 @@ export async function notifySupportTicketCreated(data: {
   const html = `
     <div dir="ltr" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
       <div style="background: #dc2626; padding: 24px; color: #ffffff; text-align: center;">
+        <img src="${SITE_URL}/icon-192.png" alt="OUM" width="44" height="44" style="display: block; margin: 0 auto 10px auto; border: 0;" />
         <h1 style="margin: 0; font-size: 20px; font-weight: bold;">Alert: New problem / support ticket</h1>
         <p style="margin: 6px 0 0 0; font-size: 13px; color: #fee2e2;">A customer opened a support ticket for a problem they're facing</p>
       </div>
       <div style="padding: 24px;">
         <div style="margin-bottom: 20px; padding: 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;">
-          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Ticket ID:</strong> #${data.ticketId}</p>
-          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Customer:</strong> ${data.userEmail || data.userId}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Ticket ID:</strong> #${escapeHtml(data.ticketId)}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Customer:</strong> ${escapeHtml(data.userEmail || data.userId)}</p>
           <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Priority:</strong> ${priorityBadge}</p>
-          <p style="margin: 0; font-size: 14px;"><strong>Subject:</strong> ${data.subject}</p>
+          <p style="margin: 0; font-size: 14px;"><strong>Subject:</strong> ${escapeHtml(data.subject)}</p>
         </div>
         <div style="margin-bottom: 24px;">
           <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #374151;">Issue details:</h3>
-          <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${data.description}</div>
+          <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${escapeHtml(data.description)}</div>
         </div>
         <div style="text-align: center;">
           <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/oum-hq-secure-gateway/overview" style="display: inline-block; background: #111110; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">Open the admin panel</a>
@@ -277,11 +304,12 @@ export async function notifySupportTicketReply(data: {
   const html = `
     <div dir="ltr" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
       <div style="background: #111110; padding: 20px; color: #ffffff; text-align: center;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: bold;">New reply on ticket #${data.ticketId}</h2>
+        <img src="${SITE_URL}/icon-192.png" alt="OUM" width="40" height="40" style="display: block; margin: 0 auto 10px auto; border: 0;" />
+        <h2 style="margin: 0; font-size: 18px; font-weight: bold;">New reply on ticket #${escapeHtml(data.ticketId)}</h2>
       </div>
       <div style="padding: 24px;">
-        <p style="margin: 0 0 16px 0; font-size: 14px; color: #4b5563;">The customer (${data.userEmail || data.userId}) added a new reply:</p>
-        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${data.content}</div>
+        <p style="margin: 0 0 16px 0; font-size: 14px; color: #4b5563;">The customer (${escapeHtml(data.userEmail || data.userId)}) added a new reply:</p>
+        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #111827; white-space: pre-wrap;">${escapeHtml(data.content)}</div>
       </div>
     </div>
   `;

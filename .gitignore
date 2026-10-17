@@ -40,6 +40,11 @@ dev-err*.log
 *.tsbuildinfo
 next-env.d.ts
 
+# local QA artifacts (screenshots, audit output) — not part of the site
+/pixel-qa/
+/audit-screenshots/
+/.opencode/
+
 # Remotion video project (source is committed; deps + renders are not)
 /video/node_modules
 /video/out

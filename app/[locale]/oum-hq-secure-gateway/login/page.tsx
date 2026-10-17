@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-ink-soft bg-ink-soft p-6 shadow-card"
+          className="rounded-xl border border-ink-soft bg-ink-soft p-6 shadow-card px-edge-light"
         >
           {error && (
             <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
@@ -92,7 +92,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   autoComplete="current-password"
-                  className="h-11 w-full rounded-md border border-ink-soft bg-ink px-4 pr-10 text-sm text-paper-high placeholder:text-ink-mute focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                  className="h-11 w-full rounded-md border border-ink-soft bg-ink px-4 pr-10 text-sm text-paper-high placeholder:text-ink-mute focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 px-edge-light"
                   required
                 />
                 <Lock className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-mute" />
@@ -118,7 +118,7 @@ export default function AdminLoginPage() {
                 }
                 placeholder="000000"
                 autoComplete="one-time-code"
-                className="h-11 w-full rounded-md border border-ink-soft bg-ink px-4 font-mono text-lg tracking-[0.4em] text-paper-high placeholder:text-ink-mute focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                className="h-11 w-full rounded-md border border-ink-soft bg-ink px-4 font-mono text-lg tracking-[0.4em] text-paper-high placeholder:text-ink-mute focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 px-edge-light"
                 required
               />
               <p className="mt-2 text-[11px] text-ink-mute">

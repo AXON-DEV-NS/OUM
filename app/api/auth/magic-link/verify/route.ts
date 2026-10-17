@@ -31,7 +31,11 @@ export async function GET(request: NextRequest) {
     await markTokenUsed(payload.jti);
   }
 
-  const userId = Buffer.from(payload.email).toString("base64url");
+  // Persist/fetch the real user row BEFORE creating the session so the
+  // session carries the database id — never a fake derived value.
+  const { ensureDbUserDetailed } = await import("@/lib/auth/db-user");
+  const { id: dbUserId } = await ensureDbUserDetailed(payload.email);
+  const userId = dbUserId || Buffer.from(payload.email).toString("base64url");
 
   // Role comes from the database — the owner's account is ADMIN there.
   const role = await resolveUserRole(payload.email, "USER");
@@ -42,10 +46,6 @@ export async function GET(request: NextRequest) {
     name: payload.email.split("@")[0],
     role,
   });
-
-  // Persist a real user row so the admin panel reflects actual signups.
-  const { ensureDbUserDetailed } = await import("@/lib/auth/db-user");
-  await ensureDbUserDetailed(payload.email);
 
   return NextResponse.redirect(new URL("/onboarding", request.url));
 }

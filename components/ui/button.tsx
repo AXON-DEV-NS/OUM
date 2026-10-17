@@ -10,16 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-ink text-paper-high shadow-soft hover:bg-ink-soft hover:-translate-y-0.5 active:translate-y-0 active:shadow-none px-corners",
+          "bg-ink text-paper-high shadow-soft hover:bg-ink-soft hover:-translate-y-0.5 active:translate-y-0 active:shadow-none px-corners px-corners-duo",
         secondary:
           "border border-line bg-paper-high text-ink hover:border-ink-soft hover:-translate-y-0.5 active:translate-y-0 px-corners",
         green:
-          "bg-green-600 text-paper-high shadow-soft hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none px-corners",
+          "bg-green-600 text-paper-high shadow-soft hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none px-corners px-corners-duo",
         gold:
           "bg-gold-500 text-ink shadow-soft hover:bg-gold-600 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none px-corners",
         ghost: "text-ink-mute hover:bg-paper-low hover:text-ink",
         link: "h-auto p-0 text-green-600 underline-offset-4 hover:underline",
-        danger: "bg-red-600 text-paper-high hover:bg-red-700 px-corners",
+        danger: "bg-red-600 text-paper-high hover:bg-red-700 px-corners px-corners-duo",
       },
       size: {
         sm: "h-8 px-3.5 text-xs",

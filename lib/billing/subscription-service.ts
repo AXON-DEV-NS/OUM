@@ -51,16 +51,21 @@ export async function checkUserAccess(userId: string, email: string): Promise<Us
       });
 
       if (user?.subscription && user.subscription.status === "ACTIVE") {
-        const plan = PLANS.find((p) => p.id.toUpperCase() === user.subscription!.plan) || PLANS[0];
-        return {
-          hasAccess: true,
-          status: "ACTIVE",
-          reason: "ACTIVE_SUBSCRIPTION",
-          planId: plan.id,
-          planName: plan.name,
-          expiresAt: user.subscription.currentPeriodEnd.toISOString(),
-          message: `Subscription active — ${plan.name} plan`,
-        };
+        // An ACTIVE row only grants access while its paid period is current —
+        // otherwise a lapsed subscription would unlock the agent forever.
+        const periodEnd = new Date(user.subscription.currentPeriodEnd).getTime();
+        if (periodEnd > Date.now()) {
+          const plan = PLANS.find((p) => p.id.toUpperCase() === user.subscription!.plan) || PLANS[0];
+          return {
+            hasAccess: true,
+            status: "ACTIVE",
+            reason: "ACTIVE_SUBSCRIPTION",
+            planId: plan.id,
+            planName: plan.name,
+            expiresAt: user.subscription.currentPeriodEnd.toISOString(),
+            message: `Subscription active — ${plan.name} plan`,
+          };
+        }
       }
 
       if (user?.subscription && user.subscription.status === "TRIALING") {

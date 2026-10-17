@@ -178,6 +178,7 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string | null>>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [apiError, setApiError] = useState<string | null>(null);
+  const [serverAmount, setServerAmount] = useState<number | null>(null);
   const [promoCode, setPromoCode] = useState("");
   const [promo, setPromo] = useState<{ discountType: string; discountValue: number } | null>(null);
   const [promoMessage, setPromoMessage] = useState<string | null>(null);
@@ -258,10 +259,20 @@ export default function CheckoutPage() {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: plan.id, billing, ...fields }),
+        body: JSON.stringify({
+          plan: plan.id,
+          billing,
+          // Send the applied code so the server charges the discounted
+          // amount atomically — never silently full price.
+          promoCode: promo ? promoCode.trim().toUpperCase() : undefined,
+          ...fields,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.ok) {
+        if (typeof data.subscription?.price === "number") {
+          setServerAmount(data.subscription.price);
+        }
         setStatus("success");
       } else {
         setStatus("error");
@@ -287,8 +298,8 @@ export default function CheckoutPage() {
           <h1 className="display text-display-md">You&apos;re subscribed.</h1>
           <p className="mt-4 text-ink-mute">
             Your <span className="font-medium text-ink">{plan.name}</span> plan
-            is active. We sent a receipt and account setup link to{" "}
-            <span className="font-medium text-ink">{fields.email}</span>.
+            is active. This was a sandbox checkout — no real charge was made
+            and no receipt was emailed.
           </p>
 
           <div className="mt-8 rounded-lg border border-line bg-paper-high p-6 text-left">
@@ -305,9 +316,9 @@ export default function CheckoutPage() {
               </span>
             </div>
             <div className="flex items-center justify-between pt-4">
-              <span className="text-sm font-medium text-ink">Charged today</span>
+              <span className="text-sm font-medium text-ink">Simulated charge today</span>
               <span className="font-display text-lg font-semibold text-ink">
-                ${price}
+                ${serverAmount ?? finalPrice}
               </span>
             </div>
           </div>
@@ -416,11 +427,12 @@ export default function CheckoutPage() {
 
             <div className="mt-6 rounded-md bg-green-50 px-4 py-3">
               <p className="text-sm font-medium text-green-800">
-                Secure subscription
+                Sandbox subscription
               </p>
               <p className="mt-1 text-xs leading-relaxed text-green-700">
-                Charged today: <span className="font-semibold">${price}</span>.
-                Cancel anytime from your account settings.
+                Simulated total today:{" "}
+                <span className="font-semibold">${finalPrice}</span> — no real
+                charge is made. Cancel anytime from your account settings.
               </p>
             </div>
           </div>
@@ -549,7 +561,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <Lock className="h-4 w-4" />
-                    Subscribe now — ${price}/{billing === "yearly" ? "year" : "month"}
+                    Subscribe now — ${finalPrice}/{billing === "yearly" ? "year" : "month"}
                   </>
                 )}
               </Button>
@@ -557,7 +569,7 @@ export default function CheckoutPage() {
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
                 <div className="flex items-center gap-2 text-xs text-ink-faint">
                   <ShieldCheck className="h-4 w-4 text-green-600" />
-                  <span>Encrypted with 256-bit TLS</span>
+                  <span>Test mode — card details are never stored</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {["Visa", "Mastercard", "Amex", "Discover"].map((brand) => (

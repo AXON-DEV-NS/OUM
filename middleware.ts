@@ -25,7 +25,7 @@ async function isAdminRequest(request: NextRequest): Promise<boolean> {
     try {
       const { payload } = await jwtVerify(token, getSessionSecretBytes());
       const email = typeof payload.email === "string" ? payload.email.trim().toLowerCase() : "";
-      if (payload.role === "ADMIN" && email === allowedEmail) {
+      if (payload.role === "ADMIN" && email === allowedEmail && payload.type === "session") {
         return true;
       }
     } catch {
@@ -39,8 +39,14 @@ async function hasSession(request: NextRequest): Promise<boolean> {
   const token = request.cookies.get("session")?.value;
   if (!token) return false;
   try {
-    await jwtVerify(token, getSessionSecretBytes());
-    return true;
+    const { payload } = await jwtVerify(token, getSessionSecretBytes());
+    // Only genuine session tokens count — never other JWTs sharing the
+    // secret (e.g. magic-link tokens), and never tokens without a real userId.
+    return (
+      payload.type === "session" &&
+      typeof payload.userId === "string" &&
+      payload.userId.length > 0
+    );
   } catch {
     return false;
   }
@@ -119,11 +125,6 @@ export async function middleware(request: NextRequest) {
         }
       }
     }
-    return applySecurityHeaders(NextResponse.next());
-  }
-
-  // Apply security headers directly to /api routes without routing/locale overhead
-  if (pathname.startsWith("/api")) {
     return applySecurityHeaders(NextResponse.next());
   }
 

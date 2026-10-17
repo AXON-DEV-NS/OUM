@@ -14,7 +14,7 @@ export interface SessionPayload {
 }
 
 async function signSession(claims: Record<string, unknown>): Promise<string> {
-  return new SignJWT(claims)
+  return new SignJWT({ ...claims, type: "session" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_MAX_AGE}s`)
@@ -71,11 +71,22 @@ export async function getSession(): Promise<SessionPayload | null> {
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
+
+    // Only tokens explicitly minted as sessions are valid sessions. Other
+    // JWTs signed with the same secret — e.g. magic-link tokens, which carry
+    // an email but no userId — must never authenticate a request: an
+    // `undefined` userId would silently collapse Prisma filters and leak
+    // other users' data.
+    if (payload.type !== "session") return null;
+    const userId = typeof payload.userId === "string" ? payload.userId : "";
+    const email = typeof payload.email === "string" ? payload.email : "";
+    if (!userId || !email) return null;
+
     const session: SessionPayload = {
-      userId: payload.userId as string,
-      email: payload.email as string,
-      name: payload.name as string | undefined,
-      role: payload.role as "USER" | "ADMIN",
+      userId,
+      email,
+      name: typeof payload.name === "string" ? payload.name : undefined,
+      role: payload.role === "ADMIN" ? "ADMIN" : "USER",
     };
 
     // Revocation + suspension check: tokens minted with a session id are only
@@ -99,8 +110,8 @@ export async function getSession(): Promise<SessionPayload | null> {
         // Database unavailable: fall back to verifying the signed token only.
       }
     } else if (process.env.DATABASE_URL) {
-      // Legacy stateless tokens (minted before revocable sessions) — still
-      // honor an account suspension.
+      // Stateless session tokens (no `sid` — e.g. minted while session
+      // bookkeeping was unavailable) — still honor an account suspension.
       try {
         const user = await prisma.user.findFirst({
           where: {

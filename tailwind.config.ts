@@ -63,9 +63,19 @@ const config: Config = {
         "2xl": "1rem",
       },
       boxShadow: {
-        soft: "0 1px 2px rgba(27, 25, 21, 0.04), 0 8px 24px -12px rgba(27, 25, 21, 0.12)",
-        card: "0 1px 3px rgba(27, 25, 21, 0.06), 0 12px 32px -16px rgba(27, 25, 21, 0.16)",
-        lift: "0 2px 4px rgba(27, 25, 21, 0.05), 0 20px 48px -20px rgba(27, 25, 21, 0.22)",
+        /* Pixel edge system: every shadow is a hard offset (blur 0) so depth
+           reads as 8-bit, never as a smooth border. */
+        xs: "2px 2px 0 0 rgba(27, 25, 21, 0.10)",
+        sm: "3px 3px 0 0 rgba(27, 25, 21, 0.10)",
+        DEFAULT: "4px 4px 0 0 rgba(27, 25, 21, 0.10)",
+        md: "5px 5px 0 0 rgba(27, 25, 21, 0.12)",
+        lg: "6px 6px 0 0 rgba(27, 25, 21, 0.14)",
+        xl: "8px 8px 0 0 rgba(27, 25, 21, 0.16)",
+        "2xl": "10px 10px 0 0 rgba(27, 25, 21, 0.18)",
+        soft: "4px 4px 0 0 rgba(27, 25, 21, 0.10)",
+        card: "6px 6px 0 0 rgba(27, 25, 21, 0.12)",
+        lift: "8px 8px 0 0 rgba(27, 25, 21, 0.16)",
+        none: "none",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out",

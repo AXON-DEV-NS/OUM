@@ -49,7 +49,7 @@ export default function BlogIndexPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-md">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-md px-edge px-edge-duo">
                       Featured Analysis
                     </span>
                   </div>
@@ -115,7 +115,7 @@ export default function BlogIndexPage() {
           <span className="text-xs font-semibold text-ink-faint mr-2 flex items-center gap-1">
             <BookOpen className="w-3.5 h-3.5" /> Topics:
           </span>
-          <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-ink text-white">
+          <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-ink text-white px-edge px-edge-duo">
             All Articles
           </span>
           {categories.map((cat) => (
@@ -143,7 +143,7 @@ export default function BlogIndexPage() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-black/70 text-white backdrop-blur-md">
+                    <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/70 text-white backdrop-blur-md px-edge px-edge-duo">
                       {post.category}
                     </span>
                   </div>
