@@ -49,3 +49,6 @@ next-env.d.ts
 /video/node_modules
 /video/out
 
+
+# Local DB backups (never commit data)
+backups/

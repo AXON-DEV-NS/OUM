@@ -41,6 +41,8 @@ model User {
   invoices      Invoice[]
   freeGrants    FreeGrant[]
   notices       UserNotice[]
+  runs          Run[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -102,6 +104,8 @@ model Channel {
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   contentItems    ContentItem[]
   nicheRecord     Niche?        @relation(fields: [nicheId], references: [id], onDelete: SetNull)
+  runs            Run[]
+  dna             ChannelDna?
 
   @@unique([userId, youtubeId])
   @@index([nicheId])
@@ -544,5 +548,248 @@ model UserNotice {
   @@index([userId])
   @@index([email])
   @@map("user_notices")
+}
+
+// ─────────────────────────────────────────────
+// PIPELINE ENGINE (constitution V1)
+// 8 new tables; users / channels / audit_logs already exist.
+// Flexible payloads live in JSON columns; no speculative tables.
+// ─────────────────────────────────────────────
+
+enum RunPath {
+  AVATAR
+  FACELESS
+  MIXED
+}
+
+enum RunMode {
+  COPILOT
+  AUTOPILOT
+}
+
+enum RunStatus {
+  QUEUED
+  RUNNING
+  WAITING_HUMAN
+  HOLD
+  FAILED
+  PUBLISHED
+  DONE
+}
+
+enum StageStatus {
+  PENDING
+  RUNNING
+  PASSED
+  FAILED
+  RETRY
+  SKIPPED
+  WAITING
+}
+
+/// Compiled, versioned channel DNA. One active record per channel.
+model ChannelDna {
+  id          String    @id @default(cuid())
+  channelId   String    @unique
+  version     Int       @default(1)
+  /// Compiled rules extracted from user instructions (JSON)
+  rules       Json
+  /// Detected rule conflicts, if any (JSON)
+  conflicts   Json?
+  competitors Json?
+  audience    Json?
+  avatar      Json?
+  mode        Json
+  approvedAt  DateTime?
+  approvedBy  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  channel     Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@map("channel_dna")
+}
+
+/// One production run = 13 stages from setup to learning.
+model Run {
+  id             String     @id @default(cuid())
+  userId         String
+  channelId      String
+  nicheKey       String?
+  path           RunPath
+  mode           RunMode    @default(COPILOT)
+  status         RunStatus  @default(QUEUED)
+  /// Index of the next stage to execute (0-12)
+  currentStage   Int        @default(0)
+  /// Hard budget cap for this run, in cents
+  costCapCents   Int
+  costSpentCents Int        @default(0)
+  locale         String     @default("en")
+  scheduledFor   DateTime?
+  /// Caller-supplied dedupe key; unique when present
+  idempotencyKey String?    @unique
+  lastError      String?    @db.Text
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel        Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  stages         RunStage[]
+  assets         Asset[]
+  ledger         CostLedger[]
+  qaReports      QaReport[]
+  notifications  Notification[]
+
+  @@index([userId, status])
+  @@index([channelId, status])
+  @@index([status, scheduledFor])
+  @@map("runs")
+}
+
+/// Per-stage execution state of a run. One row per (run, stage).
+model RunStage {
+  id            String      @id @default(cuid())
+  runId         String
+  /// "S0" .. "S12"
+  stageKey      String
+  index         Int
+  status        StageStatus @default(PENDING)
+  attempts      Int         @default(0)
+  /// Free-form resumable state (sub-steps, timers, sub-scores)
+  checkpoint    Json?
+  input         Json?
+  output        Json?
+  score         Int?
+  /// { skillKey: version } actually executed for this stage
+  skillVersions Json?
+  error         String?     @db.Text
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  durationMs    Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  run           Run         @relation(fields: [runId], references: [id], onDelete: Cascade)
+  qaReports     QaReport[]
+
+  @@unique([runId, stageKey])
+  @@index([runId, index])
+  @@map("run_stages")
+}
+
+/// Immutable record of every produced artifact (generated or licensed).
+model Asset {
+  id          String   @id @default(cuid())
+  runId       String
+  /// "image" | "audio" | "video" | "text" | "subtitle"
+  kind        String
+  stage       String?
+  filePath    String?
+  mimeType    String?
+  bytes       Int?
+  width       Int?
+  height      Int?
+  durationSec Float?
+  /// "generated" | "licensed" | "uploaded"
+  source      String
+  provider    String?
+  license     String?
+  licenseUrl  String?
+  meta        Json?
+  createdAt   DateTime @default(now())
+
+  run         Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, kind])
+  @@map("assets")
+}
+
+/// Every deterministic check and every judge verdict. Append-only.
+model QaReport {
+  id          String   @id @default(cuid())
+  runId       String
+  stageKey    String
+  stageRowId  String?
+  checkKey    String
+  /// "deterministic" | "judge" | "gate"
+  kind        String
+  score       Int?
+  passed      Boolean
+  reasons     Json?
+  action      String?
+  judgeModel  String?
+  writerModel String?
+  createdAt   DateTime @default(now())
+
+  run         Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stageRow    RunStage? @relation(fields: [stageRowId], references: [id], onDelete: SetNull)
+
+  @@index([runId, stageKey])
+  @@map("qa_reports")
+}
+
+/// Append-only cost log. Amounts in cents (integer).
+model CostLedger {
+  id        String   @id @default(cuid())
+  runId     String
+  stageKey  String
+  provider  String
+  operation String
+  units     Json?
+  costCents Int
+  currency  String   @default("usd")
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
+  @@map("cost_ledger")
+}
+
+/// Shared niche knowledge base: lessons learned across runs.
+/// A lesson only becomes "active" after it repeats (occurrences >= 2).
+model NicheKb {
+  id          String   @id @default(cuid())
+  nicheKey    String
+  scope       String   @default("niche")
+  channelId   String?
+  lesson      String   @db.Text
+  lessonHash  String
+  evidence    Json?
+  confidence  Int      @default(1)
+  occurrences Int      @default(1)
+  status      String   @default("pending")
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([nicheKey, lessonHash])
+  @@index([nicheKey, status])
+  @@map("niche_kb")
+}
+
+/// In-app + Telegram notifications. One row per notification, always.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String?
+  runId     String?
+  /// "in_app" | "telegram"
+  channel   String
+  /// "approval_needed" | "provider_missing" | "budget_hold" | "publish_done" | ...
+  kind      String
+  title     String
+  body      String    @db.Text
+  data      Json?
+  sentAt    DateTime?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  run       Run?      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([runId])
+  @@map("notifications")
 }
 
