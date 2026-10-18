@@ -77,6 +77,19 @@ Vercel Hobby allows one cron invocation per day, so the tick is built for catch-
 
 Owner notifications are written in-app and best-effort mirrored to Telegram when `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` are set. Database backups: `node scripts/pipeline/db-backup.mjs` (keeps the newest 10 dumps).
 
+## Owner Operator (admin AI)
+
+`/oum-hq-secure-gateway/operator` is an owner-only console where the admin AI inspects the platform and executes administrative actions through a closed tool registry (25 tools: users, plans, promo codes, free access, warnings, pipeline runs, notifications, audit search, finance and read-only SQL).
+
+- **Owner only**: every request re-verifies the admin session (password + TOTP), same-origin, rate-limited; the route is invisible to everyone else.
+- **Reads run instantly; writes never do**: a write becomes a proposal with a server-signed confirmation token bound to the owner's email, the exact tool + payload, a single-use `jti` (enforced by the audit-log primary key) and a 5-minute expiry. Nothing changes until the owner clicks Confirm.
+- **Read-only SQL**: one `SELECT`/`WITH` statement, no comments, no writes/DDL, 3s statement timeout inside a `READ ONLY` transaction, 200-row cap, and credential-like columns are redacted before any data leaves the server. `sessions`, `api_service_keys`, `security_chat_messages` and system catalogs are blocked.
+- **Audited**: every read is `admin.operator_read`; every confirmed action is `admin.operator_execute` with the tool and payload.
+- **Hard exclusions**: no shell, no SQL writes, no secrets, no security-control changes, no history deletion.
+- **Requires `DEEPSEEK_API_KEY`** (Production). Without it the console stays visibly offline and refuses to call a model.
+
+The console tells the owner that read results are processed by the model provider; SQL is investigation-only.
+
 ## Admin Setup
 
 To initialize or update the admin credentials and TOTP secret:

@@ -41,6 +41,7 @@ const ROUTES = [
   { path: "/oum-hq-secure-gateway/finance", name: "05-finance", auth: true },
   { path: "/oum-hq-secure-gateway/audit-logs", name: "06-audit-logs", auth: true },
   { path: "/oum-hq-secure-gateway/security-chat", name: "07-security-chat", auth: true },
+  { path: "/oum-hq-secure-gateway/operator", name: "08-operator", auth: true },
 ];
 
 // ── TOTP (RFC 6238, SHA-1, 6 digits, 30s) ────────────────────────────────────

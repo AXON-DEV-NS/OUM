@@ -10,6 +10,7 @@ import {
   Tags,
   ShieldCheck,
   ScrollText,
+  Terminal,
   Wallet,
   LogOut,
   Lock,
@@ -58,6 +59,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const navItems: NavItem[] = [
     { label: "Overview", href: ADMIN_ROUTES.overview, icon: LayoutDashboard },
+    { label: "Operator", href: ADMIN_ROUTES.operator, icon: Terminal },
     { label: "Users", href: ADMIN_ROUTES.users, icon: Users },
     { label: "Plans & pricing", href: ADMIN_ROUTES.plans, icon: BadgeDollarSign },
     { label: "Promo codes", href: ADMIN_ROUTES.promoCodes, icon: Tags },

@@ -11,6 +11,7 @@ export const ADMIN_ROUTES = {
   plans: `/${ADMIN_ROUTE_PREFIX}/plans`,
   promoCodes: `/${ADMIN_ROUTE_PREFIX}/promo-codes`,
   securityChat: `/${ADMIN_ROUTE_PREFIX}/security-chat`,
+  operator: `/${ADMIN_ROUTE_PREFIX}/operator`,
   auditLogs: `/${ADMIN_ROUTE_PREFIX}/audit-logs`,
   finance: `/${ADMIN_ROUTE_PREFIX}/finance`,
 } as const;
