@@ -119,7 +119,7 @@ export default function AdminPromoCodesPage() {
       )}
 
       <div>
-        <h1 className="text-2xl font-bold text-ink">Promo codes</h1>
+        <h1 className="text-xl font-bold text-ink sm:text-2xl">Promo codes</h1>
         <p className="text-sm text-ink-mute">
           Create discount codes users can apply at checkout — a percentage or a fixed amount that you choose.
         </p>
@@ -198,9 +198,9 @@ export default function AdminPromoCodesPage() {
           ) : (
             <div className="divide-y divide-line">
               {codes.map((c) => (
-                <div key={c.id} className="flex items-center justify-between gap-4 p-4">
+                <div key={c.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono font-bold text-ink">{c.code}</span>
                       <Badge variant={c.active ? 'default' : 'error'} className={c.active ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : ''}>
                         {c.active ? 'Active' : 'Disabled'}
@@ -212,10 +212,11 @@ export default function AdminPromoCodesPage() {
                       {c.maxUses ? ` · ${c.usedCount}/${c.maxUses} used` : ' · unlimited'}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 sm:shrink-0">
                     <Button
                       size="sm"
                       variant="secondary"
+                      className="h-10 flex-1 sm:h-10 sm:flex-none"
                       disabled={busyId === c.id}
                       onClick={() => toggle(c.id, !c.active)}
                     >
@@ -230,6 +231,7 @@ export default function AdminPromoCodesPage() {
                     <Button
                       size="sm"
                       variant="danger"
+                      className="h-10 flex-1 sm:h-10 sm:flex-none"
                       disabled={busyId === c.id}
                       onClick={() => remove(c.id)}
                     >

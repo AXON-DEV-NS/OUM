@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -114,9 +114,9 @@ export default function AdminUsersPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">User management — HQ</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">User management — HQ</h1>
           <p className="text-sm text-ink-mute">
             Search users, inspect connected YouTube channels and subscriptions, and suspend/reactivate accounts.
           </p>
@@ -126,154 +126,266 @@ export default function AdminUsersPage() {
       {/* Filter Bar */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardContent className="p-4">
-          <form onSubmit={handleSearchSubmit} className="flex gap-3">
-            <Input
-              type="text"
-              placeholder="Search by name or email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" variant="primary">
-              Search
-            </Button>
-            {search && (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  setSearch('');
-                  fetchUsers('');
-                }}
-              >
-                Clear
+          <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row">
+            <div className="min-w-0 flex-1">
+              <Input
+                type="text"
+                aria-label="Search users by name or email"
+                placeholder="Search by name or email..."
+                className="placeholder:text-ink-mute"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" variant="primary" className="h-10 flex-1 sm:flex-none">
+                Search
               </Button>
-            )}
+              {search && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="h-10 flex-1 sm:flex-none"
+                  onClick={() => {
+                    setSearch('');
+                    fetchUsers('');
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>
 
-      {/* Users Table */}
+      {/* Users Table (desktop) + user cards (mobile) */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User / email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Channels</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableSkeletonRows rows={6} columns={6} />
-              ) : users.length === 0 ? (
+          <div className="hidden lg:block">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-ink-mute">
-                    No users yet.
-                  </TableCell>
+                  <TableHead>User / email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Channels</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : filteredUsers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-ink-mute">
-                    No users match your search.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredUsers.map((user) => (
-                  <TableRow key={user.id} className="hover:bg-paper">
-                    <TableCell>
-                      <div>
-                        <div className="font-semibold text-ink">{user.name || 'Unnamed user'}</div>
-                        <div className="text-xs text-ink-mute font-mono" dir="ltr">{user.email}</div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge variant="default" className="text-xs font-mono">
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {user.status === 'SUSPENDED' ? (
-                        <Badge variant="error" className="bg-red-100 text-red-800 border-red-200">
-                          Suspended
-                        </Badge>
-                      ) : (
-                        <Badge variant="default" className="bg-emerald-100 text-emerald-800 border-emerald-200">
-                          Active
-                        </Badge>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="text-xs font-medium text-ink-soft">
-                        {user.channels.length > 0 ? (
-                          <div className="space-y-0.5">
-                            {user.channels.map((ch) => (
-                              <div key={ch.id} className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                <span>{ch.title}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-ink-faint">No connected channels</span>
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <span className="text-xs font-bold text-ink-soft">
-                        {PLAN_LABELS[user.subscription?.plan || 'STARTER'] || user.subscription?.plan || 'Starter'}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setSelectedUser(user)}
-                        >
-                          View details
-                        </Button>
-
-                        {user.status === 'SUSPENDED' ? (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setModalAction('reactivate');
-                            }}
-                          >
-                            Reactivate
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setModalAction('suspend');
-                            }}
-                          >
-                            Suspend
-                          </Button>
-                        )}
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableSkeletonRows rows={6} columns={6} />
+                ) : users.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-ink-mute">
+                      No users yet.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : filteredUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-ink-mute">
+                      No users match your search.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <TableRow key={user.id} className="hover:bg-paper">
+                      <TableCell>
+                        <div>
+                          <div className="font-semibold text-ink">{user.name || 'Unnamed user'}</div>
+                          <div className="text-xs text-ink-mute font-mono" dir="ltr">{user.email}</div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <Badge variant="default" className="text-xs font-mono">
+                          {user.role}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell>
+                        {user.status === 'SUSPENDED' ? (
+                          <Badge variant="error" className="bg-red-100 text-red-800 border-red-200">
+                            Suspended
+                          </Badge>
+                        ) : (
+                          <Badge variant="default" className="bg-emerald-100 text-emerald-800 border-emerald-200">
+                            Active
+                          </Badge>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="text-xs font-medium text-ink-soft">
+                          {user.channels.length > 0 ? (
+                            <div className="space-y-0.5">
+                              {user.channels.map((ch) => (
+                                <div key={ch.id} className="flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                  <span>{ch.title}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-ink-mute">No connected channels</span>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <span className="text-xs font-bold text-ink-soft">
+                          {PLAN_LABELS[user.subscription?.plan || 'STARTER'] || user.subscription?.plan || 'Starter'}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-10"
+                            onClick={() => setSelectedUser(user)}
+                          >
+                            View details
+                          </Button>
+
+                          {user.status === 'SUSPENDED' ? (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              className="h-10 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setModalAction('reactivate');
+                              }}
+                            >
+                              Reactivate
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              className="h-10"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setModalAction('suspend');
+                              }}
+                            >
+                              Suspend
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile: one card per user — no clipped columns, 40px touch targets */}
+          <div className="divide-y divide-line lg:hidden">
+            {loading ? (
+              <div className="space-y-3 p-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-2 rounded-lg border border-line p-4">
+                    <div className="h-4 w-40 animate-pulse rounded bg-paper-low" />
+                    <div className="h-3 w-52 animate-pulse rounded bg-paper-low" />
+                  </div>
+                ))}
+              </div>
+            ) : users.length === 0 ? (
+              <p className="p-6 text-center text-sm text-ink-mute">No users yet.</p>
+            ) : filteredUsers.length === 0 ? (
+              <p className="p-6 text-center text-sm text-ink-mute">No users match your search.</p>
+            ) : (
+              filteredUsers.map((user) => (
+                <div key={user.id} className="space-y-3 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-ink">{user.name || 'Unnamed user'}</div>
+                      <div className="break-all font-mono text-xs text-ink-mute" dir="ltr">
+                        {user.email}
+                      </div>
+                    </div>
+                    {user.status === 'SUSPENDED' ? (
+                      <Badge variant="error" className="shrink-0 bg-red-100 text-red-800 border-red-200">
+                        Suspended
+                      </Badge>
+                    ) : (
+                      <Badge variant="default" className="shrink-0 bg-emerald-100 text-emerald-800 border-emerald-200">
+                        Active
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-ink-soft">
+                    <Badge variant="default" className="font-mono text-[11px]">
+                      {user.role}
+                    </Badge>
+                    <span>
+                      Plan: <b>{PLAN_LABELS[user.subscription?.plan || 'STARTER'] || 'Starter'}</b>
+                    </span>
+                    <span className="text-ink-faint">·</span>
+                    <span>
+                      {user.channels.length > 0
+                        ? `${user.channels.length} channel${user.channels.length > 1 ? 's' : ''}`
+                        : 'No channels'}
+                    </span>
+                  </div>
+
+                  {user.channels.length > 0 && (
+                    <div className="space-y-0.5 text-xs text-ink-soft">
+                      {user.channels.map((ch) => (
+                        <div key={ch.id} className="flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                          <span className="truncate">{ch.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-0.5">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-10 flex-1 border border-line"
+                      onClick={() => setSelectedUser(user)}
+                    >
+                      View details
+                    </Button>
+                    {user.status === 'SUSPENDED' ? (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-10 flex-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setModalAction('reactivate');
+                        }}
+                      >
+                        Reactivate
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        className="h-10 flex-1"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setModalAction('suspend');
+                        }}
+                      >
+                        Suspend
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -285,7 +397,7 @@ export default function AdminUsersPage() {
           title={`User details — ${selectedUser.email}`}
         >
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
               <div>
                 <span className="text-xs text-ink-mute block">Full name</span>
                 <span className="font-semibold">{selectedUser.name || 'Not provided'}</span>
@@ -342,16 +454,18 @@ export default function AdminUsersPage() {
             <div className="border-t border-line pt-3 space-y-4">
               <div>
                 <h4 className="font-bold text-sm text-ink mb-2">⚠️ Send a warning</h4>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     value={warnMessage}
                     onChange={(e) => setWarnMessage(e.target.value)}
+                    aria-label="Warning message for the user"
                     placeholder="Warning text for the user..."
-                    className="flex-1 h-10 rounded-md border border-line bg-paper-high px-3 text-sm"
+                    className="h-10 min-w-0 flex-1 rounded-md border border-line bg-paper-high px-3 text-sm"
                   />
                   <Button
                     variant="secondary"
                     size="sm"
+                    className="h-10 sm:h-8"
                     disabled={warnSending || !warnMessage.trim()}
                     onClick={async () => {
                       setWarnSending(true);
@@ -377,11 +491,11 @@ export default function AdminUsersPage() {
 
               <div>
                 <h4 className="font-bold text-sm text-ink mb-2">🎁 Grant a free plan</h4>
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-wrap items-center gap-2">
                   <select
                     value={freePlanId}
                     onChange={(e) => setFreePlanId(e.target.value)}
-                    className="h-10 rounded-md border border-line bg-paper-high px-3 text-sm"
+                    className="h-10 min-w-0 flex-1 rounded-md border border-line bg-paper-high px-3 text-sm sm:flex-none"
                   >
                     <option value="starter">Starter</option>
                     <option value="growth">Growth</option>
@@ -392,6 +506,7 @@ export default function AdminUsersPage() {
                     min={1}
                     value={freeDuration}
                     onChange={(e) => setFreeDuration(e.target.value)}
+                    aria-label="Free plan duration in days"
                     placeholder="Duration in days"
                     className="w-24 h-10 rounded-md border border-line bg-paper-high px-3 text-sm"
                   />
@@ -399,6 +514,7 @@ export default function AdminUsersPage() {
                   <Button
                     variant="green"
                     size="sm"
+                    className="h-10 sm:h-8"
                     disabled={freeSending}
                     onClick={async () => {
                       setFreeSending(true);

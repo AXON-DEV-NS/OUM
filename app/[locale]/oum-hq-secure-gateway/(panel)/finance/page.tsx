@@ -60,9 +60,9 @@ export default function AdminFinancePage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Platform finance & revenue</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Platform finance &amp; revenue</h1>
           <p className="text-sm text-ink-mute">
             Real-time monthly recurring revenue, subscription plan breakdown, churn analysis, and recent invoices.
           </p>
@@ -70,7 +70,7 @@ export default function AdminFinancePage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
         <Card className="bg-paper-high border-line shadow-xs">
           <CardHeader className="pb-2">
             <span className="text-xs font-semibold text-ink-mute uppercase tracking-wider">
@@ -141,7 +141,7 @@ export default function AdminFinancePage() {
                 <Badge variant="default">$29/mo</Badge>
               </div>
               <div className="text-2xl font-extrabold text-ink">
-                {finance.planBreakdown.STARTER} accounts
+                {finance.planBreakdown.STARTER} account{finance.planBreakdown.STARTER === 1 ? '' : 's'}
               </div>
               <p className="text-xs text-ink-mute">One channel, standard AI features</p>
             </div>
@@ -154,7 +154,7 @@ export default function AdminFinancePage() {
                 </Badge>
               </div>
               <div className="text-2xl font-extrabold text-blue-600">
-                {finance.planBreakdown.GROWTH} accounts
+                {finance.planBreakdown.GROWTH} account{finance.planBreakdown.GROWTH === 1 ? '' : 's'}
               </div>
               <p className="text-xs text-ink-mute">3 channels, Higgsfield generation</p>
             </div>
@@ -165,7 +165,7 @@ export default function AdminFinancePage() {
                 <Badge variant="default">$199/mo</Badge>
               </div>
               <div className="text-2xl font-extrabold text-ink">
-                {finance.planBreakdown.AGENCY} accounts
+                {finance.planBreakdown.AGENCY} account{finance.planBreakdown.AGENCY === 1 ? '' : 's'}
               </div>
               <p className="text-xs text-ink-mute">10 channels, priority AI queue</p>
             </div>
@@ -173,54 +173,87 @@ export default function AdminFinancePage() {
         </CardContent>
       </Card>
 
-      {/* Invoice History Table */}
+      {/* Invoice History */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardHeader>
           <CardTitle className="text-lg text-ink">Recent invoice history</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice ID</TableHead>
-                <TableHead>Customer email</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {finance.recentInvoices.length === 0 ? (
+          <div className="hidden lg:block">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-ink-mute">
-                    No invoices yet.
-                  </TableCell>
+                  <TableHead>Invoice ID</TableHead>
+                  <TableHead>Customer email</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Date</TableHead>
                 </TableRow>
-              ) : (
-                finance.recentInvoices.map((inv) => (
-                  <TableRow key={inv.id} className="hover:bg-paper">
-                    <TableCell className="font-mono text-xs font-semibold text-ink" dir="ltr">
-                      {inv.id}
-                    </TableCell>
-                    <TableCell className="text-xs text-ink-soft" dir="ltr">
-                      {inv.userEmail || '—'}
-                    </TableCell>
-                    <TableCell className="font-bold text-ink" dir="ltr">
-                      ${(inv.amountCents / 100).toFixed(2)} {inv.currency.toUpperCase()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="default" className="bg-emerald-100 text-emerald-800 border-emerald-200">
-                        {STATUS_LABELS[inv.status] || inv.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-xs text-ink-mute">
-                      {new Date(inv.createdAt).toLocaleDateString('en-US')}
+              </TableHeader>
+              <TableBody>
+                {finance.recentInvoices.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-ink-mute">
+                      No invoices yet.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  finance.recentInvoices.map((inv) => (
+                    <TableRow key={inv.id} className="hover:bg-paper">
+                      <TableCell className="font-mono text-xs font-semibold text-ink" dir="ltr">
+                        {inv.id}
+                      </TableCell>
+                      <TableCell className="text-xs text-ink-soft" dir="ltr">
+                        {inv.userEmail || '—'}
+                      </TableCell>
+                      <TableCell className="font-bold text-ink" dir="ltr">
+                        ${(inv.amountCents / 100).toFixed(2)} {inv.currency.toUpperCase()}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="default" className="bg-emerald-100 text-emerald-800 border-emerald-200">
+                          {STATUS_LABELS[inv.status] || inv.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-mono text-xs text-ink-mute">
+                        {new Date(inv.createdAt).toLocaleDateString('en-US')}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile: invoice cards */}
+          <div className="divide-y divide-line lg:hidden">
+            {finance.recentInvoices.length === 0 ? (
+              <p className="p-6 text-center text-sm text-ink-mute">No invoices yet.</p>
+            ) : (
+              finance.recentInvoices.map((inv) => (
+                <div key={inv.id} className="space-y-2 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="break-all font-mono text-xs font-semibold text-ink" dir="ltr">
+                      {inv.id}
+                    </span>
+                    <Badge variant="default" className="shrink-0 bg-emerald-100 text-emerald-800 border-emerald-200">
+                      {STATUS_LABELS[inv.status] || inv.status}
+                    </Badge>
+                  </div>
+                  <div className="break-all text-xs text-ink-soft" dir="ltr">
+                    {inv.userEmail || '—'}
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-bold text-ink" dir="ltr">
+                      ${(inv.amountCents / 100).toFixed(2)} {inv.currency.toUpperCase()}
+                    </span>
+                    <span className="font-mono text-xs text-ink-mute">
+                      {new Date(inv.createdAt).toLocaleDateString('en-US')}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

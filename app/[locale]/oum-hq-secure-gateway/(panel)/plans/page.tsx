@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Gift, Loader2, Zap } from 'lucide-react';
 
 interface PlanView {
   id: string;
@@ -171,10 +171,13 @@ export default function AdminPlansPage() {
       {/* Enable / disable automatic trial */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <span>⚡ Automatic trial for new customers (14 days)</span>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <CardTitle className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-ink-faint" aria-hidden="true" />
+                  Automatic trial for new customers (14 days)
+                </span>
                 <Badge variant={autoTrialEnabled ? 'green' : 'warning'}>
                   {autoTrialEnabled ? 'Enabled — 14 days free' : 'Disabled — subscription required to start'}
                 </Badge>
@@ -188,6 +191,7 @@ export default function AdminPlansPage() {
             <Button
               variant={autoTrialEnabled ? 'secondary' : 'green'}
               disabled={togglingTrial}
+              className="h-10 w-full shrink-0 sm:w-auto"
               onClick={async () => {
                 setTogglingTrial(true);
                 try {
@@ -227,7 +231,10 @@ export default function AdminPlansPage() {
       {/* Site-wide free access */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardHeader>
-          <CardTitle>🎁 Site-wide free access</CardTitle>
+          <CardTitle className="inline-flex items-center gap-2">
+            <Gift className="h-5 w-5 text-ink-faint" aria-hidden="true" />
+            Site-wide free access
+          </CardTitle>
           <p className="text-xs text-ink-mute">
             Open a plan (or all plans) for free — for everyone or for a specific person — for a duration you choose.
           </p>
@@ -240,7 +247,7 @@ export default function AdminPlansPage() {
               <button
                 type="button"
                 onClick={() => setSiteTarget('all')}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors px-edge ${
+                className={`h-10 rounded-full px-4 text-sm font-medium transition-colors px-edge ${
                   siteTarget === 'all' ? 'bg-ink text-paper-high px-edge-duo' : 'text-ink-mute hover:text-ink'
                 }`}
               >
@@ -249,7 +256,7 @@ export default function AdminPlansPage() {
               <button
                 type="button"
                 onClick={() => setSiteTarget('user')}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors px-edge ${
+                className={`h-10 rounded-full px-4 text-sm font-medium transition-colors px-edge ${
                   siteTarget === 'user' ? 'bg-ink text-paper-high px-edge-duo' : 'text-ink-mute hover:text-ink'
                 }`}
               >
@@ -264,7 +271,7 @@ export default function AdminPlansPage() {
               <select
                 value={siteUserId}
                 onChange={(e) => setSiteUserId(e.target.value)}
-                className="h-10 min-w-[220px] rounded-md border border-line bg-paper-high px-3 text-sm"
+                className="h-10 w-full rounded-md border border-line bg-paper-high px-3 text-sm sm:w-auto sm:min-w-[220px]"
               >
                 <option value="">Select a user...</option>
                 {siteUsers.map((u) => (
@@ -292,6 +299,7 @@ export default function AdminPlansPage() {
                 min={1}
                 value={siteDuration}
                 onChange={(e) => setSiteDuration(e.target.value)}
+                aria-label="Free access duration in days"
                 placeholder="Duration"
                 className="w-24 h-10 rounded-md border border-line bg-paper-high px-3 text-sm"
               />
@@ -300,6 +308,7 @@ export default function AdminPlansPage() {
 
             <Button
               variant="green"
+              className="h-10 w-full sm:w-auto"
               disabled={siteSending || (siteTarget === 'user' && !siteUserId)}
               onClick={async () => {
                 setSiteSending(true);

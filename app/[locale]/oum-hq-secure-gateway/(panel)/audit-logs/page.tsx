@@ -95,9 +95,9 @@ export default function AdminAuditLogsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Immutable audit logs</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-ink sm:text-2xl">Immutable audit logs</h1>
           <p className="text-sm text-ink-mute">
             Platform-wide trail of sensitive actions (authentication events, admin actions, billing changes, data deletion).
           </p>
@@ -107,22 +107,26 @@ export default function AdminAuditLogsPage() {
       {/* Filter Bar */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardContent className="p-4">
-          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
-            <Input
-              type="text"
-              placeholder="Search by action, actor ID, or target..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1"
-            />
+          <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row">
+            <div className="min-w-0 flex-1">
+              <Input
+                type="text"
+                aria-label="Search audit logs by action, actor ID, or target"
+                placeholder="Search by action, actor ID, or target..."
+                className="placeholder:text-ink-mute"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
 
             <select
+              aria-label="Filter audit logs by action"
               value={actionFilter}
               onChange={(e) => {
                 setActionFilter(e.target.value);
                 fetchLogs(search, e.target.value);
               }}
-              className="px-3 py-2 border border-line-strong rounded-lg text-sm bg-paper-high text-ink-soft focus:outline-none focus:ring-2 focus:ring-ink"
+              className="h-10 rounded-lg border border-line-strong bg-paper-high px-3 text-sm text-ink-soft focus:outline-none focus:ring-2 focus:ring-ink sm:w-auto"
             >
               <option value="">All actions</option>
               {ACTION_OPTIONS.map((opt) => (
@@ -132,31 +136,35 @@ export default function AdminAuditLogsPage() {
               ))}
             </select>
 
-            <Button type="submit" variant="primary">
-              Filter
-            </Button>
-
-            {(search || actionFilter) && (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  setSearch('');
-                  setActionFilter('');
-                  fetchLogs('', '');
-                }}
-              >
-                Reset
+            <div className="flex gap-2">
+              <Button type="submit" variant="primary" className="h-10 flex-1 sm:flex-none">
+                Filter
               </Button>
-            )}
+
+              {(search || actionFilter) && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="h-10 flex-1 sm:flex-none"
+                  onClick={() => {
+                    setSearch('');
+                    setActionFilter('');
+                    fetchLogs('', '');
+                  }}
+                >
+                  Reset
+                </Button>
+              )}
+            </div>
           </form>
         </CardContent>
       </Card>
 
-      {/* Audit Log Table */}
+      {/* Audit Log Table (desktop) + cards (mobile) */}
       <Card className="bg-paper-high border-line shadow-xs">
         <CardContent className="p-0">
-          <Table>
+          <div className="hidden lg:block">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Time</TableHead>
@@ -195,7 +203,7 @@ export default function AdminAuditLogsPage() {
                         <TableCell>
                           <span className="font-mono text-xs text-ink font-semibold" dir="ltr">{log.actorId}</span>
                           {log.actorRole && (
-                            <span className="text-[10px] text-ink-faint block">
+                            <span className="text-[10px] text-ink-mute block">
                               ({log.actorRole === 'admin' ? 'admin' : log.actorRole === 'client' ? 'client' : log.actorRole})
                             </span>
                           )}
@@ -218,7 +226,7 @@ export default function AdminAuditLogsPage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => setExpandedLog(isExpanded ? null : log.id)}
-                            className="text-xs"
+                            className="h-10 text-xs"
                           >
                             {isExpanded ? 'Hide payload' : 'View payload'}
                           </Button>
@@ -245,6 +253,76 @@ export default function AdminAuditLogsPage() {
               )}
             </TableBody>
           </Table>
+          </div>
+
+          {/* Mobile: audit cards with an expandable JSON payload */}
+          <div className="divide-y divide-line lg:hidden">
+            {loading ? (
+              <div className="space-y-3 p-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="space-y-2 rounded-lg border border-line p-3">
+                    <div className="h-4 w-32 animate-pulse rounded bg-paper-low" />
+                    <div className="h-3 w-48 animate-pulse rounded bg-paper-low" />
+                  </div>
+                ))}
+              </div>
+            ) : logs.length === 0 ? (
+              <p className="p-6 text-center text-sm text-ink-mute">
+                No audit logs match the current filters.
+              </p>
+            ) : (
+              logs.map((log) => {
+                const isExpanded = expandedLog === log.id;
+                return (
+                  <div key={log.id} className="space-y-2 p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <Badge
+                        variant="default"
+                        className={`font-mono text-[11px] ${getActionBadgeColor(log.action)}`}
+                      >
+                        {ACTION_LABELS[log.action] || log.action}
+                      </Badge>
+                      <span className="shrink-0 font-mono text-[11px] text-ink-mute">
+                        {new Date(log.timestamp).toLocaleString('en-US')}
+                      </span>
+                    </div>
+
+                    <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                      <dt className="text-ink-mute">Actor</dt>
+                      <dd className="break-all font-mono text-ink" dir="ltr">
+                        {log.actorId}
+                        {log.actorRole ? ` (${log.actorRole})` : ''}
+                      </dd>
+                      <dt className="text-ink-mute">Target</dt>
+                      <dd className="break-all font-mono text-ink-soft" dir="ltr">
+                        {log.targetUserId || '—'}
+                      </dd>
+                      <dt className="text-ink-mute">IP</dt>
+                      <dd className="font-mono text-ink-soft" dir="ltr">
+                        {log.ipAddress || '127.0.0.1'}
+                      </dd>
+                    </dl>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setExpandedLog(isExpanded ? null : log.id)}
+                      className="h-10 w-full border border-line text-xs"
+                      aria-expanded={isExpanded}
+                    >
+                      {isExpanded ? 'Hide payload' : 'View payload'}
+                    </Button>
+
+                    {isExpanded && (
+                      <pre className="overflow-x-auto rounded-lg bg-ink p-3 font-mono text-[11px] leading-relaxed text-emerald-400">
+                        {JSON.stringify(log.metadata || { note: 'No metadata payload attached' }, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
