@@ -49,6 +49,34 @@ Autonomous AI-powered YouTube channel manager. Research, script drafting, compli
    ```
    Open [http://localhost:3000](http://localhost:3000) to view the application.
 
+## Production Pipeline (13 stages, S0 → S12)
+
+The engine in `src/pipeline/` moves every run through 13 gated stages — research → script → storyboard → assets → render → SEO → final QA → human approval → private-first publish → timeline checks → learning. The guarantees live in code, never in a prompt:
+
+- **Fail Early / Fail Cheap**: tier order (`text < image < video < publish`) is enforced before every stage; budget floors stop doomed runs before any spend.
+- **Deterministic checks, not vibes**: zod contracts + code checklists decide pass/fail; `src/skills/` holds the modular skill arsenal (50 skills: 46 implemented, 4 explicitly deferred to wave 2).
+- **The judge is never the writer**: QA2/QA3 judge skills must run on a different model family; without two keys the run parks (it never "self-approves").
+- **Private first**: S10 uploads private, schedules, parks until the slot, then verifies and flips public explicitly.
+- **Holds are typed**: `timing`/`provider` holds self-heal on the next tick; `qa`/`budget`/`gate`/`judge` holds move only through a human decision.
+
+```bash
+npm test        # engine + checks + registry tests (offline, stub providers, no keys needed)
+```
+
+Pipeline API (session-protected):
+
+| Route | Purpose |
+| --- | --- |
+| `GET/POST /api/pipeline/runs` | list recent runs / queue a new run (channel, path, budget cap) |
+| `GET /api/pipeline/runs/[id]` | run + stages + QA evidence + ledger + notifications |
+| `POST /api/pipeline/runs/[id]/advance` | advance the run (bounded steps, guarded) |
+| `POST /api/pipeline/runs/[id]/decision` | human approve / reject / resume / retry |
+| `GET/POST /api/cron/pipeline-tick` | catch-up tick: repairs stale stages, wakes due runs, prunes old notifications (Bearer `CRON_SECRET` in production) |
+
+Vercel Hobby allows one cron invocation per day, so the tick is built for catch-up — nothing is lost between invocations. For minute-level wakeups (S10/S11 timing), either upgrade the plan or point an external pinger (for example cron-job.org) at `/api/cron/pipeline-tick` with the `Authorization: Bearer $CRON_SECRET` header.
+
+Owner notifications are written in-app and best-effort mirrored to Telegram when `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` are set. Database backups: `node scripts/pipeline/db-backup.mjs` (keeps the newest 10 dumps).
+
 ## Admin Setup
 
 To initialize or update the admin credentials and TOTP secret:

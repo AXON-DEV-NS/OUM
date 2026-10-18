@@ -29,21 +29,22 @@ async function handle(request: NextRequest) {
     const summary = await runDailyResearch();
 
     console.log(
-      `[cron/daily-research] ran at ${startedAt} — processed ${summary.processed} niche(s): ${JSON.stringify(summary)}`
+      "[cron/daily-research] ran:",
+      startedAt,
+      `processed ${summary.processed} niche(s)`,
+      JSON.stringify(summary)
     );
 
     return NextResponse.json({ ok: true, startedAt, summary });
   } catch (error) {
     if (error instanceof KnowledgeBaseUnavailableError) {
-      console.warn(
-        `[cron/daily-research] skipped at ${startedAt}: ${error.message}`
-      );
+      console.warn("[cron/daily-research] skipped:", startedAt, error.message);
       return NextResponse.json(
         { ok: false, error: error.message, code: "db_not_configured" },
         { status: 503 }
       );
     }
-    console.error(`[cron/daily-research] failed at ${startedAt}`, error);
+    console.error("[cron/daily-research] failed:", startedAt, error);
     return NextResponse.json(
       { ok: false, error: "The research job failed." },
       { status: 500 }
